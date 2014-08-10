@@ -1,0 +1,71 @@
+﻿Build started 8/10/2014 1:46:01 PM.
+     1>Project "D:\Projects\OpenWorm\LBSE_lib\LBSE_lib.vcxproj" on node 2 (Build target(s)).
+     1>InitializeBuildStatus:
+         Creating "Debug\LBSE_lib.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       PreBuildEvent:
+         Description: Generate include files
+         if not exist "D:\Projects\OpenWorm\include\" mkdir "D:\Projects\OpenWorm\include\"
+         if not exist "D:\Projects\OpenWorm\include\LBSE_lib\" mkdir "D:\Projects\OpenWorm\include\LBSE_lib\"
+         xcopy "D:\Projects\OpenWorm\LBSE_lib\*.h"  "D:\Projects\OpenWorm\include\LBSE_lib\" /y /e
+         D:\Projects\OpenWorm\LBSE_lib\lbse_extractor.h
+         D:\Projects\OpenWorm\LBSE_lib\lbse_iterationSolver.h
+         D:\Projects\OpenWorm\LBSE_lib\lbse_openCLManager.h
+         D:\Projects\OpenWorm\LBSE_lib\lbse_skeleton.h
+         4 File(s) copied
+       GenerateTargetFrameworkMonikerAttribute:
+       Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /AI"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0" /AI"C:\Program Files (x86)\Windows Kits\8.0\References\CommonConfiguration\Neutral" /Zi /clr /nologo /W0 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _UNICODE /D UNICODE /EHa /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /TP /analyze- /errorReport:prompt /clr:nostdlib lbse_extractor.cpp lbse_iterationSolver.cpp lbse_openCLManager.cpp lbse_skeleton.cpp
+         lbse_extractor.cpp
+         lbse_iterationSolver.cpp
+     1>C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\xutility(2176): warning C4996: 'std::_Copy_impl': Function call with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct. To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. See documentation on how to use Visual C++ 'Checked Iterators'
+                 C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\xutility(2157) : see declaration of 'std::_Copy_impl'
+                 lbse_iterationSolver.cpp(2978) : see reference to function template instantiation '_OutIt std::copy<boost::numeric::ublas::vector<T,A>::iterator,boost::numeric::ublas::vector<T,A>::iterator>(_InIt,_InIt,_OutIt)' being compiled
+                 with
+                 [
+                     _OutIt=boost::numeric::ublas::vector<float,boost::numeric::ublas::unbounded_array<float>>::iterator,
+                     T=float,
+                     A=boost::numeric::ublas::unbounded_array<float>,
+                     _InIt=boost::numeric::ublas::vector<float,boost::numeric::ublas::unbounded_array<float>>::iterator
+                 ]
+                 C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\xutility(2157) : see declaration of 'std::_Copy_impl'
+                 C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\xutility(2157) : see declaration of 'std::_Copy_impl'
+     1>C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\xmemory(348): warning C4996: 'std::_Uninitialized_copy0': Function call with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct. To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. See documentation on how to use Visual C++ 'Checked Iterators'
+                 C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\xmemory(333) : see declaration of 'std::_Uninitialized_copy0'
+                 D:\Projects\OpenWorm\Lib\include\boost/numeric/ublas/storage.hpp(94) : see reference to function template instantiation '_FwdIt std::uninitialized_copy<const float*,float*>(_InIt,_InIt,_FwdIt)' being compiled
+                 with
+                 [
+                     _FwdIt=float *,
+                     _InIt=const float *
+                 ]
+                 D:\Projects\OpenWorm\Lib\include\boost/numeric/ublas/storage.hpp(89) : while compiling class template member function 'boost::numeric::ublas::unbounded_array<T>::unbounded_array(const boost::numeric::ublas::unbounded_array<T> &)'
+                 with
+                 [
+                     T=float
+                 ]
+                 D:\Projects\OpenWorm\Lib\include\boost/numeric/ublas/vector.hpp(111) : see reference to function template instantiation 'boost::numeric::ublas::unbounded_array<T>::unbounded_array(const boost::numeric::ublas::unbounded_array<T> &)' being compiled
+                 with
+                 [
+                     T=float
+                 ]
+         lbse_openCLManager.cpp
+         lbse_skeleton.cpp
+         Generating Code...
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /Zi /clr /nologo /W0 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _UNICODE /D UNICODE /EHa /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /TP /analyze- /errorReport:prompt "C:\Users\mado\AppData\Local\Temp\.NETFramework,Version=v4.0.AssemblyAttributes.cpp"
+         .NETFramework,Version=v4.0.AssemblyAttributes.cpp
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\Lib.exe /OUT:"D:\Projects\OpenWorm\Debug\LBSE_lib_d.lib" /NOLOGO /WX:NO Debug\lbse_extractor.obj
+         Debug\lbse_iterationSolver.obj
+         Debug\lbse_openCLManager.obj
+         Debug\lbse_skeleton.obj
+         "Debug\.NETFramework,Version=v4.0.AssemblyAttributes.obj"
+     1>.NETFramework,Version=v4.0.AssemblyAttributes.obj : warning LNK4221: This object file does not define any previously undefined public symbols, so it will not be used by any link operation that consumes this library
+         LBSE_lib.vcxproj -> D:\Projects\OpenWorm\Debug\LBSE_lib_d.lib
+       FinalizeBuildStatus:
+         Deleting file "Debug\LBSE_lib.unsuccessfulbuild".
+         Touching "Debug\LBSE_lib.lastbuildstate".
+     1>Done Building Project "D:\Projects\OpenWorm\LBSE_lib\LBSE_lib.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:18.98

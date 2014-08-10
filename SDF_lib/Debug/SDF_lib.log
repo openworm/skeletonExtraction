@@ -1,0 +1,12 @@
+﻿Build started 8/10/2014 1:46:01 PM.
+     1>Project "D:\Projects\OpenWorm\SDF_lib\SDF_lib.vcxproj" on node 4 (Build target(s)).
+     1>InitializeBuildStatus:
+         Creating "Debug\SDF_lib.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       FinalizeBuildStatus:
+         Deleting file "Debug\SDF_lib.unsuccessfulbuild".
+         Touching "Debug\SDF_lib.lastbuildstate".
+     1>Done Building Project "D:\Projects\OpenWorm\SDF_lib\SDF_lib.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.03

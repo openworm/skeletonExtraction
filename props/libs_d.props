@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <LibraryPath>$(SolutionDir)\Lib\lib\debug\OpenMesh;$(SolutionDir)\Lib\lib\debug\Boost;$(SolutionDir)\Lib\lib\debug\;$(SolutionDir)\Lib\lib\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\Lib\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalDependencies>freetype253_D.lib;opengl32.lib;glu32.lib;glew32.lib;OpenMeshCored.lib;fade2D_vc11_Debug.lib;OpenMeshToolsd.lib;assimp.lib;DevIL.lib;poly2tri_d.lib;tinyxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup />
+</Project>

@@ -1,0 +1,36 @@
+﻿Build started 8/10/2014 1:46:01 PM.
+     1>Project "D:\Projects\OpenWorm\PCT_lib\PCT_lib.vcxproj" on node 5 (Build target(s)).
+     1>InitializeBuildStatus:
+         Creating "Debug\PCT_lib.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       PreBuildEvent:
+         Description: Generate include files
+         if not exist "D:\Projects\OpenWorm\include\" mkdir "D:\Projects\OpenWorm\include\"
+         if not exist "D:\Projects\OpenWorm\include\PCT_lib\" mkdir "D:\Projects\OpenWorm\include\PCT_lib\"
+         xcopy "D:\Projects\OpenWorm\PCT_lib\*.h"  "D:\Projects\OpenWorm\include\PCT_lib\" /y /e
+         D:\Projects\OpenWorm\PCT_lib\Delaunay.h
+         D:\Projects\OpenWorm\PCT_lib\pct_eig3.h
+         D:\Projects\OpenWorm\PCT_lib\pct_PCLManager.h
+         D:\Projects\OpenWorm\PCT_lib\pct_PointCloudTriangulation.h
+         D:\Projects\OpenWorm\PCT_lib\PCT_structures.h
+         5 File(s) copied
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /ID:\Projects\OpenWorm\\Lib\include /ZI /nologo /W1 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _CRT_SECURE_NO_WARNINGS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt pct_eig3.cpp pct_PCLManager.cpp pct_PointCloudTriangulation.cpp PCT_structures.cpp
+         PCT_structures.cpp
+         pct_PointCloudTriangulation.cpp
+         pct_PCLManager.cpp
+         pct_eig3.cpp
+         Generating Code...
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\Lib.exe /OUT:"D:\Projects\OpenWorm\Debug\PCT_lib_d.lib" /NOLOGO /WX:NO Debug\pct_eig3.obj
+         Debug\pct_PCLManager.obj
+         Debug\pct_PointCloudTriangulation.obj
+         Debug\PCT_structures.obj
+         PCT_lib.vcxproj -> D:\Projects\OpenWorm\Debug\PCT_lib_d.lib
+       FinalizeBuildStatus:
+         Deleting file "Debug\PCT_lib.unsuccessfulbuild".
+         Touching "Debug\PCT_lib.lastbuildstate".
+     1>Done Building Project "D:\Projects\OpenWorm\PCT_lib\PCT_lib.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:05.86

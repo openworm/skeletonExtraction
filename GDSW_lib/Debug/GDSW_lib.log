@@ -1,0 +1,25 @@
+﻿Build started 8/10/2014 1:46:01 PM.
+     1>Project "D:\Projects\OpenWorm\GDSW_lib\GDSW_lib.vcxproj" on node 3 (Build target(s)).
+     1>InitializeBuildStatus:
+         Creating "Debug\GDSW_lib.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       PreBuildEvent:
+         Description: Generate includes
+         if not exist "D:\Projects\OpenWorm\include\" mkdir "D:\Projects\OpenWorm\include\"
+         if not exist "D:\Projects\OpenWorm\include\GDSW_lib\" mkdir "D:\Projects\OpenWorm\include\GDSW_lib\"
+         xcopy "D:\Projects\OpenWorm\GDSW_lib\*.h"  "D:\Projects\OpenWorm\include\GDSW_lib\" /y /e
+         D:\Projects\OpenWorm\GDSW_lib\gdsw_graphAlgorithms.h
+         1 File(s) copied
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt gdsw_graphAlgorithms.cpp
+         gdsw_graphAlgorithms.cpp
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\Lib.exe /OUT:"D:\Projects\OpenWorm\Debug\GDSW_lib_d.lib" /NOLOGO Debug\gdsw_graphAlgorithms.obj
+         GDSW_lib.vcxproj -> D:\Projects\OpenWorm\Debug\GDSW_lib_d.lib
+       FinalizeBuildStatus:
+         Deleting file "Debug\GDSW_lib.unsuccessfulbuild".
+         Touching "Debug\GDSW_lib.lastbuildstate".
+     1>Done Building Project "D:\Projects\OpenWorm\GDSW_lib\GDSW_lib.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:03.87
