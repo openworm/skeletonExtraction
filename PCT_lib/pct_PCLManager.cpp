@@ -135,8 +135,8 @@ void getTangentPlanePCA_orig(int numOfPoints, CVector3 * points, CVector3 * n, C
 	double V[3][3];
 	double d[3];
 
-	//Log::log(0, "matica C: ");
-	//Log::log(0, C);
+	//logg.log(0, "matica C: ");
+	//logg.log(0, C);
 
 	for (int i=0; i<3; i++)
 		for (int j=0; j<3; j++)
@@ -229,8 +229,8 @@ void getTangentPlanePCAWithSVD_orig(int numOfPoints, CVector3 * points, CVector3
 	double V[3][3];
 	double d[3];
 
-	//Log::log(0, "matica C: ");
-	//Log::log(0, C);
+	//logg.log(0, "matica C: ");
+	//logg.log(0, C);
 
 	for (int i=0; i<3; i++)
 		for (int j=0; j<3; j++)
@@ -383,12 +383,12 @@ void getTangentPlanePCAWithSVD_orig(int numOfPoints, CVector3 * points, CVector3
 		CVector3 ev2;
 		CVector3 ev3;
 
-		Log::log(0, "okolie: ");
+		logg.log(0, "okolie: ");
 
 		k = 0;
 		for (std::set<int>::iterator it=neighs.begin(); it!=neighs.end(); ++it){
 			neighPoints[k] = pMesh->pVerts[*it];
-			Log::log(0, "neighs: ", pMesh->pVerts[*it]);
+			logg.log(0, "neighs: ", pMesh->pVerts[*it]);
 			k++;
 		}
 
@@ -408,7 +408,7 @@ void getTangentPlanePCAWithSVD_orig(int numOfPoints, CVector3 * points, CVector3
 
 //		CVector3 p2_proj = ProjectPointIntoPlane(p2, p, n);
 
-		//Log::log(0, "normala tang. plochy: ", n);
+		//logg.log(0, "normala tang. plochy: ", n);
 
 		/////////////// PROJECTION INTO TANGENT PLANE ///////////////
 
@@ -526,7 +526,7 @@ void getTangentPlanePCAWithSVD_orig(int numOfPoints, CVector3 * points, CVector3
 		//}
 
 
-		//Log::log(0, E_local);
+		//logg.log(0, E_local);
 		//return E_local;
 //}
 /*

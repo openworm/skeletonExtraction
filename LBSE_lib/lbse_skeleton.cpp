@@ -113,7 +113,7 @@ void copyMeshGraph(MeshGraph * in, MeshGraph * out){
 //---------------------------------------------------------------------------
 /*CVector3 * createModelVerticesArray(MeshGraph * mesh){
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD createModelVerticesArray STARTED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD createModelVerticesArray STARTED");
 	#endif
 
 	CVector3 * arr = new CVector3[mesh->numOfVertices];
@@ -121,7 +121,7 @@ void copyMeshGraph(MeshGraph * in, MeshGraph * out){
     	arr[i] = mesh->pVerts[i];
 	}
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD createModelVerticesArray ENDED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD createModelVerticesArray ENDED");
 	#endif
 
 	return arr;
@@ -139,7 +139,7 @@ vector<CVector3> findNeighborhood(int ind, vector<CVector3> v, float r){
 //---------------------------------------------------------------------------
 void calculateOneRingArea(MeshGraph * pMesh, t3DModel *pModel, float * p){
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD calculateOneRingArea STARTED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD calculateOneRingArea STARTED");
 	#endif
 
 		for (int i = 0; i < pMesh->numOfVertices; i++) {
@@ -190,7 +190,7 @@ void calculateOneRingArea(MeshGraph * pMesh, t3DModel *pModel, float * p){
 		//}
 
 	#ifdef _LOG	
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD calculateOneRingArea ENDED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD calculateOneRingArea ENDED");
 	#endif
 }
 //---------------------------------------------------------------------------
@@ -199,10 +199,10 @@ void collapseTriangle(MeshGraph * pMesh, boost::unordered_map<int, vector<int> >
 	CVector3 center = (pMesh->pVerts[k] + pMesh->pVerts[i] + pMesh->pVerts[j]) / 3;
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_WARNING, "Collapsujem, trojuholnik");
-		Log::log(LOG_LEVEL_WARNING, "i: ",i);
-		Log::log(LOG_LEVEL_WARNING, "j: ",j);
-		Log::log(LOG_LEVEL_WARNING, "k: ",k);
+		logg.log(LOG_LEVEL_WARNING, "Collapsujem, trojuholnik");
+		logg.log(LOG_LEVEL_WARNING, "i: ",i);
+		logg.log(LOG_LEVEL_WARNING, "j: ",j);
+		logg.log(LOG_LEVEL_WARNING, "k: ",k);
 	#endif
 
 		for (int m = 0; m < pMesh->numOfVertices; m++) {
@@ -394,7 +394,7 @@ SN::SkeletonNode * findNodeWithIdInTree(SN::SkeletonNode * node, int id){
 // Connectivity surgery
 SurgeryGraph * createSurgeryGraphFromMeshGraph(MeshGraph * pMesh){
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD createSurgeryGraphFromMeshGraph STARTED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD createSurgeryGraphFromMeshGraph STARTED");
 	#endif
 	SurgeryGraph * pGraph = new SurgeryGraph();
 	pGraph->numOfVertices = pMesh->numOfVertices;
@@ -411,7 +411,7 @@ SurgeryGraph * createSurgeryGraphFromMeshGraph(MeshGraph * pMesh){
 	}
 	return pGraph;
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD createSurgeryGraphFromMeshGraph ENDED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD createSurgeryGraphFromMeshGraph ENDED");
 	#endif
 }
 
@@ -484,12 +484,12 @@ void collapseCloseVertices(SurgeryGraph * pGraph, float groupingTolerance, float
 //---------------------------------------------------------------------------
 SurgeryGraph * createSkeletonFromSurgeryGraph(SurgeryGraph * pGraph, CVector3 * modelVertices, boost::unordered_map<int, vector<int> > mgDegeneratesMapping ,SN::SkeletonNode * root, int * wantedNumberOfBones, float groupingTolerance, float groupingToleranceSDFMulti, bool doBranchingSimplification,bool doDisplacementShifting, bool groupingWithoutEdge, bool cyclicSkeleton, CVector3 * sdfValues, bool useSDFBasedGroupingDistance){
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD createSkeletonFromSurgeryGraph STARTED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD createSkeletonFromSurgeryGraph STARTED");
 	#endif
 	int actualNumOfBones = pGraph->numOfVertices;
 
-	//Log::log(0, "Matica E PRED");
-	//Log::log(0, pGraph->E);
+	//logg.log(0, "Matica E PRED");
+	//logg.log(0, pGraph->E);
 
 	for (int i = 0; i < pGraph->numOfVertices; i++)
 		pGraph->pointClouds[i].push_back(i);
@@ -522,22 +522,22 @@ SurgeryGraph * createSkeletonFromSurgeryGraph(SurgeryGraph * pGraph, CVector3 * 
 		}
 	}
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_C_PARAMS, "actualNumOfBones na zaciatku : ",actualNumOfBones);
+		logg.log(LOG_LEVEL_C_PARAMS, "actualNumOfBones na zaciatku : ",actualNumOfBones);
 	#endif
 	//collapse very close points
 
 	collapseCloseVertices(pGraph, groupingTolerance, groupingToleranceSDFMulti, &actualNumOfBones, wantedNumberOfBones, groupingWithoutEdge, sdfValues, useSDFBasedGroupingDistance);
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_C_PARAMS, "actualNumOfBones po odstraneni blizkych : ",actualNumOfBones);
-		Log::log(LOG_LEVEL_DUMP, "Matica E po odstraneni blizkych");
-		Log::log(LOG_LEVEL_DUMP, pGraph->E);
+		logg.log(LOG_LEVEL_C_PARAMS, "actualNumOfBones po odstraneni blizkych : ",actualNumOfBones);
+		logg.log(LOG_LEVEL_DUMP, "Matica E po odstraneni blizkych");
+		logg.log(LOG_LEVEL_DUMP, pGraph->E);
 	#endif
 
 	//iterate and collapse until we got wanted number of bones
 	while(actualNumOfBones > *wantedNumberOfBones) {
 		#ifdef _LOG
-			Log::log(LOG_LEVEL_C_PARAMS, "actualNumOfBones : ",actualNumOfBones);
+			logg.log(LOG_LEVEL_C_PARAMS, "actualNumOfBones : ",actualNumOfBones);
 		#endif
 		// for every edge
 		int minIndexI = 0;
@@ -560,7 +560,7 @@ SurgeryGraph * createSkeletonFromSurgeryGraph(SurgeryGraph * pGraph, CVector3 * 
 
 	   halfEdgeCollapse(pGraph, minIndexI, minIndexJ, &actualNumOfBones, true);
 	   #ifdef _LOG
-			Log::log(LOG_LEVEL_C_PARAMS, "iterativny  halfEdgeCollapse : ",actualNumOfBones);
+			logg.log(LOG_LEVEL_C_PARAMS, "iterativny  halfEdgeCollapse : ",actualNumOfBones);
 	   #endif
 	}
 
@@ -568,16 +568,16 @@ SurgeryGraph * createSkeletonFromSurgeryGraph(SurgeryGraph * pGraph, CVector3 * 
 	// lets create collapsed hash map from point clouds
 	int segInd = 0;
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_C_PARAMS, "pointClouds na konci");
+		logg.log(LOG_LEVEL_C_PARAMS, "pointClouds na konci");
 	#endif
 
 	/*for (int i = 0; i < pGraph->pointClouds.size(); i++){
 		if ( pGraph->pointClouds[i].size() > 0){
-			Log::log(2, "pointClouds pre vrchol : ",i);
-			Log::log(2, "pointClouds velkost : ",(int)pGraph->pointClouds[i].size());
+			logg.log(2, "pointClouds pre vrchol : ",i);
+			logg.log(2, "pointClouds velkost : ",(int)pGraph->pointClouds[i].size());
 			for (int j = 0; j < pGraph->pointClouds[i].size(); j++){
 				pGraph->collapsed[pGraph->pointClouds[i][j]] = i;
-				Log::log(2, "clouditem : ",pGraph->pointClouds[i][j]);
+				logg.log(2, "clouditem : ",pGraph->pointClouds[i][j]);
 			}
 		}
 	}*/
@@ -585,8 +585,8 @@ SurgeryGraph * createSkeletonFromSurgeryGraph(SurgeryGraph * pGraph, CVector3 * 
 	*wantedNumberOfBones = actualNumOfBones;
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_NOTE, "SKELETON TRIMED");
-		Log::log(LOG_LEVEL_C_PARAMS, "actualNumOfBones : ",actualNumOfBones);
+		logg.log(LOG_LEVEL_NOTE, "SKELETON TRIMED");
+		logg.log(LOG_LEVEL_C_PARAMS, "actualNumOfBones : ",actualNumOfBones);
 	#endif
 
 	if (doDisplacementShifting)
@@ -638,8 +638,8 @@ SurgeryGraph * createSkeletonFromSurgeryGraph(SurgeryGraph * pGraph, CVector3 * 
 
 	
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_DUMP, "Matica E pred vytvaranim stromu");
-		Log::log(LOG_LEVEL_DUMP, pGraph->E);
+		logg.log(LOG_LEVEL_DUMP, "Matica E pred vytvaranim stromu");
+		logg.log(LOG_LEVEL_DUMP, pGraph->E);
 	#endif
 
 	vector<int*> cycleEnclosing;
@@ -674,8 +674,8 @@ SurgeryGraph * createSkeletonFromSurgeryGraph(SurgeryGraph * pGraph, CVector3 * 
 
 			if (pGraph->E[node->id - 1][i] && node->id - 1 != i) {
 				#ifdef _LOG
-					Log::log(LOG_LEVEL_DUMP, "matica E");
-					Log::log(LOG_LEVEL_DUMP, pGraph->E);
+					logg.log(LOG_LEVEL_DUMP, "matica E");
+					logg.log(LOG_LEVEL_DUMP, pGraph->E);
 				#endif
 				pGraph->E[node->id - 1][i] = false;
 				pGraph->E[i][node->id - 1] = false;
@@ -690,7 +690,7 @@ SurgeryGraph * createSkeletonFromSurgeryGraph(SurgeryGraph * pGraph, CVector3 * 
 						}
 
 						#ifdef _LOG
-							Log::log(LOG_LEVEL_DUMP, "skeleton node isInCycleEnclosing: ", isInCycleEnclosing);
+							logg.log(LOG_LEVEL_DUMP, "skeleton node isInCycleEnclosing: ", isInCycleEnclosing);
 						#endif
 
 						SN::SkeletonNode * node11 = (SN::SkeletonNode *)findNodeWithIdInTree(root, i + 1);
@@ -702,7 +702,7 @@ SurgeryGraph * createSkeletonFromSurgeryGraph(SurgeryGraph * pGraph, CVector3 * 
 							pair[1] = node->id - 1;
 							cycleEnclosing.push_back(pair);
 							#ifdef _LOG
-								Log::log(LOG_LEVEL_DUMP, "skeleton node cycle: ", n1->cyclic->id);
+								logg.log(LOG_LEVEL_DUMP, "skeleton node cycle: ", n1->cyclic->id);
 							#endif
 						}
 
@@ -805,8 +805,8 @@ CVector3 computeWADisplacement(int j, SurgeryGraph * pGraph, CVector3 * modelVer
 		CVector3 dis = computeWADisplacement2(j, pGraph, modelVertices, originalE, mgDegeneratesMapping);
 		bool relative = false;
 		#ifdef _LOG
-			Log::log(LOG_LEVEL_DUMP, "dispalcement for vertex : ", j);
-			Log::log(LOG_LEVEL_DUMP, "dispalcement vector: ", dis);
+			logg.log(LOG_LEVEL_DUMP, "dispalcement for vertex : ", j);
+			logg.log(LOG_LEVEL_DUMP, "dispalcement vector: ", dis);
 		#endif
 
 		if (relative){
@@ -821,7 +821,7 @@ CVector3 computeWADisplacement(int j, SurgeryGraph * pGraph, CVector3 * modelVer
 
 
 /*CVector3 computeWADisplacement0(int j, SurgeryGraph * pGraph, CVector3 * modelVertices, Array2D<bool> originalE, boost::unordered_map<int, vector<int> > mgDegeneratesMapping){
-	Log::log(LOG_LEVEL_C_PARAMS, "computeWADisplacement STARTED for vertex : ", j);
+	logg.log(LOG_LEVEL_C_PARAMS, "computeWADisplacement STARTED for vertex : ", j);
 	CVector3 d = CVector3(0,0,0);
 	float weight = 0.0f;
 
@@ -853,7 +853,7 @@ CVector3 computeWADisplacement(int j, SurgeryGraph * pGraph, CVector3 * modelVer
 }*/
 
 /*CVector3 computeWADisplacement1(int j, SurgeryGraph * pGraph, CVector3 * modelVertices, Array2D<bool> originalE, boost::unordered_map<int, vector<int> > mgDegeneratesMapping){
-	Log::log(LOG_LEVEL_C_PARAMS, "computeWADisplacement STARTED for vertex : ", j);
+	logg.log(LOG_LEVEL_C_PARAMS, "computeWADisplacement STARTED for vertex : ", j);
 	CVector3 d = CVector3(0,0,0);
 	float weight = 0.0f;
 
@@ -887,7 +887,7 @@ CVector3 computeWADisplacement(int j, SurgeryGraph * pGraph, CVector3 * modelVer
 
 CVector3 computeWADisplacement2(int j, SurgeryGraph * pGraph, CVector3 * modelVertices, Array2D<bool> originalE, boost::unordered_map<int, vector<int> > mgDegeneratesMapping){
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_C_PARAMS, "computeWADisplacement2 STARTED for vertex : ", j);
+		logg.log(LOG_LEVEL_C_PARAMS, "computeWADisplacement2 STARTED for vertex : ", j);
 	#endif
 
 	CVector3 d = CVector3(0,0,0);
@@ -910,7 +910,7 @@ CVector3 computeWADisplacement2(int j, SurgeryGraph * pGraph, CVector3 * modelVe
 }
 
 /*CVector3 computeWADisplacement3(int j, SurgeryGraph * pGraph, CVector3 * modelVertices, Array2D<bool> originalE, boost::unordered_map<int, vector<int> > mgDegeneratesMapping){
-	Log::log(LOG_LEVEL_C_PARAMS, "computeWADisplacement STARTED for vertex : ", j);
+	logg.log(LOG_LEVEL_C_PARAMS, "computeWADisplacement STARTED for vertex : ", j);
 	CVector3 d = CVector3(0,0,0);
 	float weight = 0.0f;
 
@@ -951,8 +951,8 @@ float computeErrorValue(SurgeryGraph * pGraph, int i, int j){
 	P[2][0] = p.z;
 	P[3][0] = 1.0f;
 	Array2D< float > Q = pGraph->QMatrices[i];
-	//Log::log(0, "Matica Q");
-	//Log::log(0, Q);
+	//logg.log(0, "Matica Q");
+	//logg.log(0, Q);
 	Array2D< float > Res(1, 1, 0.0f);
 	Array2D< float > PT(1, 3, 0.0f);
 	PT = P.transpose(P);

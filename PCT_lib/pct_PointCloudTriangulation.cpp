@@ -283,8 +283,8 @@ void DeleunayTriangulator::getTangentPlanePCA(int numOfPoints, PCTCVector3 * poi
 	double V[3][3];
 	double d[3];
 
-	//Log::log(0, "matica C: ");
-	//Log::log(0, C);
+	//logg.log(0, "matica C: ");
+	//logg.log(0, C);
 
 	for (int i=0; i<3; i++)
 		for (int j=0; j<3; j++)
@@ -395,7 +395,7 @@ Array2D<bool> DeleunayTriangulator::computeLocalTriangulation(int i, PCTMeshGrap
 
 		PCTCVector3 p2_proj = ProjectPointIntoPlane(p2, p, n);*/
 
-		//Log::log(0, "normala tang. plochy: ", n);
+		//logg.log(0, "normala tang. plochy: ", n);
 
 		/////////////// PROJECTION INTO TANGENT PLANE ///////////////
 

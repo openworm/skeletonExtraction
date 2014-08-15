@@ -4,11 +4,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <LibraryPath>$(SolutionDir)\Debug;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(SolutionDir)\include;$(SolutionDir)\include\inline;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\CustomLibs\JMSP;$(SolutionDir)\include;$(SolutionDir)\include\inline;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <Link>
-      <AdditionalDependencies>GLW_lib_d.lib;BMM_lib_d.lib;Loader_lib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>GDSW_lib_d.lib;LBSE_lib_d.lib;PCT_lib_d.lib;Loader_lib_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

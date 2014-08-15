@@ -1,6 +1,8 @@
-﻿Build started 8/10/2014 1:46:01 PM.
-     1>Project "D:\Projects\OpenWorm\GDSW_lib\GDSW_lib.vcxproj" on node 3 (Build target(s)).
-     1>InitializeBuildStatus:
+﻿Build started 8/15/2014 2:14:10 PM.
+     1>Project "D:\Projects\OpenWorm\GDSW_lib\GDSW_lib.vcxproj" on node 7 (Rebuild target(s)).
+     1>_PrepareForClean:
+         Deleting file "Debug\GDSW_lib.lastbuildstate".
+       InitializeBuildStatus:
          Creating "Debug\GDSW_lib.unsuccessfulbuild" because "AlwaysCreate" was specified.
        PreBuildEvent:
          Description: Generate includes
@@ -18,8 +20,8 @@
        FinalizeBuildStatus:
          Deleting file "Debug\GDSW_lib.unsuccessfulbuild".
          Touching "Debug\GDSW_lib.lastbuildstate".
-     1>Done Building Project "D:\Projects\OpenWorm\GDSW_lib\GDSW_lib.vcxproj" (Build target(s)).
+     1>Done Building Project "D:\Projects\OpenWorm\GDSW_lib\GDSW_lib.vcxproj" (Rebuild target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:03.87
+Time Elapsed 00:00:04.08

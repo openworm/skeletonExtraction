@@ -8,7 +8,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <Link>
-      <AdditionalDependencies>freetype253_D.lib;opengl32.lib;glu32.lib;glew32.lib;OpenMeshCored.lib;fade2D_vc11_Debug.lib;OpenMeshToolsd.lib;assimp.lib;DevIL.lib;poly2tri_d.lib;tinyxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fade2D_vc11_Debug.lib;tinyxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup />

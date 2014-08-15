@@ -3,40 +3,40 @@
 
 //---------------------------------------------------------------------------
 
-void contractMeshGraph(int laplacianScheme, MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, bool &recreateOperator, float sL, float * curOneRingExtent, float * curOneRingArea, int kneigh, vector<std::set<int>> globalNeighbourhoods, OpenCLContext oclc, CVector3 * centerPoints, PointCloudTriangulation::DeleunayTriangulator * pTriangulator, OpenCLManager openCLManager){ //ModelController::CModel * sdfController
+void contractMeshGraph(int laplacianScheme, MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingExtent, float * curOneRingArea, int kneigh, vector<std::set<int>> globalNeighbourhoods, OpenCLContext oclc, CVector3 * centerPoints, PointCloudTriangulation::DeleunayTriangulator * pTriangulator, OpenCLManager openCLManager){ //ModelController::CModel * sdfController
 	switch(laplacianScheme){
 
 	case LS_GLOBAL_JAMA_COTANGENT: 
-		contractMeshGraphCPUCotangent(pMesh, mgDegeneratesMapping, it, LImage, recreateOperator, sL, curOneRingArea); 
+		contractMeshGraphCPUCotangent(pMesh, mgDegeneratesMapping, it, LImage, sL, curOneRingArea); 
 		break;
 	case LS_GLOBAL_JAMA_POINTCLOUD:
-		contractMeshGraphCPUPointCloud(pMesh, mgDegeneratesMapping, it, LImage, recreateOperator, sL, curOneRingExtent, curOneRingArea, kneigh, globalNeighbourhoods, pTriangulator); 
+		contractMeshGraphCPUPointCloud(pMesh, mgDegeneratesMapping, it, LImage, sL, curOneRingExtent, curOneRingArea, kneigh, globalNeighbourhoods, pTriangulator); 
 		break;
 	case LS_GLOBAL_VCL_COTANGENT: 
-		contractMeshGraphGPUVCL(pMesh,mgDegeneratesMapping, it, LImage, recreateOperator, sL, curOneRingArea); 
+		contractMeshGraphGPUVCL(pMesh,mgDegeneratesMapping, it, LImage, sL, curOneRingArea); 
 		break;
 	case LS_LOCAL_JAMA_COTANGENT: 
-		contractMeshGraphParallelCPU(pMesh, mgDegeneratesMapping, it, LImage, recreateOperator, sL, curOneRingArea); 
+		contractMeshGraphParallelCPU(pMesh, mgDegeneratesMapping, it, LImage, sL, curOneRingArea); 
 		break;
 	case LS_LOCAL_OCL_COTANGENT:
-		contractMeshGraphParallelOpenCL(pMesh, mgDegeneratesMapping, it, LImage, recreateOperator, sL, curOneRingArea, openCLManager); 
+		contractMeshGraphParallelOpenCL(pMesh, mgDegeneratesMapping, it, LImage, sL, curOneRingArea, openCLManager); 
 		break;
 	case LS_GLOBAL_VCLLSM_COTANGENT: 
-		contractMeshGraphGPUVCL_LSM(pMesh, mgDegeneratesMapping, it, LImage, recreateOperator, sL, curOneRingArea); 
+		contractMeshGraphGPUVCL_LSM(pMesh, mgDegeneratesMapping, it, LImage, sL, curOneRingArea); 
 		break;
 	case LS_GLOBAL_CPU_COTANGENT_PCL: 
-		contractMeshGraphCPUPCL(pMesh, mgDegeneratesMapping, it, LImage, recreateOperator, sL, curOneRingArea); 
+		contractMeshGraphCPUPCL(pMesh, mgDegeneratesMapping, it, LImage, sL, curOneRingArea); 
 		break;
 	case LS_GLOBAL_VCLLSMSDF_COTANGENT:
-		contractMeshGraphGPUVCL_LSM_SDF(pMesh, centerPoints, mgDegeneratesMapping, it, LImage, recreateOperator, sL, curOneRingArea);				
+		contractMeshGraphGPUVCL_LSM_SDF(pMesh, centerPoints, mgDegeneratesMapping, it, LImage, sL, curOneRingArea);				
 		break;	
 	case LS_LOCAL_JAMASDF_COTANGENT:
-		contractMeshGraphParallelCPU_SDF(pMesh, centerPoints, mgDegeneratesMapping, it, LImage, recreateOperator, sL, curOneRingArea);				
+		contractMeshGraphParallelCPU_SDF(pMesh, centerPoints, mgDegeneratesMapping, it, LImage, sL, curOneRingArea);				
 		break;	
 	case LS_GLOBAL_OCL_JACOBI_COTANGENT:
 		contractMeshGraphParallelOpenCLJacobi(pMesh, mgDegeneratesMapping, sL, curOneRingArea, oclc, openCLManager);
 		break;
-	default: contractMeshGraphGPUVCL_LSM(pMesh, mgDegeneratesMapping, it, LImage, recreateOperator, sL, curOneRingArea);
+	default: contractMeshGraphGPUVCL_LSM(pMesh, mgDegeneratesMapping, it, LImage, sL, curOneRingArea);
 	}
 }
 
@@ -62,8 +62,8 @@ void collapseDegenerates(MeshGraph * pMesh,  boost::unordered_map<int, vector<in
 
 							if (ind > 1) {
 								#ifdef _LOG
-									Log::log(LOG_LEVEL_WARNING, "Vrchol narusajuci 2D manifold pri DEGENERATES: " ,k);
-									Log::log(LOG_LEVEL_WARNING, "ind je: " ,ind);
+									logg.log(LOG_LEVEL_WARNING, "Vrchol narusajuci 2D manifold pri DEGENERATES: " ,k);
+									logg.log(LOG_LEVEL_WARNING, "ind je: " ,ind);
 								#endif
 							} else {
 								idcs[ind] = k;
@@ -118,7 +118,7 @@ void collapseDegenerates(MeshGraph * pMesh,  boost::unordered_map<int, vector<in
 						}
 
 					} else {
-						//Log::log(LOG_LEVEL_WARNING, "ind nieje 2 pri DEGENERATES : ", ind);
+						//logg.log(LOG_LEVEL_WARNING, "ind nieje 2 pri DEGENERATES : ", ind);
 					}
 				}
 
@@ -126,7 +126,7 @@ void collapseDegenerates(MeshGraph * pMesh,  boost::unordered_map<int, vector<in
 
 	if (pMesh->numOfVertices < 3){
 		#ifdef _LOG
-			Log::log(0, "METHOD contractMeshGraph RETURNED: pMesh->numOfVertices < 3");
+			logg.log(0, "METHOD contractMeshGraph RETURNED: pMesh->numOfVertices < 3");
 		#endif
 
 		return;
@@ -159,7 +159,7 @@ Array2D< float > calculateLaplacianMatrix(MeshGraph * pMesh){
 
 						if (ind > 1) {
 							#ifdef _LOG
-								Log::log(LOG_LEVEL_WARNING, "Vrchol narusajuci 2 manifold: " ,k);
+								logg.log(LOG_LEVEL_WARNING, "Vrchol narusajuci 2 manifold: " ,k);
 							#endif
 						} else
 							a[ind++] = AngleBetweenVectors(v1, v2);
@@ -175,20 +175,20 @@ Array2D< float > calculateLaplacianMatrix(MeshGraph * pMesh){
 						L[i][j] = -FLT_MAX;
 
 						#ifdef _LOG
-							Log::log(LOG_LEVEL_WARNING, "L bolo mensie ako -float");
-							Log::log(LOG_LEVEL_WARNING, "alfa : " ,a[0]);
-							Log::log(LOG_LEVEL_WARNING, "beta : " ,a[1]);
-							Log::log(LOG_LEVEL_WARNING, "i: " ,i);
-							Log::log(LOG_LEVEL_WARNING, "j: " ,j);
+							logg.log(LOG_LEVEL_WARNING, "L bolo mensie ako -float");
+							logg.log(LOG_LEVEL_WARNING, "alfa : " ,a[0]);
+							logg.log(LOG_LEVEL_WARNING, "beta : " ,a[1]);
+							logg.log(LOG_LEVEL_WARNING, "i: " ,i);
+							logg.log(LOG_LEVEL_WARNING, "j: " ,j);
 						#endif
 					} else if (L[i][j] > FLT_MAX) {
 						L[i][j] = FLT_MAX;
 						#ifdef _LOG
-							Log::log(LOG_LEVEL_WARNING, "L bolo vacsie ako float");
-							Log::log(LOG_LEVEL_WARNING, "alfa : " ,a[0]);
-							Log::log(LOG_LEVEL_WARNING, "beta : " ,a[1]);
-							Log::log(LOG_LEVEL_WARNING, "i: " ,i);
-							Log::log(LOG_LEVEL_WARNING, "j: " ,j);
+							logg.log(LOG_LEVEL_WARNING, "L bolo vacsie ako float");
+							logg.log(LOG_LEVEL_WARNING, "alfa : " ,a[0]);
+							logg.log(LOG_LEVEL_WARNING, "beta : " ,a[1]);
+							logg.log(LOG_LEVEL_WARNING, "i: " ,i);
+							logg.log(LOG_LEVEL_WARNING, "j: " ,j);
 						#endif
 					}
 				} 
@@ -202,20 +202,20 @@ Array2D< float > calculateLaplacianMatrix(MeshGraph * pMesh){
 
 //---------------------------------------------------------------------------
 
-void contractMeshGraphParallelOpenCL(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, bool &recreateOperator, float sL, float * curOneRingArea, OpenCLManager openCLManager){
+void contractMeshGraphParallelOpenCL(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea, OpenCLManager openCLManager){
 	#ifdef _LOG
 		Timerlog timerlog = Timerlog("contractMeshGraphParallelOpenCL");
 	#endif
 
 	if (pMesh->numOfVertices < 3){
 		#ifdef _LOG
-			Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
+			logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
 		#endif
 		return;
 	}
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
 	#endif
 
 	#ifdef _LOG
@@ -372,7 +372,7 @@ void contractMeshGraphParallelOpenCL(MeshGraph * pMesh, boost::unordered_map<int
 	#ifdef _LOG
 		timerlog.addEnd();
 
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph ENDED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph ENDED");
 		timerlog.logExecutionTimes();
 	#endif
 
@@ -388,13 +388,13 @@ void contractMeshGraphParallelOpenCLInterop(int * ite, MeshGraph * pMesh, boost:
 
 	if (pMesh->numOfVertices < 3){
 		#ifdef _LOG
-			Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
+			logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
 		#endif
 		return;
 	}
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
 
 		timerlog.addStart("check degenarates");
 	#endif
@@ -530,7 +530,7 @@ void contractMeshGraphParallelOpenCLInterop(int * ite, MeshGraph * pMesh, boost:
 
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph ENDED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph ENDED");
 		timerlog.logExecutionTimes();
 	#endif
 
@@ -538,7 +538,7 @@ void contractMeshGraphParallelOpenCLInterop(int * ite, MeshGraph * pMesh, boost:
 
 //---------------------------------------------------------------------------
 
-void contractMeshGraphParallelOpenCL2ring(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, bool &recreateOperator, float sL, float * curOneRingArea, OpenCLManager openCLManager){
+void contractMeshGraphParallelOpenCL2ring(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea, OpenCLManager openCLManager){
 
 	#ifdef _LOG
 		Timerlog timerlog = Timerlog("contractMeshGraphParallelOpenCL");
@@ -546,13 +546,13 @@ void contractMeshGraphParallelOpenCL2ring(MeshGraph * pMesh, boost::unordered_ma
 
 	if (pMesh->numOfVertices < 3){
 		#ifdef _LOG
-			Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
+			logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
 		#endif
 		return;
 	}
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
 	#endif
 
 	#ifdef _LOG
@@ -762,7 +762,7 @@ void contractMeshGraphParallelOpenCL2ring(MeshGraph * pMesh, boost::unordered_ma
 	#ifdef _LOG
 		timerlog.addEnd();
 
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph ENDED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph ENDED");
 		timerlog.logExecutionTimes();
 	#endif
 
@@ -788,14 +788,14 @@ void contractMeshGraphParallelOpenCLJacobi(MeshGraph * pMesh, boost::unordered_m
 
 	if (pMesh->numOfVertices < 3){
 		#ifdef _LOG
-			Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
+			logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
 		#endif
 		return;
 	}
 
 	
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
 
 		timerlog.addStart("check degenarates");
 	#endif
@@ -861,11 +861,11 @@ void contractMeshGraphParallelOpenCLJacobi(MeshGraph * pMesh, boost::unordered_m
 		}
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_DUMP, "Matica wL");
-		Log::log(LOG_LEVEL_DUMP, WL);
+		logg.log(LOG_LEVEL_DUMP, "Matica wL");
+		logg.log(LOG_LEVEL_DUMP, WL);
 
-		Log::log(LOG_LEVEL_DUMP, "Matica wH");
-		Log::log(LOG_LEVEL_DUMP, WH);
+		logg.log(LOG_LEVEL_DUMP, "Matica wH");
+		logg.log(LOG_LEVEL_DUMP, WH);
 	#endif
 
 		UPA = WL * L;
@@ -879,8 +879,8 @@ void contractMeshGraphParallelOpenCLJacobi(MeshGraph * pMesh, boost::unordered_m
 				}
 
 				#ifdef _LOG
-					Log::log(LOG_LEVEL_DUMP, "Matica UPA");
-					Log::log(LOG_LEVEL_DUMP, UPA);
+					logg.log(LOG_LEVEL_DUMP, "Matica UPA");
+					logg.log(LOG_LEVEL_DUMP, UPA);
 				#endif
 
 				// now solve the system using TNT and JAMA with QR decomposition
@@ -942,7 +942,7 @@ void contractMeshGraphParallelOpenCLJacobi(MeshGraph * pMesh, boost::unordered_m
 
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph ENDED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph ENDED");
 		timerlog.logExecutionTimes();
 	#endif
 
@@ -967,13 +967,13 @@ void contractMeshGraphParallelOpenCLJacobiInterop(int * ite, MeshGraph * pMesh, 
 
 	if (pMesh->numOfVertices < 3){
 		#ifdef _LOG
-			Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
+			logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
 		#endif
 		return;
 	}
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
 
 		timerlog.addStart("check degenarates");
 	#endif
@@ -1040,11 +1040,11 @@ void contractMeshGraphParallelOpenCLJacobiInterop(int * ite, MeshGraph * pMesh, 
 		}
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_DUMP, "Matica wL");
-		Log::log(LOG_LEVEL_DUMP, WL);
+		logg.log(LOG_LEVEL_DUMP, "Matica wL");
+		logg.log(LOG_LEVEL_DUMP, WL);
 
-		Log::log(LOG_LEVEL_DUMP, "Matica wH");
-		Log::log(LOG_LEVEL_DUMP, WH);
+		logg.log(LOG_LEVEL_DUMP, "Matica wH");
+		logg.log(LOG_LEVEL_DUMP, WH);
 	#endif
 
 		UPA = WL * L;
@@ -1058,8 +1058,8 @@ void contractMeshGraphParallelOpenCLJacobiInterop(int * ite, MeshGraph * pMesh, 
 				}
 
 				#ifdef _LOG
-					Log::log(LOG_LEVEL_DUMP, "Matica UPA");
-					Log::log(LOG_LEVEL_DUMP, UPA);
+					logg.log(LOG_LEVEL_DUMP, "Matica UPA");
+					logg.log(LOG_LEVEL_DUMP, UPA);
 				#endif
 
 				// now solve the system using TNT and JAMA with QR decomposition
@@ -1097,7 +1097,7 @@ void contractMeshGraphParallelOpenCLJacobiInterop(int * ite, MeshGraph * pMesh, 
 
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph ENDED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph ENDED");
 		timerlog.logExecutionTimes();
 	#endif
 
@@ -1370,7 +1370,7 @@ float solveParallelWithJama_SDF(int idx, float * centerPoints, Array2D< float > 
 
 //---------------------------------------------------------------------------
 
-void contractMeshGraphParallelCPU(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, bool &recreateOperator, float sL, float * curOneRingArea){
+void contractMeshGraphParallelCPU(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea){
 
 	#ifdef _LOG
 		Timerlog timerlog = Timerlog("contractMeshGraphParallelCPU");
@@ -1378,13 +1378,13 @@ void contractMeshGraphParallelCPU(MeshGraph * pMesh, boost::unordered_map<int, v
 
 	if (pMesh->numOfVertices < 3){
 		#ifdef _LOG
-			Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
+			logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
 		#endif
 		return;
 	}
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
 
 		timerlog.addStart("check degenarates");
 	#endif
@@ -1424,8 +1424,8 @@ void contractMeshGraphParallelCPU(MeshGraph * pMesh, boost::unordered_map<int, v
 		 L[i][i] = sum;
 	 }*/
 
-	 //Log::log(0, "Matica L cotangent");
-	 //Log::log(0, L);
+	 //logg.log(0, "Matica L cotangent");
+	 //logg.log(0, L);
 	 /*
 	 WL = Array2D< float >(pMesh->numOfVertices, pMesh->numOfVertices, 0.0f);
 	 WH = Array2D< float >(pMesh->numOfVertices, pMesh->numOfVertices, 0.0f);
@@ -1455,11 +1455,11 @@ void contractMeshGraphParallelCPU(MeshGraph * pMesh, boost::unordered_map<int, v
 		WH[i][i] = pMesh->wH[i];
 	 }
 
-	 Log::log(LOG_LEVEL_DUMP, "Matica wL");
-	 Log::log(LOG_LEVEL_DUMP, WL);
+	 logg.log(LOG_LEVEL_DUMP, "Matica wL");
+	 logg.log(LOG_LEVEL_DUMP, WL);
 
-	 Log::log(LOG_LEVEL_DUMP, "Matica wH");
-	 Log::log(LOG_LEVEL_DUMP, WH);
+	 logg.log(LOG_LEVEL_DUMP, "Matica wH");
+	 logg.log(LOG_LEVEL_DUMP, WH);
 
 	 UPA = WL * L;
 
@@ -1467,16 +1467,16 @@ void contractMeshGraphParallelCPU(MeshGraph * pMesh, boost::unordered_map<int, v
 		 for (int n = 0; n < UPA.dim2(); n++)
 			if (UPA[m][n] < -FLT_MAX) {
 							UPA[m][n] = -FLT_MAX;
-							Log::log(LOG_LEVEL_WARNING,"UPA[m][n] bolo mensie ako -float v sume");
-							Log::log(LOG_LEVEL_WARNING, "UPA[m][n] : " ,UPA[m][n]);
+							logg.log(LOG_LEVEL_WARNING,"UPA[m][n] bolo mensie ako -float v sume");
+							logg.log(LOG_LEVEL_WARNING, "UPA[m][n] : " ,UPA[m][n]);
 						 } else if (UPA[m][n] > FLT_MAX) {
 								UPA[m][n] = FLT_MAX;
-								Log::log(LOG_LEVEL_WARNING, "UPA[m][n] bolo vacsie ako float v sume");
-								Log::log(LOG_LEVEL_WARNING, "UPA[m][n] : " ,UPA[m][n]);
+								logg.log(LOG_LEVEL_WARNING, "UPA[m][n] bolo vacsie ako float v sume");
+								logg.log(LOG_LEVEL_WARNING, "UPA[m][n] : " ,UPA[m][n]);
 			 					}
 
-	 Log::log(LOG_LEVEL_DUMP, "Matica UPA");
-	 Log::log(LOG_LEVEL_DUMP, UPA);
+	 logg.log(LOG_LEVEL_DUMP, "Matica UPA");
+	 logg.log(LOG_LEVEL_DUMP, UPA);
 
 	// now solve the system using TNT and JAMA with QR decomposition
 
@@ -1489,8 +1489,8 @@ void contractMeshGraphParallelCPU(MeshGraph * pMesh, boost::unordered_map<int, v
 			A[i][j] = (double)UPA[i][j];
 	}
 
-	 Log::log(LOG_LEVEL_DUMP, "Matica A");
-	 Log::log(LOG_LEVEL_DUMP, A);
+	 logg.log(LOG_LEVEL_DUMP, "Matica A");
+	 logg.log(LOG_LEVEL_DUMP, A);
 
 	 B = Array2D<double>(2 * pMesh->numOfVertices, 3, 0.0f);
 
@@ -1597,26 +1597,26 @@ void contractMeshGraphParallelCPU(MeshGraph * pMesh, boost::unordered_map<int, v
 	#ifdef _LOG
 		timerlog.addEnd();
 
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph ENDED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph ENDED");
 		timerlog.logExecutionTimes();
 	#endif
 
 }
 
-void contractMeshGraphParallelCPU_SDF(MeshGraph * pMesh, CVector3 * centerPoints, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, bool &recreateOperator, float sL, float * curOneRingArea){
+void contractMeshGraphParallelCPU_SDF(MeshGraph * pMesh, CVector3 * centerPoints, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea){
 	#ifdef _LOG
 		Timerlog timerlog = Timerlog("contractMeshGraphParallelCPU");
 	#endif
 
 	if (pMesh->numOfVertices < 3){
 		#ifdef _LOG
-			Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
+			logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
 		#endif
 		return;
 	}
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
 	#endif
 
 	#ifdef _LOG
@@ -1732,7 +1732,7 @@ void contractMeshGraphParallelCPU_SDF(MeshGraph * pMesh, CVector3 * centerPoints
 	#ifdef _LOG
 		timerlog.addEnd();
 
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph ENDED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph ENDED");
 		timerlog.logExecutionTimes();
 	#endif
 
@@ -1742,20 +1742,20 @@ void contractMeshGraphParallelCPU_SDF(MeshGraph * pMesh, CVector3 * centerPoints
 
 //---------------------------------------------------------------------------
 
-void contractMeshGraphCPUCotangent(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, bool &recreateOperator, float sL, float * curOneRingArea){
+void contractMeshGraphCPUCotangent(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea){
 	#ifdef _LOG
 		Timerlog timerlog = Timerlog("contractMeshGraphCPU1");
 	#endif
 
 	if (pMesh->numOfVertices < 3){
 		#ifdef _LOG
-			Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
+			logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
 		#endif
 		return;
 	}
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
 
 		timerlog.addStart("check degenarates");
 	#endif
@@ -1802,14 +1802,14 @@ void contractMeshGraphCPUCotangent(MeshGraph * pMesh, boost::unordered_map<int, 
 		 for (int j=0; j < pMesh->numOfVertices; j++)
 			 Ll(i,j) = L[i][j];	
 
-	 //Log::log(0, "Matica L cotangent");
-	 //Log::log(0, L);
+	 //logg.log(0, "Matica L cotangent");
+	 //logg.log(0, L);
 	 
 	 WL = Array2D< float >(pMesh->numOfVertices, pMesh->numOfVertices, 0.0f);
 	 WH = Array2D< float >(pMesh->numOfVertices, pMesh->numOfVertices, 0.0f);
 	 UPA = Array2D< float >(pMesh->numOfVertices, pMesh->numOfVertices, 0.0f);
 
-	 for (int i=0; i < pMesh->numOfVertices; i++)
+	 /*for (int i=0; i < pMesh->numOfVertices; i++)
 		 for (int j=0; j < pMesh->numOfVertices; j++){
 			 BYTE val = ((L[i][j] - minL) / (maxL - minL)) * 255.0;
 			 //GLubyte val = (float)j / (float)pMesh->numOfVertices * 255.0;
@@ -1818,7 +1818,7 @@ void contractMeshGraphCPUCotangent(MeshGraph * pMesh, boost::unordered_map<int, 
 			 LImage[i * pMesh->numOfVertices * 3 + j * 3 + 2] = 0;
 		 }
 
-		 recreateOperator = true;
+		 recreateOperator = true;*/
 
 	#ifdef _LOG
 		 timerlog.addEnd();
@@ -1836,11 +1836,11 @@ void contractMeshGraphCPUCotangent(MeshGraph * pMesh, boost::unordered_map<int, 
 	 }
 
 	#ifdef _LOG
-		 Log::log(LOG_LEVEL_DUMP, "Matica wL");
-		 Log::log(LOG_LEVEL_DUMP, WL);
+		 logg.log(LOG_LEVEL_DUMP, "Matica wL");
+		 logg.log(LOG_LEVEL_DUMP, WL);
 
-		 Log::log(LOG_LEVEL_DUMP, "Matica wH");
-		 Log::log(LOG_LEVEL_DUMP, WH);
+		 logg.log(LOG_LEVEL_DUMP, "Matica wH");
+		 logg.log(LOG_LEVEL_DUMP, WH);
 	#endif
 
 	 UPA = WL * L;
@@ -1849,17 +1849,17 @@ void contractMeshGraphCPUCotangent(MeshGraph * pMesh, boost::unordered_map<int, 
 		 for (int n = 0; n < UPA.dim2(); n++)
 			if (UPA[m][n] < -FLT_MAX) {
 							UPA[m][n] = -FLT_MAX;
-							//Log::log(LOG_LEVEL_WARNING,"UPA[m][n] bolo mensie ako -float v sume");
-							//Log::log(LOG_LEVEL_WARNING, "UPA[m][n] : " ,UPA[m][n]);
+							//logg.log(LOG_LEVEL_WARNING,"UPA[m][n] bolo mensie ako -float v sume");
+							//logg.log(LOG_LEVEL_WARNING, "UPA[m][n] : " ,UPA[m][n]);
 						 } else if (UPA[m][n] > FLT_MAX) {
 								UPA[m][n] = FLT_MAX;
-								//Log::log(LOG_LEVEL_WARNING, "UPA[m][n] bolo vacsie ako float v sume");
-								//Log::log(LOG_LEVEL_WARNING, "UPA[m][n] : " ,UPA[m][n]);
+								//logg.log(LOG_LEVEL_WARNING, "UPA[m][n] bolo vacsie ako float v sume");
+								//logg.log(LOG_LEVEL_WARNING, "UPA[m][n] : " ,UPA[m][n]);
 			 					}
 
 	#ifdef _LOG
-		 Log::log(LOG_LEVEL_DUMP, "Matica UPA");
-		 Log::log(LOG_LEVEL_DUMP, UPA);
+		 logg.log(LOG_LEVEL_DUMP, "Matica UPA");
+		 logg.log(LOG_LEVEL_DUMP, UPA);
 	#endif
 
 	// now solve the system using TNT and JAMA with QR decomposition
@@ -1873,8 +1873,8 @@ void contractMeshGraphCPUCotangent(MeshGraph * pMesh, boost::unordered_map<int, 
 			A[i][j] = (float)UPA[i][j];
 	}
 
-	 //Log::log(0, "Matica A");
-	 //Log::log(0, A);
+	 //logg.log(0, "Matica A");
+	 //logg.log(0, A);
 
 	 B = Array2D<float>(2 * pMesh->numOfVertices, 3, 0.0f);
 
@@ -1885,8 +1885,8 @@ void contractMeshGraphCPUCotangent(MeshGraph * pMesh, boost::unordered_map<int, 
 		B[pMesh->numOfVertices + i][2] = (float)(pMesh->pVerts[i].z * pMesh->wH[i]);
 	}
 
-	//Log::log(0, "Matica B");
-	//Log::log(0, B);
+	//logg.log(0, "Matica B");
+	//logg.log(0, B);
 
 	#ifdef _LOG
 		timerlog.addEnd();
@@ -1897,8 +1897,8 @@ void contractMeshGraphCPUCotangent(MeshGraph * pMesh, boost::unordered_map<int, 
 	JAMA::QR<float> qr(A);
 	V = qr.solve(B);
 
-	//Log::log(0, "Nove vrcholy");
-	//Log::log(0, V);
+	//logg.log(0, "Nove vrcholy");
+	//logg.log(0, V);
 
 	//delete[] curOneRingArea;
 	//curOneRingArea = NULL;
@@ -1911,7 +1911,7 @@ void contractMeshGraphCPUCotangent(MeshGraph * pMesh, boost::unordered_map<int, 
 
 //---------------------------------------------------------------------------
 
-void contractMeshGraphCPUPCL(MeshGraph * origMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, bool &recreateOperator, float sL, float * curOneRingArea){
+void contractMeshGraphCPUPCL(MeshGraph * origMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea){
 	#ifdef _LOG
 		Timerlog timerlog = Timerlog("contractMeshGraphCPU1");
 	#endif
@@ -1922,13 +1922,13 @@ void contractMeshGraphCPUPCL(MeshGraph * origMesh, boost::unordered_map<int, vec
 
 	if (pMesh->numOfVertices < 3){
 		#ifdef _LOG
-			Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
+			logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
 		#endif
 		return;
 	}
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
 
 		timerlog.addStart("check degenarates");
 	#endif
@@ -1968,14 +1968,14 @@ void contractMeshGraphCPUPCL(MeshGraph * origMesh, boost::unordered_map<int, vec
 		 L[i][i] = sum;
 	 }
 
-	 //Log::log(0, "Matica L cotangent");
-	 //Log::log(0, L);
+	 //logg.log(0, "Matica L cotangent");
+	 //logg.log(0, L);
 	 
 	 WL = Array2D< float >(pMesh->numOfVertices, pMesh->numOfVertices, 0.0f);
 	 WH = Array2D< float >(pMesh->numOfVertices, pMesh->numOfVertices, 0.0f);
 	 UPA = Array2D< float >(pMesh->numOfVertices, pMesh->numOfVertices, 0.0f);
 
-	 for (int i=0; i < pMesh->numOfVertices; i++)
+	 /*for (int i=0; i < pMesh->numOfVertices; i++)
 		 for (int j=0; j < pMesh->numOfVertices; j++){
 			 BYTE val = ((L[i][j] - minL) / (maxL - minL)) * 255.0;
 			 //GLubyte val = (float)j / (float)pMesh->numOfVertices * 255.0;
@@ -1984,7 +1984,7 @@ void contractMeshGraphCPUPCL(MeshGraph * origMesh, boost::unordered_map<int, vec
 			 LImage[i * pMesh->numOfVertices * 3 + j * 3 + 2] = 0;
 		 }
 
-		 recreateOperator = true;
+		 recreateOperator = true;*/
 
 	#ifdef _LOG
 		 timerlog.addEnd();
@@ -2002,11 +2002,11 @@ void contractMeshGraphCPUPCL(MeshGraph * origMesh, boost::unordered_map<int, vec
 	 }
 
 	#ifdef _LOG
-		 Log::log(LOG_LEVEL_DUMP, "Matica wL");
-		 Log::log(LOG_LEVEL_DUMP, WL);
+		 logg.log(LOG_LEVEL_DUMP, "Matica wL");
+		 logg.log(LOG_LEVEL_DUMP, WL);
 
-		 Log::log(LOG_LEVEL_DUMP, "Matica wH");
-		 Log::log(LOG_LEVEL_DUMP, WH);
+		 logg.log(LOG_LEVEL_DUMP, "Matica wH");
+		 logg.log(LOG_LEVEL_DUMP, WH);
 	#endif
 
 	 UPA = WL * L;
@@ -2016,20 +2016,20 @@ void contractMeshGraphCPUPCL(MeshGraph * origMesh, boost::unordered_map<int, vec
 			if (UPA[m][n] < -FLT_MAX) {
 							UPA[m][n] = -FLT_MAX;
 							#ifdef _LOG
-								Log::log(LOG_LEVEL_WARNING,"UPA[m][n] bolo mensie ako -float v sume");
-								Log::log(LOG_LEVEL_WARNING, "UPA[m][n] : " ,UPA[m][n]);
+								logg.log(LOG_LEVEL_WARNING,"UPA[m][n] bolo mensie ako -float v sume");
+								logg.log(LOG_LEVEL_WARNING, "UPA[m][n] : " ,UPA[m][n]);
 							#endif
 						 } else if (UPA[m][n] > FLT_MAX) {
 								UPA[m][n] = FLT_MAX;
 								#ifdef _LOG
-									Log::log(LOG_LEVEL_WARNING, "UPA[m][n] bolo vacsie ako float v sume");
-									Log::log(LOG_LEVEL_WARNING, "UPA[m][n] : " ,UPA[m][n]);
+									logg.log(LOG_LEVEL_WARNING, "UPA[m][n] bolo vacsie ako float v sume");
+									logg.log(LOG_LEVEL_WARNING, "UPA[m][n] : " ,UPA[m][n]);
 								#endif
 			 					}
 
 	#ifdef _LOG
-		 Log::log(LOG_LEVEL_DUMP, "Matica UPA");
-		 Log::log(LOG_LEVEL_DUMP, UPA);
+		 logg.log(LOG_LEVEL_DUMP, "Matica UPA");
+		 logg.log(LOG_LEVEL_DUMP, UPA);
 	#endif
 
 	// now solve the system using TNT and JAMA with QR decomposition
@@ -2044,8 +2044,8 @@ void contractMeshGraphCPUPCL(MeshGraph * origMesh, boost::unordered_map<int, vec
 	}
 
 	#ifdef _LOG
-		 Log::log(LOG_LEVEL_DUMP, "Matica A");
-		 Log::log(LOG_LEVEL_DUMP, A);
+		 logg.log(LOG_LEVEL_DUMP, "Matica A");
+		 logg.log(LOG_LEVEL_DUMP, A);
 	#endif
 
 	 B = Array2D<double>(2 * pMesh->numOfVertices, 3, 0.0f);
@@ -2058,8 +2058,8 @@ void contractMeshGraphCPUPCL(MeshGraph * origMesh, boost::unordered_map<int, vec
 	}
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_DUMP, "Matica B");
-		Log::log(LOG_LEVEL_DUMP, B);
+		logg.log(LOG_LEVEL_DUMP, "Matica B");
+		logg.log(LOG_LEVEL_DUMP, B);
 
 		timerlog.addEnd();
 
@@ -2071,8 +2071,8 @@ void contractMeshGraphCPUPCL(MeshGraph * origMesh, boost::unordered_map<int, vec
 
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_DUMP, "Nove vrcholy");
-		Log::log(LOG_LEVEL_DUMP, V);
+		logg.log(LOG_LEVEL_DUMP, "Nove vrcholy");
+		logg.log(LOG_LEVEL_DUMP, V);
 	#endif
 
 	//delete[] curOneRingArea;
@@ -2135,7 +2135,7 @@ float getNeighbourhoodKernelWidth(MeshGraph * pMesh, int idx, int kneigh, int * 
 
 //---------------------------------------------------------------------------
 
-void contractMeshGraphCPUPointCloud(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, bool &recreateOperator, float sL, float * curOneRingExtent, float * curOneRingArea, int kneigh, vector<std::set<int>> globalNeighbourhoods, PointCloudTriangulation::DeleunayTriangulator * pTriangulator){
+void contractMeshGraphCPUPointCloud(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingExtent, float * curOneRingArea, int kneigh, vector<std::set<int>> globalNeighbourhoods, PointCloudTriangulation::DeleunayTriangulator * pTriangulator){
 
 	#ifdef _LOG
 		Timerlog timerlog = Timerlog("contractMeshGraphCPU2");
@@ -2143,13 +2143,13 @@ void contractMeshGraphCPUPointCloud(MeshGraph * pMesh, boost::unordered_map<int,
 
 	if (pMesh->numOfVertices < 3){
 		#ifdef _LOG
-			Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
+			logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
 		#endif
 		return;
 	}
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
 	#endif
 
     Array2D< float >  L, WL, WH, UPA, LV, O;
@@ -2158,7 +2158,7 @@ void contractMeshGraphCPUPointCloud(MeshGraph * pMesh, boost::unordered_map<int,
 	// compute Laplace operator from new points
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - construction of Laplacian operator");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - construction of Laplacian operator");
 
 		timerlog.addStart("construct L");
 	#endif
@@ -2186,8 +2186,8 @@ void contractMeshGraphCPUPointCloud(MeshGraph * pMesh, boost::unordered_map<int,
 
 	/*for (int i = 0; i < pMesh->numOfVertices; i++){
 
-	 //Log::log(0, "Vertex i:", i);
-	 //Log::log(0, "Maxedge for i:", maxedge);
+	 //logg.log(0, "Vertex i:", i);
+	 //logg.log(0, "Maxedge for i:", maxedge);
 		for (int j = 0; j < pMesh->numOfVertices; j++){
 				L[i][j] = GLaplace(kernelWidth, pMesh->pVerts[i], pMesh->pVerts[j]) * (curOneRingArea[j] / 3.0);
 		}
@@ -2217,7 +2217,7 @@ void contractMeshGraphCPUPointCloud(MeshGraph * pMesh, boost::unordered_map<int,
 		verts[j * 3 + 2] = pMesh->pVerts[j].z;
 	}
 
-	int numOfTrians;
+	int numOfTrians = 0;
 	int * indices = NULL;
 
 	pTriangulator->neighVis = new PCTNeighVisualization[pMesh->numOfVertices];
@@ -2259,7 +2259,7 @@ void contractMeshGraphCPUPointCloud(MeshGraph * pMesh, boost::unordered_map<int,
 
 						if (ind > 1) {
 							#ifdef _LOG
-								Log::log(LOG_LEVEL_WARNING, "Vrchol narusajuci 2 manifold: " ,k);
+								logg.log(LOG_LEVEL_WARNING, "Vrchol narusajuci 2 manifold: " ,k);
 							#endif
 						} else
 							a[ind++] = AngleBetweenVectors(v1, v2);
@@ -2272,20 +2272,20 @@ void contractMeshGraphCPUPointCloud(MeshGraph * pMesh, boost::unordered_map<int,
 					if (L[i][j] < -FLT_MAX) {
 						L[i][j] = -FLT_MAX;
 						#ifdef _LOG
-							Log::log(LOG_LEVEL_WARNING, "L bolo mensie ako -float");
-							Log::log(LOG_LEVEL_WARNING, "alfa : " ,a[0]);
-							Log::log(LOG_LEVEL_WARNING, "beta : " ,a[1]);
-							Log::log(LOG_LEVEL_WARNING, "i: " ,i);
-							Log::log(LOG_LEVEL_WARNING, "j: " ,j);
+							logg.log(LOG_LEVEL_WARNING, "L bolo mensie ako -float");
+							logg.log(LOG_LEVEL_WARNING, "alfa : " ,a[0]);
+							logg.log(LOG_LEVEL_WARNING, "beta : " ,a[1]);
+							logg.log(LOG_LEVEL_WARNING, "i: " ,i);
+							logg.log(LOG_LEVEL_WARNING, "j: " ,j);
 						#endif
 					} else if (L[i][j] > FLT_MAX) {
 						L[i][j] = FLT_MAX;
 						#ifdef _LOG
-							Log::log(LOG_LEVEL_WARNING, "L bolo vacsie ako float");
-							Log::log(LOG_LEVEL_WARNING, "alfa : " ,a[0]);
-							Log::log(LOG_LEVEL_WARNING, "beta : " ,a[1]);
-							Log::log(LOG_LEVEL_WARNING, "i: " ,i);
-							Log::log(LOG_LEVEL_WARNING, "j: " ,j);
+							logg.log(LOG_LEVEL_WARNING, "L bolo vacsie ako float");
+							logg.log(LOG_LEVEL_WARNING, "alfa : " ,a[0]);
+							logg.log(LOG_LEVEL_WARNING, "beta : " ,a[1]);
+							logg.log(LOG_LEVEL_WARNING, "i: " ,i);
+							logg.log(LOG_LEVEL_WARNING, "j: " ,j);
 						#endif
 					}
 				} 
@@ -2323,10 +2323,10 @@ void contractMeshGraphCPUPointCloud(MeshGraph * pMesh, boost::unordered_map<int,
 		 }
 		 L[i][i] = sum;
 	 }
-	 //Log::log(0, "Matica L pre pointcloud");
-	 //Log::log(0, L);
+	 //logg.log(0, "Matica L pre pointcloud");
+	 //logg.log(0, L);
 
-	 for (int i=0; i < pMesh->numOfVertices; i++)
+	 /*for (int i=0; i < pMesh->numOfVertices; i++)
 		 for (int j=0; j < pMesh->numOfVertices; j++){
 			BYTE val = ((L[i][j] - minL) / (maxL - minL)) * 255.0;
 			//GLubyte val = (float)j / (float)pMesh->numOfVertices * 255.0;
@@ -2335,7 +2335,7 @@ void contractMeshGraphCPUPointCloud(MeshGraph * pMesh, boost::unordered_map<int,
 			LImage[i * pMesh->numOfVertices * 3 + j * 3 + 2] = 0;
 		 }
 
-	 recreateOperator = true;
+	 recreateOperator = true;*/
 
 	#ifdef _LOG
 		 timerlog.addEnd();
@@ -2344,9 +2344,9 @@ void contractMeshGraphCPUPointCloud(MeshGraph * pMesh, boost::unordered_map<int,
 
 		 timerlog.addEnd();
 
-		 Log::log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - construction of Laplacian operator");
+		 logg.log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - construction of Laplacian operator");
 
-		 Log::log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - preparing of weights matrices");
+		 logg.log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - preparing of weights matrices");
 
 		 timerlog.addStart("prepare submatrices");
 	#endif
@@ -2356,11 +2356,11 @@ void contractMeshGraphCPUPointCloud(MeshGraph * pMesh, boost::unordered_map<int,
 		WH[i][i] = pMesh->wH[i];
 	 }
 
-	 //Log::log(0, "Matica wL");
-	 //Log::log(0, WL);
+	 //logg.log(0, "Matica wL");
+	 //logg.log(0, WL);
 
-	 //Log::log(0, "Matica wH");
-	 //Log::log(0, WH);
+	 //logg.log(0, "Matica wH");
+	 //logg.log(0, WH);
 
 	 UPA = WL * L;
 
@@ -2369,20 +2369,20 @@ void contractMeshGraphCPUPointCloud(MeshGraph * pMesh, boost::unordered_map<int,
 			if (UPA[m][n] < -FLT_MAX) {
 							UPA[m][n] = -FLT_MAX;
 							#ifdef _LOG
-								Log::log(LOG_LEVEL_WARNING,"UPA[m][n] bolo mensie ako -float v sume");
-								Log::log(LOG_LEVEL_WARNING, "UPA[m][n] : " ,UPA[m][n]);
+								logg.log(LOG_LEVEL_WARNING,"UPA[m][n] bolo mensie ako -float v sume");
+								logg.log(LOG_LEVEL_WARNING, "UPA[m][n] : " ,UPA[m][n]);
 							#endif
 						 } else if (UPA[m][n] > FLT_MAX) {
 								UPA[m][n] = FLT_MAX;
 								#ifdef _LOG
-									Log::log(LOG_LEVEL_WARNING, "UPA[m][n] bolo vacsie ako float v sume");
-									Log::log(LOG_LEVEL_WARNING, "UPA[m][n] : " ,UPA[m][n]);
+									logg.log(LOG_LEVEL_WARNING, "UPA[m][n] bolo vacsie ako float v sume");
+									logg.log(LOG_LEVEL_WARNING, "UPA[m][n] : " ,UPA[m][n]);
 								#endif
 			 					}
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_DUMP, "Matica UPA");
-		Log::log(LOG_LEVEL_DUMP, UPA);
+		logg.log(LOG_LEVEL_DUMP, "Matica UPA");
+		logg.log(LOG_LEVEL_DUMP, UPA);
 	#endif
 
 	// now solve the system using TNT and JAMA with QR decomposition
@@ -2396,8 +2396,8 @@ void contractMeshGraphCPUPointCloud(MeshGraph * pMesh, boost::unordered_map<int,
 			A[i][j] = (double)UPA[i][j];
 	}
 
-	 //Log::log(0, "Matica A");
-	 //Log::log(0, A);
+	 //logg.log(0, "Matica A");
+	 //logg.log(0, A);
 
 
 	B = Array2D<double>(2 * pMesh->numOfVertices, 3, 0.0f);
@@ -2413,13 +2413,13 @@ void contractMeshGraphCPUPointCloud(MeshGraph * pMesh, boost::unordered_map<int,
 		timerlog.addEnd();
 	#endif
 
-	//Log::log(0, "Matica B");
-	//Log::log(0, B);
+	//logg.log(0, "Matica B");
+	//logg.log(0, B);
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - preparing of weights matrices");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - preparing of weights matrices");
 
-		Log::log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - solve LV system");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - solve LV system");
 
 		timerlog.addStart("solve using QR decomposition");
 	#endif
@@ -2430,17 +2430,17 @@ void contractMeshGraphCPUPointCloud(MeshGraph * pMesh, boost::unordered_map<int,
 	#ifdef _LOG
 		timerlog.addEnd();
 
-		Log::log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - solve LV system");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - solve LV system");
 
-		Log::log(0, "Nove vrcholy");
-		Log::log(0, V);
+		logg.log(0, "Nove vrcholy");
+		logg.log(0, V);
 	#endif
 
 	for (int i = 0; i < pMesh->numOfVertices; i++)
 		pMesh->pVerts[i] = CVector3((float)V[i][0], (float)V[i][1], (float)V[i][2]);
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph ENDED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph ENDED");
 
 		timerlog.logExecutionTimes();
 	#endif
@@ -2448,7 +2448,7 @@ void contractMeshGraphCPUPointCloud(MeshGraph * pMesh, boost::unordered_map<int,
 
 //---------------------------------------------------------------------------
 
-void contractMeshGraphGPUVCL(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, bool &recreateOperator, float sL, float * curOneRingArea){
+void contractMeshGraphGPUVCL(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea){
 
 	#ifdef _LOG
 		Timerlog timerlog = Timerlog("contractMeshGraphGPU");
@@ -2456,13 +2456,13 @@ void contractMeshGraphGPUVCL(MeshGraph * pMesh, boost::unordered_map<int, vector
 
 	if (pMesh->numOfVertices < 3){
 		#ifdef _LOG
-			Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
+			logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
 		#endif
 		return;
 	}
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
 
 		timerlog.addStart("check degenerates");
 	#endif
@@ -2485,7 +2485,7 @@ void contractMeshGraphGPUVCL(MeshGraph * pMesh, boost::unordered_map<int, vector
 	// compute Laplace operator from new points
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - construction of Laplacian operator");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - construction of Laplacian operator");
 	#endif
 
 	collapseDegenerates(pMesh, mgDegeneratesMapping);
@@ -2520,9 +2520,9 @@ void contractMeshGraphGPUVCL(MeshGraph * pMesh, boost::unordered_map<int, vector
 	 }
 
 	#ifdef _LOG
-		 Log::log(LOG_LEVEL_DUMP, "Matica L");
+		 logg.log(LOG_LEVEL_DUMP, "Matica L");
 
-		 // Log::log(LOG_LEVEL_DUMP, L);
+		 // logg.log(LOG_LEVEL_DUMP, L);
 
 		 timerlog.addEnd();
 
@@ -2530,9 +2530,9 @@ void contractMeshGraphGPUVCL(MeshGraph * pMesh, boost::unordered_map<int, vector
 
 		 timerlog.addEnd();
 
-		 Log::log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - construction of Laplacian operator");
+		 logg.log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - construction of Laplacian operator");
 
-		 Log::log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - preparing of weights matrices");
+		 logg.log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - preparing of weights matrices");
 
 		 timerlog.addStart("prepare submatrices - WH");
 	#endif
@@ -2541,9 +2541,9 @@ void contractMeshGraphGPUVCL(MeshGraph * pMesh, boost::unordered_map<int, vector
 		WL(i,i) = pMesh->wL;
 
 		#ifdef _LOG
-				Log::log(LOG_LEVEL_DUMP, "one ring area pre vrchol ", i);
-				Log::log(LOG_LEVEL_DUMP, "cur ", curOneRingArea[i]);
-				Log::log(LOG_LEVEL_DUMP, "orig ", pMesh->origOneRingArea[i]);
+				logg.log(LOG_LEVEL_DUMP, "one ring area pre vrchol ", i);
+				logg.log(LOG_LEVEL_DUMP, "cur ", curOneRingArea[i]);
+				logg.log(LOG_LEVEL_DUMP, "orig ", pMesh->origOneRingArea[i]);
 		#endif
 
 		WH(i,i) = pMesh->wH[i];
@@ -2551,11 +2551,11 @@ void contractMeshGraphGPUVCL(MeshGraph * pMesh, boost::unordered_map<int, vector
 	 //delete[] curOneRingArea;
 
 	#ifdef _LOG
-		 Log::log(LOG_LEVEL_DUMP, "Matica wL");
-	//	 Log::log(LOG_LEVEL_DUMP, WL);
+		 logg.log(LOG_LEVEL_DUMP, "Matica wL");
+	//	 logg.log(LOG_LEVEL_DUMP, WL);
 
-		 Log::log(LOG_LEVEL_DUMP, "Matica wH");
-		// Log::log(LOG_LEVEL_DUMP, WH);
+		 logg.log(LOG_LEVEL_DUMP, "Matica wH");
+		// logg.log(LOG_LEVEL_DUMP, WH);
 
 		 timerlog.addEnd();
 		 timerlog.addStart("prepare submatrices - UPA");
@@ -2567,21 +2567,21 @@ void contractMeshGraphGPUVCL(MeshGraph * pMesh, boost::unordered_map<int, vector
 		 for (int n = 0; n < UPA.size2(); n++)
 			if (UPA(m,n) < -FLT_MAX) {
 							UPA(m,n) = -FLT_MAX;
-							Log::log(LOG_LEVEL_WARNING,"UPA[m][n] bolo mensie ako -float v sume");
-							Log::log(LOG_LEVEL_WARNING, "UPA[m][n] : ", UPA(m,n));
+							logg.log(LOG_LEVEL_WARNING,"UPA[m][n] bolo mensie ako -float v sume");
+							logg.log(LOG_LEVEL_WARNING, "UPA[m][n] : ", UPA(m,n));
 						 } else if (UPA(m,n) > FLT_MAX) {
 								UPA(m,n) = FLT_MAX;
-								Log::log(LOG_LEVEL_WARNING, "UPA[m][n] bolo vacsie ako float v sume");
-								Log::log(LOG_LEVEL_WARNING, "UPA[m][n] : ", UPA(m,n));
+								logg.log(LOG_LEVEL_WARNING, "UPA[m][n] bolo vacsie ako float v sume");
+								logg.log(LOG_LEVEL_WARNING, "UPA[m][n] : ", UPA(m,n));
 			 					}*/
 
 	#ifdef _LOG
-		 Log::log(LOG_LEVEL_DUMP, "Matica UPA");
+		 logg.log(LOG_LEVEL_DUMP, "Matica UPA");
 
 		 timerlog.addEnd();
 		 timerlog.addStart("prepare submatrices - A");
 
-	//	 Log::log(LOG_LEVEL_DUMP, UPA);
+	//	 logg.log(LOG_LEVEL_DUMP, UPA);
 	#endif
 
 	 matrix<float> A(2 * pMesh->numOfVertices, pMesh->numOfVertices);
@@ -2603,8 +2603,8 @@ void contractMeshGraphGPUVCL(MeshGraph * pMesh, boost::unordered_map<int, vector
 	}
 
 	#ifdef _LOG
-		 Log::log(LOG_LEVEL_DUMP, "Matica A");
-		 //Log::log(LOG_LEVEL_DUMP, A);
+		 logg.log(LOG_LEVEL_DUMP, "Matica A");
+		 //logg.log(LOG_LEVEL_DUMP, A);
 
 		 timerlog.addEnd();
 		 timerlog.addStart("prepare submatrices - B");
@@ -2617,8 +2617,8 @@ void contractMeshGraphGPUVCL(MeshGraph * pMesh, boost::unordered_map<int, vector
 	}
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_DUMP, "Matica B");
-		//Log::log(LOG_LEVEL_DUMP, B);
+		logg.log(LOG_LEVEL_DUMP, "Matica B");
+		//logg.log(LOG_LEVEL_DUMP, B);
 	#endif
 
 	matrix<float> Q(2 * pMesh->numOfVertices, 2 * pMesh->numOfVertices);
@@ -2635,9 +2635,9 @@ void contractMeshGraphGPUVCL(MeshGraph * pMesh, boost::unordered_map<int, vector
 	// write matrices to stream file
 
 #ifdef _LOG
-	Log::log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - preparing of weights matrices");
+	logg.log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - preparing of weights matrices");
 
-	Log::log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - solve LV system");
+	logg.log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - solve LV system");
 
 	timerlog.addEnd();
 
@@ -2699,11 +2699,11 @@ void contractMeshGraphGPUVCL(MeshGraph * pMesh, boost::unordered_map<int, vector
 			R_DEBUG[i][j] = Q(i,j);
 	}
 
-	Log::log(0, "Matica Q:");
-	Log::log(0, Q_DEBUG);
+	logg.log(0, "Matica Q:");
+	logg.log(0, Q_DEBUG);
 	
-	Log::log(0, "Matica R:");
-	Log::log(0, R_DEBUG);*/
+	logg.log(0, "Matica R:");
+	logg.log(0, R_DEBUG);*/
 
 	//viennacl::compressed_matrix<float> Y_GPU(2 * pMesh->numOfVertices, 2 * pMesh->numOfVertices);
 
@@ -2761,10 +2761,10 @@ void contractMeshGraphGPUVCL(MeshGraph * pMesh, boost::unordered_map<int, vector
 	//V = qr.solve(B);
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - solve LV system");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - solve LV system");
 
-		Log::log(LOG_LEVEL_DUMP, "Nove vrcholy");
-		//Log::log(LOG_LEVEL_DUMP, V);
+		logg.log(LOG_LEVEL_DUMP, "Nove vrcholy");
+		//logg.log(LOG_LEVEL_DUMP, V);
 	#endif
 
 
@@ -2772,7 +2772,7 @@ void contractMeshGraphGPUVCL(MeshGraph * pMesh, boost::unordered_map<int, vector
 		pMesh->pVerts[i] = CVector3((float)Vvec_x(i), (float)Vvec_y(i), (float)Vvec_z(i));
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph ENDED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph ENDED");
 
 		timerlog.logExecutionTimes();
 	#endif
@@ -2782,7 +2782,7 @@ void contractMeshGraphGPUVCL(MeshGraph * pMesh, boost::unordered_map<int, vector
 
 //---------------------------------------------------------------------------
 
-void contractMeshGraphGPUVCL_LSM(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, bool &recreateOperator, float sL, float * curOneRingArea){
+void contractMeshGraphGPUVCL_LSM(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea){
 
 	#ifdef _LOG
 		Timerlog timerlog = Timerlog("contractMeshGraphGPU");
@@ -2790,13 +2790,13 @@ void contractMeshGraphGPUVCL_LSM(MeshGraph * pMesh, boost::unordered_map<int, ve
 
 	if (pMesh->numOfVertices < 3){
 		#ifdef _LOG
-			Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
+			logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
 		#endif
 		return;
 	}
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
 
 		timerlog.addStart("check degenerates");
 	#endif
@@ -2822,7 +2822,7 @@ void contractMeshGraphGPUVCL_LSM(MeshGraph * pMesh, boost::unordered_map<int, ve
 	// compute Laplace operator from new points
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - construction of Laplacian operator");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - construction of Laplacian operator");
 	#endif
 
 	collapseDegenerates(pMesh, mgDegeneratesMapping);
@@ -2855,7 +2855,7 @@ void contractMeshGraphGPUVCL_LSM(MeshGraph * pMesh, boost::unordered_map<int, ve
 	 }
 
 	#ifdef _LOG
-		 Log::log(LOG_LEVEL_DUMP, "Matica L");
+		 logg.log(LOG_LEVEL_DUMP, "Matica L");
 
 		 timerlog.addEnd();
 
@@ -2863,9 +2863,9 @@ void contractMeshGraphGPUVCL_LSM(MeshGraph * pMesh, boost::unordered_map<int, ve
 
 		 timerlog.addEnd();
 
-		 Log::log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - construction of Laplacian operator");
+		 logg.log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - construction of Laplacian operator");
 
-		 Log::log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - preparing of weights matrices");
+		 logg.log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - preparing of weights matrices");
 
 		 timerlog.addStart("prepare submatrices - WH");
 	#endif
@@ -2874,9 +2874,9 @@ void contractMeshGraphGPUVCL_LSM(MeshGraph * pMesh, boost::unordered_map<int, ve
 		WL(i,i) = pMesh->wL;
 
 		#ifdef _LOG
-				Log::log(LOG_LEVEL_DUMP, "one ring area pre vrchol ", i);
-				Log::log(LOG_LEVEL_DUMP, "cur ", curOneRingArea[i]);
-				Log::log(LOG_LEVEL_DUMP, "orig ", pMesh->origOneRingArea[i]);
+				logg.log(LOG_LEVEL_DUMP, "one ring area pre vrchol ", i);
+				logg.log(LOG_LEVEL_DUMP, "cur ", curOneRingArea[i]);
+				logg.log(LOG_LEVEL_DUMP, "orig ", pMesh->origOneRingArea[i]);
 		#endif
 
 		WH(i,i) = pMesh->wH[i];
@@ -2884,11 +2884,11 @@ void contractMeshGraphGPUVCL_LSM(MeshGraph * pMesh, boost::unordered_map<int, ve
 	 //delete[] curOneRingArea;
 
 	#ifdef _LOG
-		 Log::log(LOG_LEVEL_DUMP, "Matica wL");
-	//	 Log::log(LOG_LEVEL_DUMP, WL);
+		 logg.log(LOG_LEVEL_DUMP, "Matica wL");
+	//	 logg.log(LOG_LEVEL_DUMP, WL);
 
-		 Log::log(LOG_LEVEL_DUMP, "Matica wH");
-		// Log::log(LOG_LEVEL_DUMP, WH);
+		 logg.log(LOG_LEVEL_DUMP, "Matica wH");
+		// logg.log(LOG_LEVEL_DUMP, WH);
 
 	 
 		 timerlog.addEnd();
@@ -2897,7 +2897,7 @@ void contractMeshGraphGPUVCL_LSM(MeshGraph * pMesh, boost::unordered_map<int, ve
 
 	 UPA = prod (WL, L);
 
-//	 Log::log(LOG_LEVEL_DUMP, UPA);
+//	 logg.log(LOG_LEVEL_DUMP, UPA);
 
 	 matrix<float> A(2 * pMesh->numOfVertices, pMesh->numOfVertices);
 	 //matrix<float> B(2 * pMesh->numOfVertices, 3);
@@ -2918,8 +2918,8 @@ void contractMeshGraphGPUVCL_LSM(MeshGraph * pMesh, boost::unordered_map<int, ve
 	}
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_DUMP, "Matica A");
-		//Log::log(LOG_LEVEL_DUMP, A);
+		logg.log(LOG_LEVEL_DUMP, "Matica A");
+		//logg.log(LOG_LEVEL_DUMP, A);
 		 timerlog.addEnd();
 		 timerlog.addStart("prepare submatrices - B");
 	#endif
@@ -2933,9 +2933,9 @@ void contractMeshGraphGPUVCL_LSM(MeshGraph * pMesh, boost::unordered_map<int, ve
 
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - preparing of weights matrices");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - preparing of weights matrices");
 
-		Log::log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - solve LV system");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - solve LV system");
 	#endif
 
 	boost::numeric::ublas::vector<float> Vvec_x(pMesh->numOfVertices);
@@ -3035,7 +3035,7 @@ void contractMeshGraphGPUVCL_LSM(MeshGraph * pMesh, boost::unordered_map<int, ve
 	
 		#ifdef _LOG
 			timerlog.addEnd();
-			Log::log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - solve LV system");
+			logg.log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - solve LV system");
 		#endif
 
 
@@ -3043,7 +3043,7 @@ void contractMeshGraphGPUVCL_LSM(MeshGraph * pMesh, boost::unordered_map<int, ve
 		pMesh->pVerts[i] = CVector3((float)Vvec_x(i), (float)Vvec_y(i), (float)Vvec_z(i));
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph ENDED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph ENDED");
 
 		timerlog.logExecutionTimes();
 	#endif
@@ -3052,7 +3052,7 @@ void contractMeshGraphGPUVCL_LSM(MeshGraph * pMesh, boost::unordered_map<int, ve
 
 //---------------------------------------------------------------------------
 
-void contractMeshGraphGPUVCL_LSM_SDF(MeshGraph * pMesh, CVector3* centerPoints, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, bool &recreateOperator, float sL, float * curOneRingArea){
+void contractMeshGraphGPUVCL_LSM_SDF(MeshGraph * pMesh, CVector3* centerPoints, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea){
 
 	/*
 	Zakladna pointa tejto metody je, ze okrem zakladnych 2ch rovnic kje jedna nuluje laplacian a druha holduje vrcholy pribudne tretia:
@@ -3066,13 +3066,13 @@ void contractMeshGraphGPUVCL_LSM_SDF(MeshGraph * pMesh, CVector3* centerPoints, 
 
 	if (pMesh->numOfVertices < 3){
 		#ifdef _LOG
-			Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
+			logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
 		#endif
 		return;
 	}
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
 
 		timerlog.addStart("check degenerates");
 	#endif
@@ -3100,7 +3100,7 @@ void contractMeshGraphGPUVCL_LSM_SDF(MeshGraph * pMesh, CVector3* centerPoints, 
 	// compute Laplace operator from new points
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - construction of Laplacian operator");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - construction of Laplacian operator");
 	#endif
 
 	collapseDegenerates(pMesh, mgDegeneratesMapping);
@@ -3132,7 +3132,7 @@ void contractMeshGraphGPUVCL_LSM_SDF(MeshGraph * pMesh, CVector3* centerPoints, 
 				L(i,i) = sum;
 			}
 		#ifdef _LOG
-				Log::log(LOG_LEVEL_DUMP, "Matica L");
+				logg.log(LOG_LEVEL_DUMP, "Matica L");
 
 				timerlog.addEnd();
 
@@ -3140,9 +3140,9 @@ void contractMeshGraphGPUVCL_LSM_SDF(MeshGraph * pMesh, CVector3* centerPoints, 
 
 				timerlog.addEnd();
 
-				Log::log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - construction of Laplacian operator");
+				logg.log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - construction of Laplacian operator");
 
-				Log::log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - preparing of weights matrices");
+				logg.log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - preparing of weights matrices");
 
 				timerlog.addStart("prepare submatrices - WH");
 		#endif
@@ -3151,9 +3151,9 @@ void contractMeshGraphGPUVCL_LSM_SDF(MeshGraph * pMesh, CVector3* centerPoints, 
 				WL(i,i) = pMesh->wL;
 
 				#ifdef _LOG
-				Log::log(LOG_LEVEL_DUMP, "one ring area pre vrchol ", i);
-				Log::log(LOG_LEVEL_DUMP, "cur ", curOneRingArea[i]);
-				Log::log(LOG_LEVEL_DUMP, "orig ", pMesh->origOneRingArea[i]);
+				logg.log(LOG_LEVEL_DUMP, "one ring area pre vrchol ", i);
+				logg.log(LOG_LEVEL_DUMP, "cur ", curOneRingArea[i]);
+				logg.log(LOG_LEVEL_DUMP, "orig ", pMesh->origOneRingArea[i]);
 				#endif
 
 				WH(i,i) = pMesh->wH[i];
@@ -3162,17 +3162,17 @@ void contractMeshGraphGPUVCL_LSM_SDF(MeshGraph * pMesh, CVector3* centerPoints, 
 			//delete[] curOneRingArea;
 
 			#ifdef _LOG
-				Log::log(LOG_LEVEL_DUMP, "Matica wL");
-				//	 Log::log(LOG_LEVEL_DUMP, WL);
+				logg.log(LOG_LEVEL_DUMP, "Matica wL");
+				//	 logg.log(LOG_LEVEL_DUMP, WL);
 
-				Log::log(LOG_LEVEL_DUMP, "Matica wH");
-				// Log::log(LOG_LEVEL_DUMP, WH);
+				logg.log(LOG_LEVEL_DUMP, "Matica wH");
+				// logg.log(LOG_LEVEL_DUMP, WH);
 
 
 				timerlog.addEnd();
 				timerlog.addStart("prepare submatrices - A");
 
-				//	 Log::log(LOG_LEVEL_DUMP, UPA);
+				//	 logg.log(LOG_LEVEL_DUMP, UPA);
 			#endif
 
 			matrix<float> A(3 * pMesh->numOfVertices, pMesh->numOfVertices);
@@ -3195,8 +3195,8 @@ void contractMeshGraphGPUVCL_LSM_SDF(MeshGraph * pMesh, CVector3* centerPoints, 
 			}
 
 			#ifdef _LOG
-				Log::log(LOG_LEVEL_DUMP, "Matica A");
-				//Log::log(LOG_LEVEL_DUMP, A);
+				logg.log(LOG_LEVEL_DUMP, "Matica A");
+				//logg.log(LOG_LEVEL_DUMP, A);
 
 				timerlog.addEnd();
 				timerlog.addStart("prepare submatrices - B");
@@ -3217,9 +3217,9 @@ void contractMeshGraphGPUVCL_LSM_SDF(MeshGraph * pMesh, CVector3* centerPoints, 
 			// X
 
 			#ifdef _LOG
-				Log::log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - preparing of weights matrices");
+				logg.log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - preparing of weights matrices");
 
-				Log::log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - solve LV system");
+				logg.log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - solve LV system");
 			#endif
 
 			boost::numeric::ublas::vector<float> Vvec_x(pMesh->numOfVertices);
@@ -3319,7 +3319,7 @@ void contractMeshGraphGPUVCL_LSM_SDF(MeshGraph * pMesh, CVector3* centerPoints, 
 
 						#ifdef _LOG
 							timerlog.addEnd();
-							Log::log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - solve LV system");
+							logg.log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - solve LV system");
 						#endif
 
 						// compose new positions
@@ -3328,7 +3328,7 @@ void contractMeshGraphGPUVCL_LSM_SDF(MeshGraph * pMesh, CVector3* centerPoints, 
 							pMesh->pVerts[i] = CVector3((float)Vvec_x(i), (float)Vvec_y(i), (float)Vvec_z(i));
 
 						#ifdef _LOG
-							Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph ENDED");
+							logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph ENDED");
 
 							timerlog.logExecutionTimes();
 						#endif
@@ -3337,7 +3337,7 @@ void contractMeshGraphGPUVCL_LSM_SDF(MeshGraph * pMesh, CVector3* centerPoints, 
 
 //---------------------------------------------------------------------------
 
-void contractMeshGraphGPUVCL_LSM_SDF_C(MeshGraph * pMesh, CVector3* centerPoints, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, bool &recreateOperator, float sL, float * curOneRingArea){
+void contractMeshGraphGPUVCL_LSM_SDF_C(MeshGraph * pMesh, CVector3* centerPoints, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea){
 
 	// vertices are controcted only to SDF center, Laplacian smoothing is noot used...
 
@@ -3353,13 +3353,13 @@ void contractMeshGraphGPUVCL_LSM_SDF_C(MeshGraph * pMesh, CVector3* centerPoints
 
 	if (pMesh->numOfVertices < 3){
 		#ifdef _LOG
-			Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
+			logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph SKIPPED: pMesh->numOfVertices < 3");
 		#endif
 		return;
 	}
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph STARTED");
 
 		timerlog.addStart("check degenerates");
 	#endif
@@ -3387,7 +3387,7 @@ void contractMeshGraphGPUVCL_LSM_SDF_C(MeshGraph * pMesh, CVector3* centerPoints
 	// compute Laplace operator from new points
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - construction of Laplacian operator");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - construction of Laplacian operator");
 	#endif
 
 	collapseDegenerates(pMesh, mgDegeneratesMapping);
@@ -3420,7 +3420,7 @@ void contractMeshGraphGPUVCL_LSM_SDF_C(MeshGraph * pMesh, CVector3* centerPoints
 			}
 
 			#ifdef _LOG
-				Log::log(LOG_LEVEL_DUMP, "Matica L");
+				logg.log(LOG_LEVEL_DUMP, "Matica L");
 
 				timerlog.addEnd();
 
@@ -3428,9 +3428,9 @@ void contractMeshGraphGPUVCL_LSM_SDF_C(MeshGraph * pMesh, CVector3* centerPoints
 
 				timerlog.addEnd();
 
-				Log::log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - construction of Laplacian operator");
+				logg.log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - construction of Laplacian operator");
 
-				Log::log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - preparing of weights matrices");
+				logg.log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - preparing of weights matrices");
 
 				timerlog.addStart("prepare submatrices - WH");
 			#endif
@@ -3439,9 +3439,9 @@ void contractMeshGraphGPUVCL_LSM_SDF_C(MeshGraph * pMesh, CVector3* centerPoints
 				//WL(i,i) = pMesh->wL;
 
 				#ifdef _LOG
-					Log::log(LOG_LEVEL_DUMP, "one ring area pre vrchol ", i);
-					Log::log(LOG_LEVEL_DUMP, "cur ", curOneRingArea[i]);
-					Log::log(LOG_LEVEL_DUMP, "orig ", pMesh->origOneRingArea[i]);
+					logg.log(LOG_LEVEL_DUMP, "one ring area pre vrchol ", i);
+					logg.log(LOG_LEVEL_DUMP, "cur ", curOneRingArea[i]);
+					logg.log(LOG_LEVEL_DUMP, "orig ", pMesh->origOneRingArea[i]);
 				#endif
 
 				WH(i,i) = pMesh->wH[i];
@@ -3450,17 +3450,17 @@ void contractMeshGraphGPUVCL_LSM_SDF_C(MeshGraph * pMesh, CVector3* centerPoints
 			//delete[] curOneRingArea;
 
 			#ifdef _LOG
-				Log::log(LOG_LEVEL_DUMP, "Matica wL");
-				//	 Log::log(LOG_LEVEL_DUMP, WL);
+				logg.log(LOG_LEVEL_DUMP, "Matica wL");
+				//	 logg.log(LOG_LEVEL_DUMP, WL);
 
-				Log::log(LOG_LEVEL_DUMP, "Matica wH");
-				// Log::log(LOG_LEVEL_DUMP, WH);
+				logg.log(LOG_LEVEL_DUMP, "Matica wH");
+				// logg.log(LOG_LEVEL_DUMP, WH);
 
 
 				timerlog.addEnd();
 				timerlog.addStart("prepare submatrices - A");
 
-				//	 Log::log(LOG_LEVEL_DUMP, UPA);
+				//	 logg.log(LOG_LEVEL_DUMP, UPA);
 			#endif
 
 			matrix<float> A(pMesh->numOfVertices, pMesh->numOfVertices);//matrix<float> A(3 * pMesh->numOfVertices, pMesh->numOfVertices);
@@ -3491,8 +3491,8 @@ void contractMeshGraphGPUVCL_LSM_SDF_C(MeshGraph * pMesh, CVector3* centerPoints
 			}
 
 			#ifdef _LOG
-				Log::log(LOG_LEVEL_DUMP, "Matica A");
-				//Log::log(LOG_LEVEL_DUMP, A);
+				logg.log(LOG_LEVEL_DUMP, "Matica A");
+				//logg.log(LOG_LEVEL_DUMP, A);
 
 				timerlog.addEnd();
 				timerlog.addStart("prepare submatrices - B");
@@ -3518,9 +3518,9 @@ void contractMeshGraphGPUVCL_LSM_SDF_C(MeshGraph * pMesh, CVector3* centerPoints
 			// X
 
 			#ifdef _LOG
-				Log::log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - preparing of weights matrices");
+				logg.log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - preparing of weights matrices");
 
-				Log::log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - solve LV system");
+				logg.log(LOG_LEVEL_METHODSTARTEND, "START contractMeshGraph - solve LV system");
 			#endif
 
 			boost::numeric::ublas::vector<float> Vvec_x(pMesh->numOfVertices);
@@ -3628,7 +3628,7 @@ void contractMeshGraphGPUVCL_LSM_SDF_C(MeshGraph * pMesh, CVector3* centerPoints
 
 
 						#ifdef _LOG
-							Log::log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - solve LV system");
+							logg.log(LOG_LEVEL_METHODSTARTEND, "END contractMeshGraph - solve LV system");
 						#endif
 
 
@@ -3636,7 +3636,7 @@ void contractMeshGraphGPUVCL_LSM_SDF_C(MeshGraph * pMesh, CVector3* centerPoints
 							pMesh->pVerts[i] = CVector3((float)Vvec_x(i), (float)Vvec_y(i), (float)Vvec_z(i));
 
 						#ifdef _LOG
-							Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph ENDED");
+							logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph ENDED");
 
 							timerlog.logExecutionTimes();
 						#endif

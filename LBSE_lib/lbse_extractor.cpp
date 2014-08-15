@@ -143,14 +143,14 @@ float * LBSE::Extractor::computeOptimalJoiningTolerance(int &numOfComponents, ve
 		}
 
 	//for (int i = 0; i <compMapping.size(); i++){
-	//	Log::log(LOG_LEVEL_DUMP, "compMapping: ", i);
-	//	Log::log(LOG_LEVEL_DUMP, "value: ", compMapping[i]);
+	//	logg.log(LOG_LEVEL_DUMP, "compMapping: ", i);
+	//	logg.log(LOG_LEVEL_DUMP, "value: ", compMapping[i]);
 	//}
 
 	for (int i = 0; i <componentIndex + 1; i++){
 		#ifdef _LOG
-			Log::log(LOG_LEVEL_C_PARAMS, "minimal joining for component: ", i);
-			Log::log(LOG_LEVEL_C_PARAMS, "value: ", joinings[i]);
+			logg.log(LOG_LEVEL_C_PARAMS, "minimal joining for component: ", i);
+			logg.log(LOG_LEVEL_C_PARAMS, "value: ", joinings[i]);
 		#endif
 		joinings[i] = joinings[i] * 1.001f;
 	}
@@ -160,7 +160,7 @@ float * LBSE::Extractor::computeOptimalJoiningTolerance(int &numOfComponents, ve
 //---------------------------------------------------------------------------
 void LBSE::Extractor::optimizeMeshGraphComponents(){
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD optimizeMeshGraphComponents STARTED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD optimizeMeshGraphComponents STARTED");
 	#endif
 	bool * mark = new bool[pMesh->numOfVertices];
 	for (int i = 0; i < pMesh->numOfVertices; i++)
@@ -257,23 +257,23 @@ void LBSE::Extractor::optimizeMeshGraphComponents(){
 	optMesh->numOfVBOlines = pMesh->numOfVBOlines;
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "Mesh graph components have been optimized.");
-		Log::log(LOG_LEVEL_METHODSTARTEND, "Old graph had vertices: ", pMesh->numOfVertices);
+		logg.log(LOG_LEVEL_METHODSTARTEND, "Mesh graph components have been optimized.");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "Old graph had vertices: ", pMesh->numOfVertices);
 	#endif
 
 	delete pMesh;
 	pMesh = optMesh;
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "New graph has vertices: ", pMesh->numOfVertices);
-		Log::log(LOG_LEVEL_DUMP, "Matica E");
-		Log::log(LOG_LEVEL_DUMP, pMesh->E);
+		logg.log(LOG_LEVEL_METHODSTARTEND, "New graph has vertices: ", pMesh->numOfVertices);
+		logg.log(LOG_LEVEL_DUMP, "Matica E");
+		logg.log(LOG_LEVEL_DUMP, pMesh->E);
 	#endif
 }
 //---------------------------------------------------------------------------
 float LBSE::Extractor::calculateVolumeFromMesh(MeshGraph * mesh, t3DModel *pModel, int subdivision){
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD calculateVolumeFromMesh STARTED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD calculateVolumeFromMesh STARTED");
 	#endif
 
 	float vol = 0.0f;
@@ -306,13 +306,13 @@ float LBSE::Extractor::calculateVolumeFromMesh(MeshGraph * mesh, t3DModel *pMode
 					if (intersections % 2 == 1)
 					vol += voxelVolume;
 		}
-    Log::log(LOG_LEVEL_METHODSTARTEND, "calculateVolumeFromMesh RETURNED ", vol);*/
+    logg.log(LOG_LEVEL_METHODSTARTEND, "calculateVolumeFromMesh RETURNED ", vol);*/
 	return vol;
 }
 //---------------------------------------------------------------------------
 float LBSE::Extractor::calculateVolumeFromMesh(MeshGraph * mesh, t3DModel *pModel){
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD calculateVolumeFromMesh STARTED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD calculateVolumeFromMesh STARTED");
 	#endif
 
 	float vol = 0.0f;
@@ -335,7 +335,7 @@ float LBSE::Extractor::calculateVolumeFromMesh(MeshGraph * mesh, t3DModel *pMode
 	vol = vol / 6.0;
 
     #ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "calculateVolumeFromMesh RETURNED ", vol);
+		logg.log(LOG_LEVEL_METHODSTARTEND, "calculateVolumeFromMesh RETURNED ", vol);
 	#endif
 
 	return vol;
@@ -344,7 +344,7 @@ float LBSE::Extractor::calculateVolumeFromMesh(MeshGraph * mesh, t3DModel *pMode
 void LBSE::Extractor::restoreMeshVolume(MeshGraph * mesh, t3DModel *pModel){
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD calculateVolumeFromMesh STARTED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD calculateVolumeFromMesh STARTED");
 	#endif
 
 	float ratio = pow(origVolume / contractedVolume, (float)(1.0/3.0));
@@ -361,8 +361,8 @@ void LBSE::Extractor::restoreMeshVolume(MeshGraph * mesh, t3DModel *pModel){
 void LBSE::Extractor::logContraction(MeshGraph * mesh1, MeshGraph * mesh2){
 	#ifdef _LOG
 	for (int i = 0; i < mesh1->numOfVertices; i++) {
-		Log::log(LOG_LEVEL_C_PARAMS, "posun vertexu ", i);
-		Log::log(LOG_LEVEL_C_PARAMS, "vektor: ", mesh1->pVerts[i] - mesh2->pVerts[i]);
+		logg.log(LOG_LEVEL_C_PARAMS, "posun vertexu ", i);
+		logg.log(LOG_LEVEL_C_PARAMS, "vektor: ", mesh1->pVerts[i] - mesh2->pVerts[i]);
 	}
 	#endif
 }
@@ -387,11 +387,11 @@ bool LBSE::Extractor::checkContractedMesh(MeshGraph * mesh){
 }
 
 //---------------------------------------------------------------------------
-void LBSE::Extractor::computeSkeleton(t3DModel *pModel, int sourcePointID, SN::SkeletonNode * node, int * ite, bool &recreateOperator, float modelMaxDim){
+void LBSE::Extractor::computeSkeleton(t3DModel *pModel, int sourcePointID, SN::SkeletonNode * node, int * ite, float modelMaxDim){
 
 	#ifdef _LOG
 		Timerlog timerlog = Timerlog("computeSkeleton");
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD computeSkeleton STARTED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD computeSkeleton STARTED");
 	#endif
 
 	numOfBones = maxBones;
@@ -539,7 +539,7 @@ void LBSE::Extractor::computeSkeleton(t3DModel *pModel, int sourcePointID, SN::S
 					int iternum = (*ite);
 					sprintf_s ( s, sizeof(s), "contraction %i", iternum);
 
-					Log::log(LOG_LEVEL_NOTE, "Po Contraction ITERATION : ", iternum);
+					logg.log(LOG_LEVEL_NOTE, "Po Contraction ITERATION : ", iternum);
 					timerlog.addStart(s);
 				#endif
 
@@ -562,7 +562,7 @@ void LBSE::Extractor::computeSkeleton(t3DModel *pModel, int sourcePointID, SN::S
 
 				}
 
-				contractMeshGraph(laplacianScheme, pMesh, mgDegeneratesMapping, *ite ,LImage, recreateOperator, sL, curOneRingExtent, curOneRingArea, kneigh, globalNeighbourhoods, openCLContext, sdfHalfVectorsMG, pTriangulator, openCLManager); 
+				contractMeshGraph(laplacianScheme, pMesh, mgDegeneratesMapping, *ite ,LImage, sL, curOneRingExtent, curOneRingArea, kneigh, globalNeighbourhoods, openCLContext, sdfHalfVectorsMG, pTriangulator, openCLManager); 
 
 				
 				if (doSimplifyMeshAfterIteration){
@@ -654,7 +654,7 @@ void LBSE::Extractor::computeSkeleton(t3DModel *pModel, int sourcePointID, SN::S
 		}
 
 		/*if (goBack){
-			Log::log(LOG_LEVEL_NOTE, "STEPING BACK THE MESH !!!");
+			logg.log(LOG_LEVEL_NOTE, "STEPING BACK THE MESH !!!");
 			copyMeshGraph(stepBack, pMesh);
 			dumpMesh(pMesh);
 		}*/
@@ -696,7 +696,7 @@ void LBSE::Extractor::computeSkeleton(t3DModel *pModel, int sourcePointID, SN::S
 		//	pMesh->pNormals[i] = normals[i];
 		//}
 
-		//Log::log(0, "Contracted mesh graph has been serialized into file contractedMeshGraph_last.cmg");
+		//logg.log(0, "Contracted mesh graph has been serialized into file contractedMeshGraph_last.cmg");
 		//serializeMeshGraph((char*)(config.projectDir + "\\MeshGraphs\\contractedMeshGraph_last.cmg").c_str());
 
 	}
@@ -769,7 +769,7 @@ void LBSE::Extractor::calculateSDFForMeshGraph(MeshGraph * pMesh, t3DModel * pMo
 	int size = 0;
 
 	// UNCOMMENT sdfModelController->ComputeSDF();
-	float * sdf;// UNCOMMENT  = sdfModelController->GetSDF(size, true); 
+	float * sdf = new float[0];// UNCOMMENT  = sdfModelController->GetSDF(size, true); 
 	float maxSDF = FLT_MIN;
 	float minSDF = FLT_MAX;
 	sdfSize = size;
@@ -904,7 +904,7 @@ SN::SkeletonNode * LBSE::Extractor::rerootSkeleton(int newrootId, SN::SkeletonNo
 	queue.push_back(pSkelet);
 	SN::SkeletonNode * imaginary = pSkelet->father;
 	pSkelet->father = NULL;
-	SN::SkeletonNode * newroot;
+	SN::SkeletonNode * newroot = NULL;
 
 	while (queue.size() > 0){
 		SN::SkeletonNode* pNode = queue[queue.size() - 1];

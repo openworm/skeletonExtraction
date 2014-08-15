@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{1CA678B2-C3AE-4F52-8665-ADA874926EB1}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>SkeletonExtractionWrapper</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\props\inlineInclude.props" />
+    <Import Project="..\props\CustomLibs_d.props" />
+    <Import Project="..\props\BoostD.props" />
+    <Import Project="..\props\tnt.props" />
+    <Import Project="..\props\jama.props" />
+    <Import Project="..\props\OpenCL.props" />
+    <Import Project="..\props\libs_d.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\props\inlineInclude.props" />
+    <Import Project="..\props\CustomLibs_d.props" />
+    <Import Project="..\props\BoostD.props" />
+    <Import Project="..\props\tnt.props" />
+    <Import Project="..\props\jama.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(SolutionDir)\Lib\include\jama;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>fade2D_vc11_Debug.lib;tinyxml2.lib;JMSP.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>xcopy "D:\Projects\_shared\GDSW_lib\*.h"  "D:\Projects\OpenWorm\GDSW_lib\" /y /e
+xcopy "D:\Projects\_shared\GDSW_lib\*.cpp"  "D:\Projects\OpenWorm\GDSW_lib\" /y /e
+
+xcopy "D:\Projects\_shared\LBSE_lib\*.h"  "D:\Projects\OpenWorm\LBSE_lib\" /y /e
+xcopy "D:\Projects\_shared\LBSE_lib\*.cpp"  "D:\Projects\OpenWorm\LBSE_lib\" /y /e
+
+xcopy "D:\Projects\_shared\PCT_lib\*.h"  "D:\Projects\OpenWorm\PCT_lib\" /y /e
+xcopy "D:\Projects\_shared\PCT_lib\*.cpp"  "D:\Projects\OpenWorm\PCT_lib\" /y /e
+
+xcopy "D:\Projects\_shared\SDF_lib\*.h"  "D:\Projects\OpenWorm\SDF_lib\" /y /e
+xcopy "D:\Projects\_shared\SDF_lib\*.cpp"  "D:\Projects\OpenWorm\SDF_lib\" /y /e
+
+xcopy "D:\Projects\_shared\Loader_lib\*.h"  "D:\Projects\OpenWorm\Loader_lib\" /y /e
+xcopy "D:\Projects\_shared\Loader_lib\*.cpp"  "D:\Projects\OpenWorm\Loader_lib\" /y /e</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Copy new src files from Skeleton Extensions</Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="Wrapper.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="SkeletonExtractionWrapper.cpp" />
+    <ClCompile Include="Wrapper.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

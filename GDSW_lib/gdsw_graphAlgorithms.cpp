@@ -156,7 +156,7 @@ void GraphAlgorithms::computeObjectSkeletonShaderData(SN::SkeletonNode* currentS
 		return;
 
 #ifdef _LOG
-	Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD computeObjectSkeletonShaderData STARTED");
+	logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD computeObjectSkeletonShaderData STARTED");
 #endif
 
 	data->numOfVertices = length;
@@ -223,8 +223,8 @@ void GraphAlgorithms::computeObjectSkeletonShaderData(SN::SkeletonNode* currentS
 			distSum += dist[k];
 
 			#ifdef _LOG
-				Log::log(LOG_LEVEL_DUMP, "indexy pre vertex : " ,i);
-				Log::log(LOG_LEVEL_DUMP, "index", indices[i * config.NUM_OF_CTRL_BONES + k]);
+				logg.log(LOG_LEVEL_DUMP, "indexy pre vertex : " ,i);
+				logg.log(LOG_LEVEL_DUMP, "index", indices[i * config.NUM_OF_CTRL_BONES + k]);
 			#endif
 		}
 
@@ -239,8 +239,8 @@ void GraphAlgorithms::computeObjectSkeletonShaderData(SN::SkeletonNode* currentS
 				weights[i*numOfControlBones + k] = 1.0f;
 
 			#ifdef _LOG
-				Log::log(LOG_LEVEL_DUMP, "vahy pre vertex : " , i);
-				Log::log(LOG_LEVEL_DUMP, "vaha ",weights[i * config.NUM_OF_CTRL_BONES + k]);
+				logg.log(LOG_LEVEL_DUMP, "vahy pre vertex : " , i);
+				logg.log(LOG_LEVEL_DUMP, "vaha ",weights[i * config.NUM_OF_CTRL_BONES + k]);
 			#endif
 		}
 	}
@@ -284,8 +284,8 @@ void GraphAlgorithms::computeObjectSkeletonShaderData(SN::SkeletonNode* currentS
 	}
 
 
-	delete[] base;
-	base = NULL;
+	//delete[] base;
+	//base = NULL;
 	delete[] dist;
 	dist = NULL;
 	delete[] indices;
@@ -296,7 +296,7 @@ void GraphAlgorithms::computeObjectSkeletonShaderData(SN::SkeletonNode* currentS
 	data->numOfBones = maxBones;
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD computeObjectSkeletonShaderData ENDED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD computeObjectSkeletonShaderData ENDED");
 	#endif
 }
 

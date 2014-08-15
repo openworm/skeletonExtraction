@@ -80,7 +80,7 @@ const int LS_LOCAL_JAMASDF_COTANGENT = 11;             // | OK,NEKON KOSTRA | LO
 //---------------------------------------------------------------------------
 
 // main method for contraction of meshgraph for all the laplacian schemas
-void contractMeshGraph(int laplacianScheme, MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, bool &recreateOperator, float sL, float * curOneRingExtent, float * curOneRingArea, int kneigh, vector<std::set<int>> globalNeighbourhoods, OpenCLContext oclc, CVector3 * sdfValues, PointCloudTriangulation::DeleunayTriangulator * pTriangulator, OpenCLManager openCLManager); //ModelController::CModel * sdfController
+void contractMeshGraph(int laplacianScheme, MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingExtent, float * curOneRingArea, int kneigh, vector<std::set<int>> globalNeighbourhoods, OpenCLContext oclc, CVector3 * sdfValues, PointCloudTriangulation::DeleunayTriangulator * pTriangulator, OpenCLManager openCLManager); //ModelController::CModel * sdfController
 
 //float GLaplace(float h, CVector3 v1, CVector3 v2);
 
@@ -97,21 +97,21 @@ Array2D< float > calculateLaplacianMatrix(MeshGraph * pMesh);
 /* 
 	global methods for meshgraph contraction
 */
-void contractMeshGraphCPUCotangent(MeshGraph * pMesh,  boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, bool &recreateOperator, float sL, float * curOneRingArea);
-void contractMeshGraphCPUPointCloud(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, bool &recreateOperator, float sL, float * curOneRingExtent, float * curOneRingArea,  int kneigh, vector<std::set<int>> globalNeighbourhoods, PointCloudTriangulation::DeleunayTriangulator * pTriangulator);
-void contractMeshGraphGPUVCL(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, bool &recreateOperator, float sL, float * curOneRingArea);
-void contractMeshGraphGPUVCL_LSM(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, bool &recreateOperator, float sL, float * curOneRingArea);
-void contractMeshGraphCPUPCL(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, bool &recreateOperator, float sL, float * curOneRingArea);
-void contractMeshGraphGPUVCL_LSM_SDF(MeshGraph * pMesh, CVector3 * centerPoints, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, bool &recreateOperator, float sL, float * curOneRingArea);
-void contractMeshGraphGPUVCL_LSM_SDF_C(MeshGraph * pMesh, CVector3 * centerPoints, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, bool &recreateOperator, float sL, float * curOneRingArea);
-void contractMeshGraphParallelCPU_SDF(MeshGraph * pMesh, CVector3 * centerPoints, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, bool &recreateOperator, float sL, float * curOneRingArea);
+void contractMeshGraphCPUCotangent(MeshGraph * pMesh,  boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea);
+void contractMeshGraphCPUPointCloud(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingExtent, float * curOneRingArea,  int kneigh, vector<std::set<int>> globalNeighbourhoods, PointCloudTriangulation::DeleunayTriangulator * pTriangulator);
+void contractMeshGraphGPUVCL(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea);
+void contractMeshGraphGPUVCL_LSM(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea);
+void contractMeshGraphCPUPCL(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea);
+void contractMeshGraphGPUVCL_LSM_SDF(MeshGraph * pMesh, CVector3 * centerPoints, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea);
+void contractMeshGraphGPUVCL_LSM_SDF_C(MeshGraph * pMesh, CVector3 * centerPoints, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea);
+void contractMeshGraphParallelCPU_SDF(MeshGraph * pMesh, CVector3 * centerPoints, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea);
 
 /* 
 	local parallel methods for meshgraph contraction, both CPU and OpenCL
 */
-void contractMeshGraphParallelCPU(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, bool &recreateOperator, float sL, float * curOneRingArea);
-void contractMeshGraphParallelOpenCL(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, bool &recreateOperator, float sL, float * curOneRingArea, OpenCLManager openCLManager);
-void contractMeshGraphParallelOpenCL2ring(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, bool &recreateOperator, float sL, float * curOneRingArea, OpenCLManager openCLManager);
+void contractMeshGraphParallelCPU(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea);
+void contractMeshGraphParallelOpenCL(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea, OpenCLManager openCLManager);
+void contractMeshGraphParallelOpenCL2ring(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea, OpenCLManager openCLManager);
 void contractMeshGraphParallelOpenCLInterop(int * ite, MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, float sL, float * curOneRingArea, int numOfIte,  OpenCLContext oclc, OpenCLManager openCLManager);
 void contractMeshGraphParallelOpenCLJacobi(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, float sL, float * curOneRingArea, OpenCLContext oclc, OpenCLManager openCLManager);
 void contractMeshGraphParallelOpenCLJacobiInterop(int * ite, MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, float sL, float * curOneRingArea, int numOfIte, OpenCLContext oclc, OpenCLManager openCLManager);

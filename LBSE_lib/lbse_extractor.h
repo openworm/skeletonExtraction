@@ -89,7 +89,8 @@ namespace LBSE {
 			float groupingTolerance; // distance limit which determinates if two vertices are the same in mesh contraction
 			float groupingToleranceSDFMulti;
 
-			void computeSkeleton(t3DModel *pModel, int sourcePointID, SN::SkeletonNode * skeleton, int * ite, bool &recreateOperator, float modelMaxDim);
+			//void computeSkeleton(t3DModel *pModel, int sourcePointID, SN::SkeletonNode * skeleton, int * ite, bool &recreateOperator, float modelMaxDim);
+			void computeSkeleton(t3DModel *pModel, int sourcePointID, SN::SkeletonNode * skeleton, int * ite, float modelMaxDim);
 			void applyConnectivitySurgery(SN::SkeletonNode * node, float modelMaxDim);
 
 			float calculateVolumeFromMesh(MeshGraph * mesh, t3DModel *pModel, int subdivision);
