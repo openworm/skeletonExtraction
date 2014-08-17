@@ -84,8 +84,11 @@ xcopy "D:\Projects\_shared\PCT_lib\*.cpp"  "D:\Projects\OpenWorm\PCT_lib\" /y /e
 xcopy "D:\Projects\_shared\SDF_lib\*.h"  "D:\Projects\OpenWorm\SDF_lib\" /y /e
 xcopy "D:\Projects\_shared\SDF_lib\*.cpp"  "D:\Projects\OpenWorm\SDF_lib\" /y /e
 
-xcopy "D:\Projects\_shared\Loader_lib\*.h"  "D:\Projects\OpenWorm\Loader_lib\" /y /e
-xcopy "D:\Projects\_shared\Loader_lib\*.cpp"  "D:\Projects\OpenWorm\Loader_lib\" /y /e</Command>
+xcopy "D:\Projects\_shared\Import_lib\*.h"  "D:\Projects\OpenWorm\Import_lib\" /y /e
+xcopy "D:\Projects\_shared\Import_lib\*.cpp"  "D:\Projects\OpenWorm\Import_lib\" /y /e
+
+xcopy "D:\Projects\_shared\Export_lib\*.h"  "D:\Projects\OpenWorm\Export_lib\" /y /e
+xcopy "D:\Projects\_shared\Export_lib\*.cpp"  "D:\Projects\OpenWorm\Export_lib\" /y /e</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>Copy new src files from Skeleton Extensions</Message>

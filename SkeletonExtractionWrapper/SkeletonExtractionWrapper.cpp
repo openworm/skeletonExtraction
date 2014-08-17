@@ -8,6 +8,9 @@
 #include <LBSE_lib/lbse_extractor.h>
 #include <LBSE_lib/lbse_skeleton.h>
 
+#include <Import_lib/WormLoader.h>
+#include <Export_lib/ColladaExporter.h>
+
 #include "Wrapper.h"
 
 
@@ -79,6 +82,8 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	ga.FloydWarshall(oLBSExtractor.pMesh, distanceMatrix);
 
+	ObjectSkeletonShaderData wormData;
+
 	int offset = 0;
 
 	for(int i = 0; i < g_3DModel.numOfObjects; i++){
@@ -93,6 +98,11 @@ int _tmain(int argc, _TCHAR* argv[])
 		ga.computeObjectSkeletonShaderData(pSkeletonRoot, oLBSExtractor.pMesh, pObject, &skeletonData, pObject->numOfVertices, offset, true, distanceMatrix, NUM_OF_CTRL_BONES, MAX_BONE_MAT);
 
 		// copy skeletonData
+
+		wormData.weights = new float[skeletonData.numOfVertices * NUM_OF_CTRL_BONES];
+		wormData.indices = new float[skeletonData.numOfVertices * NUM_OF_CTRL_BONES];
+		memcpy(skeletonData.indices, skeletonData.indices, skeletonData.numOfVertices * NUM_OF_CTRL_BONES * sizeof(float));
+		memcpy(skeletonData.weights, skeletonData.weights, skeletonData.numOfVertices * NUM_OF_CTRL_BONES * sizeof(float));	
 
 		offset += pObject->numOfVerts;
 	}
