@@ -1,5 +1,5 @@
 ###PROJECTS:###
-*All projects are in this repository's [Visual Studio Solution SOLUTION](http://msdn.microsoft.com/en-us/library/bb165951(v=vs.80).aspx) [file](https://github.com/openworm/skeletonExtraction/blob/master/OpenWormSkeletonExtraction.sln).*
+*All projects are in this repository's [Visual Studio Solution](http://msdn.microsoft.com/en-us/library/bb165951(v=vs.80).aspx) [file](https://github.com/openworm/skeletonExtraction/blob/master/OpenWormSkeletonExtraction.sln).*
 
 **1) GDSW_lib** [Geodesic Distance Skinning Weights]
 - Library computes geodesic distance on the mesh surface using Floyd-Warshall algorithm. 
