@@ -12,7 +12,7 @@ void FloydWarshall(MeshGraph * pMesh, Array2D<float>& M)
 ```
 - Computes distances on the graph
 
-**2) LBSE_lib** [Laplacian Based Skeleton Extraction]
+**2) LBSE_lib** [Laplacian-Based Skeleton Extraction]
 - Library uses Laplacian based skeleton contraction for extraction of the skeleton from input mesh
 - The resulting skeleton is a tree structure
 
