@@ -1,4 +1,4 @@
-###PROJECTS IN SOLUTION:###
+###PROJECTS IN THIS REPO'S [VISUAL STUDIO SOLUTION](http://msdn.microsoft.com/en-us/library/bb165951(v=vs.80).aspx) FILE:###
 
 **1) GDSW_lib** [Geodesic Distance Skinning Weights]
 - Library computes geodesic distance on the mesh surface using Floyd-Warshall algorithm. 
