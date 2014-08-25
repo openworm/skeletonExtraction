@@ -17,7 +17,14 @@ void FloydWarshall(MeshGraph * pMesh, Array2D<float>& M)
 - The resulting skeleton is a tree structure
 
 *Main functions:*
-void computeSkeleton(t3DModel *pModel, int sourcePointID, SN::SkeletonNode * skeleton, int * ite, bool &recreateOperator, float modelMaxDim)
+```
+void computeSkeleton(t3DModel *pModel, 
+                     int sourcePointID, 
+                     SN::SkeletonNode * skeleton, 
+                     int * ite, 
+                     bool &recreateOperator, 
+                     float modelMaxDim)
+```
 - Computes skeleton from input mesh
 
 **3) PCT_lib** [Point Cloud Triangulation]
