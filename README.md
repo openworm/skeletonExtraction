@@ -1,30 +1,30 @@
 ###PROJECTS IN SOLUTION:###
 
-1) GDSW_lib [Geodesic Distance Skinning Weights]
+**1) GDSW_lib** [Geodesic Distance Skinning Weights]
 - Library computes geodesic distance on the mesh surface using Floyd-Warshall algorithm. 
 - The geodesic distance is than used for computation of skinning weights
 - It is a very trivial approach how skinning weights can be computed
 - A more complex approach might be needed in the future
 
-**Main functions:**
+*Main functions:*
 ```
 void FloydWarshall(MeshGraph * pMesh, Array2D<float>& M)
 ```
 - Computes distances on the graph
 
-2) LBSE_lib [Laplacian Based Skeleton Extraction]
+**2) LBSE_lib** [Laplacian Based Skeleton Extraction]
 - Library uses Laplacian based skeleton contraction for extraction of the skeleton from input mesh
 - The resulting skeleton is a tree structure
 
-**Main functions:**
+*Main functions:*
 void computeSkeleton(t3DModel *pModel, int sourcePointID, SN::SkeletonNode * skeleton, int * ite, bool &recreateOperator, float modelMaxDim)
 - Computes skeleton from input mesh
 
-3) PCT_lib [Point Cloud Triangulation]
+**3) PCT_lib** [Point Cloud Triangulation]
 - Library computes triangulation from input point cloud
 - The global triangulation is composed from local Delaunay triangulations
 
-**Main functions:**
+*Main functions:*
 ```
 void computeLocalTriangulationFromPoints(int index, int numOfPoints, 
                                          float * points, int &numOfIndices, 
@@ -43,7 +43,7 @@ void computeGlobalTriangulationFromPoints(int numOfPoints,
 ```
 - computes global triangulation
 
-4) SDF_lib [Shape Diameter Function]
+**4) SDF_lib** [Shape Diameter Function]
 - Not yet needed, but I have left it there for keeping compatibility of source files between my repo and this repo.
 
 ###PREPROCESSOR DEFINITIONS:###
