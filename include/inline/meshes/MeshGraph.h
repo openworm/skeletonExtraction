@@ -7,6 +7,7 @@
 
 #include <meshes/structure.h>
 #include <mmath/mmath.h>
+#include <meshes\IndexedFace.h>
 using namespace mmath;
 
 #ifdef _LOG
@@ -15,7 +16,6 @@ using namespace mmath;
 
 
 #include <PCT_lib/pct_PointCloudTriangulation.h>
-
 
 
 //using namespace std;
@@ -37,7 +37,7 @@ struct VertexJoiningVisualization {
 	}
 };
 
-struct neighVisualization
+struct NeighVisualization
 {
 	Array2D<bool> E_local_visualize;
 	bool isE_local_visualize;
@@ -127,8 +127,9 @@ struct SurgeryGraph {
 	}
 };
 
-void calculateOneRingArea(MeshGraph * pMesh, t3DModel *pModel, float * p);
-void createMeshGraph(t3DModel *pModel,MeshGraph * pMesh, VertexJoiningVisualization * pJoining, float * joinings, float delta, float wL, float wH, int numOfComponents, std::vector<int> compMapping);
+void calculateOneRingArea(MeshGraph * pMesh, structure::t3DModel *pModel, float * p);
+void createMeshGraph(structure::t3DModel *pModel,MeshGraph * pMesh, VertexJoiningVisualization * pJoining, float * joinings, float delta, float wL, float wH, int numOfComponents, std::vector<int> compMapping);
+void createMeshGraph(meshes::IndexedFace *mesh, MeshGraph * pMesh, float wL, float wH);
 void halfEdgeCollapse(SurgeryGraph * pGraph, int i, int j, int * actualNumOfBones, bool updateQ);
 void halfEdgeCollapse(MeshGraph * pMesh, boost::unordered_map<int, std::vector<int> > &mgDegeneratesMapping, int i, int j);
 bool isMeshTriangle(MeshGraph * pMesh, int a,int b,int c);

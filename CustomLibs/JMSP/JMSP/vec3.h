@@ -26,6 +26,9 @@
 // Vec3 is a vector class
 // I couldn't call it vec3, because that already
 // seems to be defined.
+
+namespace jmsp {
+
 class Vec3 
 {
 public:
@@ -97,11 +100,13 @@ public:
 
 
 	// Input and Output
-	friend std::ostream& operator<<(std::ostream& os, const Vec3& vo);
+	//friend std::ostream& operator<<(std::ostream& os, const Vec3& vo);
 
 //	friend istream& operator>>(istream& is, Vec3& vi);
 
 private:
 };
+
+}
 
 #endif // #ifndef __Vec3_h

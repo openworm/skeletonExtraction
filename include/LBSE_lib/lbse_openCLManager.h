@@ -1,6 +1,5 @@
 #ifndef c_openCLManagerH
 #define c_openCLManagerH
-//---------------------------------------------------------------------------
 
 #include <CL\cl.h>
 #include <CL\cl_gl.h>
@@ -9,8 +8,6 @@
 #include <fstream>
 #include <vector>
 
-//#include <windows.h>
-
 #pragma warning(push, 0)
 
 #include <boost/numeric/ublas/matrix.hpp>
@@ -18,8 +15,6 @@
 
 #pragma pop
 
-//#include "c_config.h"
-//#include "m_math.h"
 #include <mmath/mmath.h>
 using namespace mmath;
 
@@ -28,8 +23,6 @@ using namespace mmath;
 #endif
 
 #include "PCT_lib/pct_eig3.h"
-
-//using namespace std;
 
 struct OpenCLContext {
 	cl_context context;

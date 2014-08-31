@@ -275,6 +275,9 @@ namespace mmath {
 
 	// This returns the distance between 2 3D points
 	float Distance(CVector3 vPoint1, CVector3 vPoint2);
+	
+	// This returns the distance between 2 2D points
+	float Distance(CVector2 vPoint1, CVector2 vPoint2);
 
 	float DistancePointToLine(CVector3 vA, CVector3 vB, CVector3 vPoint);
 

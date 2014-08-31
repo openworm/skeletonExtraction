@@ -1,0 +1,149 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="inline libs">
+      <UniqueIdentifier>{efb9748d-d9bd-43fe-8afe-46a3fd3afec7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="GraphNodeMatch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="m_math_additions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SkeletonGraph.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SkeletonGraphNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SkeletonMatchNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="USkeletonNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphMatcher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphMatchingEvaluator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SM_lib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QuaternionsBetweenWormSkeletons.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="s_skeletonNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GraphEdge.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphMatcher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphMatchingEvaluator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphNodeMatch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="m_math_additions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SkeletonGraph.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SkeletonGraphNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SkeletonMatchNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SkeletonNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="USkeletonNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ValueMatchingStruct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SM_lib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MatchingStruct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="QuaternionsBetweenWormSkeletons.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="s_skeletonNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inline\meshes\CVectorMesh.h">
+      <Filter>inline libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inline\meshes\IndexedFace.h">
+      <Filter>inline libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inline\meshes\Mesh+Skin.h">
+      <Filter>inline libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inline\meshes\Mesh.h">
+      <Filter>inline libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inline\meshes\MeshGraph.h">
+      <Filter>inline libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inline\meshes\meshSimplification.h">
+      <Filter>inline libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inline\meshes\structure.h">
+      <Filter>inline libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inline\mmath\mmath.h">
+      <Filter>inline libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inline\SkeletonNode\SkeletonNode.h">
+      <Filter>inline libs</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\include\inline\meshes\MeshGraph.inl">
+      <Filter>inline libs</Filter>
+    </None>
+    <None Include="..\include\inline\meshes\meshSimplification.inl">
+      <Filter>inline libs</Filter>
+    </None>
+    <None Include="..\include\inline\meshes\structure.inl">
+      <Filter>inline libs</Filter>
+    </None>
+    <None Include="..\include\inline\mmath\mmath.inl">
+      <Filter>inline libs</Filter>
+    </None>
+  </ItemGroup>
+</Project>

@@ -24,6 +24,7 @@
 #include <mmath/mmath.h>
 using namespace mmath;
 #include <meshes/structure.h>
+#include <meshes/Mesh.h>
 //#include "s_skeletonNode.h"
 #include <SkeletonNode/SkeletonNode.h>
 
@@ -32,8 +33,8 @@ using namespace mmath;
 #include <SDF_lib/Structures/Math/Mat4.h>
 
 
-void ImportModel(t3DModel * p_3DModel, char * strFileName, ModelController::CModel * sdfController, SN::SkeletonNode * pNode);
-void recursiveModelFill(int *i, t3DModel * p_3DModel, const aiScene *sc,const aiNode* nd, BoundingBox * pModelMax, SN::SkeletonNode * pNode);
+void ImportModel(meshes::Mesh * pModel, structure::t3DModel * p_3DModel, char * strFileName, ModelController::CModel * sdfController, SN::SkeletonNode * pNode);
+void recursiveModelFill(int *i, meshes::Mesh * pModel, structure::t3DModel * p_3DModel, const aiScene *sc,const aiNode* nd, structure::BoundingBox * pModelMax, SN::SkeletonNode * pNode);
 
 //---------------------------------------------------------------------------
 #endif

@@ -35,6 +35,7 @@ using namespace std;
 #include "triangle.h"
 #include "mesh.h"
 
+namespace jmsp {
 
 // The edge collapse structure.  The "from vertex" will
 // be collapsed to the "to vertex."  This may flatten some
@@ -225,5 +226,7 @@ private:
 								float &retmaxValue, 
 								bool &bMaxValueFound);
 };
+
+}
 
 #endif // __PMesh_h

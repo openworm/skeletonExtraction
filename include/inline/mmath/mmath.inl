@@ -341,6 +341,18 @@ namespace mmath {
 		// Return the distance between the 2 points
 		return (float)distance;
 	}
+	
+
+	inline float Distance(CVector2 vPoint1, CVector2 vPoint2)
+	{
+
+		double distance = sqrt( (vPoint2.x - vPoint1.x) * (vPoint2.x - vPoint1.x) +
+			(vPoint2.y - vPoint1.y) * (vPoint2.y - vPoint1.y));
+
+		// Return the distance between the 2 points
+		return (float)distance;
+	}
+
 
 	inline float DistancePointToLine(CVector3 vA, CVector3 vB, CVector3 vPoint){
 		return Magnitude(Cross(vPoint-vA, vPoint - vB)) / Magnitude(vB - vA);

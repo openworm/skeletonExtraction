@@ -24,6 +24,8 @@
 
 #include "mesh.h"
 
+using namespace jmsp;
+
 
 Mesh::Mesh(char* filename)
 {

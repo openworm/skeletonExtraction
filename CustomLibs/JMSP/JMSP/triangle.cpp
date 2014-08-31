@@ -24,18 +24,18 @@
 #include "mesh.h"
 
 // retrieve vertices as an array of floats
-const float* triangle::getVert1() {return (_mesh->getVertex(_vert1)).getArrayVerts();}
-const float* triangle::getVert2() {return (_mesh->getVertex(_vert2)).getArrayVerts();}
-const float* triangle::getVert3() {return (_mesh->getVertex(_vert3)).getArrayVerts();}
+const float* jmsp::triangle::getVert1() {return (_mesh->getVertex(_vert1)).getArrayVerts();}
+const float* jmsp::triangle::getVert2() {return (_mesh->getVertex(_vert2)).getArrayVerts();}
+const float* jmsp::triangle::getVert3() {return (_mesh->getVertex(_vert3)).getArrayVerts();}
 
 // retrieve vertices as a vertex object
-const vertex& triangle::getVert1vertex() const {return _mesh->getVertex(_vert1);};
-const vertex& triangle::getVert2vertex() const {return _mesh->getVertex(_vert2);};
-const vertex& triangle::getVert3vertex() const {return _mesh->getVertex(_vert3);};
+const jmsp::vertex& jmsp::triangle::getVert1vertex() const {return _mesh->getVertex(_vert1);};
+const jmsp::vertex& jmsp::triangle::getVert2vertex() const {return _mesh->getVertex(_vert2);};
+const jmsp::vertex& jmsp::triangle::getVert3vertex() const {return _mesh->getVertex(_vert3);};
 
 // Calculate normal of triangle
 void
-triangle::calcNormal()
+jmsp::triangle::calcNormal()
 {
 	assert(_mesh);
 
@@ -56,7 +56,7 @@ triangle::calcNormal()
 
 // Calculate area of triangle
 float
-triangle::calcArea()
+jmsp::triangle::calcArea()
 {
 	assert(_mesh);
 
@@ -76,8 +76,8 @@ triangle::calcArea()
 
 
 // Used for output
-std::ostream&
-operator<<(std::ostream& os, const triangle& to)
+/*std::ostream&
+jmsp::operator<<(std::ostream& os, const jmsp::triangle& to)
 {
 	os << "vert1: " << to._vert1 << " vert2: " << to._vert2 << " vert3: " << to._vert3; // for some reason this isn't working as a friend function, not sure why
 	os << " Normal: " << to._normal << " Active? " << to.isActive();
@@ -85,5 +85,5 @@ operator<<(std::ostream& os, const triangle& to)
 
 	// it is pulling ostream from the STL typedef, not the regular ostream, though.
 	return os;
-}
+}*/
 

@@ -24,27 +24,24 @@ void assignFathersForSkeletonTree(SN::SkeletonNode * pNode){
 	}
 }
 
-SN::SkeletonNode * copySkeletonNode(SN::SkeletonNode * src){
-	SN::SkeletonNode * pNode = copySkeletonNodeImpl(src);
-	assignFathersForSkeletonTree(pNode);
-
-	return pNode;
+void copySkeletonNode(SN::SkeletonNode * src, SN::SkeletonNode * dest){
+	copySkeletonNodeImpl(src, dest);
+	//assignFathersForSkeletonTree(dest);
 }
 
-SN::SkeletonNode * copySkeletonNodeImpl(SN::SkeletonNode * src){
-	SN::SkeletonNode * dest = new SN::SkeletonNode();
+void copySkeletonNodeImpl(SN::SkeletonNode * src, SN::SkeletonNode * dest){
 
 	dest->id = src->id;
 	dest->point = src->point;
 	dest->nodes = vector<SN::SkeletonNode*>();
 	//dest->father = src->father;
 	for (int i = 0; i < src->nodes.size(); i++) {
-		SN::SkeletonNode * p = copySkeletonNode(src->nodes[i]);
+		SN::SkeletonNode * p = new SN::SkeletonNode();
 		p->father = dest;
 		dest->nodes.push_back(p);
+		copySkeletonNode(src->nodes[i], p);
 	}
 
-	return dest;
 }
 
 /*void copySkeletonNodeToSQMNode(SN::SkeletonNode * src, bmm::SkeletonNode * dest, float radius){
@@ -137,7 +134,7 @@ vector<CVector3> findNeighborhood(int ind, vector<CVector3> v, float r){
 
 
 //---------------------------------------------------------------------------
-void calculateOneRingArea(MeshGraph * pMesh, t3DModel *pModel, float * p){
+void calculateOneRingArea(MeshGraph * pMesh, structure::t3DModel *pModel, float * p){
 	#ifdef _LOG
 		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD calculateOneRingArea STARTED");
 	#endif
@@ -150,7 +147,7 @@ void calculateOneRingArea(MeshGraph * pMesh, t3DModel *pModel, float * p){
 			// ak je toto 0, nesimplifikujeme mesh a ratame z povodnych trojuholnikov
 			int offset = 0;
 			for (int j = 0; j < pModel->numOfObjects; j++){
-				t3DObject *pObject = &pModel->pObject[j];
+				structure::t3DObject *pObject = &pModel->pObject[j];
 				 for (int k = 0; k < pObject->numOfFaces; k++){
 							int ind0 = pMesh->indices[offset + pObject->pFaces[k].vertIndex[0]];
 							int ind1 = pMesh->indices[offset + pObject->pFaces[k].vertIndex[1]];
@@ -327,6 +324,25 @@ SN::SkeletonNode * findNodeWithIdInTree(SN::SkeletonNode * node, int id){
 	//return nullNode;
 	return NULL;
 }
+
+SN::SkeletonNode * findNodeWithId(SN::SkeletonNode * pRoot, int id){
+	vector<SN::SkeletonNode*> queue;
+	queue.push_back(pRoot);
+
+	while (queue.size() > 0){
+		SN::SkeletonNode* pNode = queue[queue.size() - 1];
+		queue.pop_back();
+
+		if (pNode->id == id)
+			return pNode;
+
+		for (int i=0; i < pNode->nodes.size(); i++){
+			SN::SkeletonNode* pSon = (SN::SkeletonNode*)pNode->nodes[i];
+			queue.push_back(pSon);
+		}
+	}
+}
+
 
 //---------------------------------------------------------------------------
 // returns the shortest way between 2 points on the mesh graph structure

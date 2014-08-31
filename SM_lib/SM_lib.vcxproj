@@ -1,0 +1,156 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{B454CAAC-6210-4AB7-B40F-B58825E49496}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>SM_lib</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\props\libs_d.props" />
+    <Import Project="..\props\CustomLibs_d.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\props\libs.props" />
+    <Import Project="..\props\CustomLibs.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetName>$(ProjectName)_d</TargetName>
+    <IncludePath>$(SolutionDir)\Lib\include;$(IncludePath);$(WindowsSdkDir)\;$(WindowsSdkDir)\include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Include</IncludePath>
+    <LibraryPath>$(SolutionDir)\Lib\lib\debug\OpenMesh;$(SolutionDir)\Lib\lib\debug\Boost;$(SolutionDir)\Lib\lib\debug\;$(SolutionDir)\Lib\lib\;$(LibraryPath);$(WindowsSdkDir)\lib</LibraryPath>
+    <ExecutablePath>$(VCInstallDir)bin;$(WindowsSDK_ExecutablePath_x86);$(VSInstallDir)Common7\Tools\bin;$(VSInstallDir)Common7\tools;$(VSInstallDir)Common7\ide;$(ProgramFiles)\HTML Help Workshop;$(MSBuildToolsPath32);$(VSInstallDir);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);$(WindowsSdkDir)\bin</ExecutablePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>$(SolutionDir)\Lib\include\;$(SolutionDir)\include\inline;$(IncludePath)</IncludePath>
+    <LibraryWPath>$(WindowsSdkDir)\lib;$(LibraryWPath)</LibraryWPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PreBuildEvent>
+      <Command>if not exist "$(SolutionDir)include\" mkdir "$(SolutionDir)include\"
+if not exist "$(SolutionDir)include\$(ProjectName)\" mkdir "$(SolutionDir)include\$(ProjectName)\"
+xcopy "$(ProjectDir)*.h"  "$(SolutionDir)include\$(ProjectName)\" /y /e</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Generate include files</Message>
+    </PreBuildEvent>
+    <Lib>
+      <TreatLibWarningAsErrors>false</TreatLibWarningAsErrors>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <PreBuildEvent>
+      <Command>if not exist "$(SolutionDir)include\" mkdir "$(SolutionDir)include\"
+if not exist "$(SolutionDir)include\$(ProjectName)\" mkdir "$(SolutionDir)include\$(ProjectName)\"
+xcopy "$(ProjectDir)*.h"  "$(SolutionDir)include\$(ProjectName)\" /y /e</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="GraphMatcher.cpp" />
+    <ClCompile Include="GraphMatchingEvaluator.cpp" />
+    <ClCompile Include="GraphNodeMatch.cpp" />
+    <ClCompile Include="m_math_additions.cpp" />
+    <ClCompile Include="QuaternionsBetweenWormSkeletons.cpp" />
+    <ClCompile Include="SkeletonGraph.cpp" />
+    <ClCompile Include="SkeletonGraphNode.cpp" />
+    <ClCompile Include="SkeletonMatchNode.cpp" />
+    <ClCompile Include="SM_lib.cpp" />
+    <ClCompile Include="s_skeletonNode.cpp" />
+    <ClCompile Include="USkeletonNode.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\inline\meshes\CVectorMesh.h" />
+    <ClInclude Include="..\include\inline\meshes\IndexedFace.h" />
+    <ClInclude Include="..\include\inline\meshes\Mesh+Skin.h" />
+    <ClInclude Include="..\include\inline\meshes\Mesh.h" />
+    <ClInclude Include="..\include\inline\meshes\MeshGraph.h" />
+    <ClInclude Include="..\include\inline\meshes\meshSimplification.h" />
+    <ClInclude Include="..\include\inline\meshes\structure.h" />
+    <ClInclude Include="..\include\inline\mmath\mmath.h" />
+    <ClInclude Include="..\include\inline\SkeletonNode\SkeletonNode.h" />
+    <ClInclude Include="GraphEdge.h" />
+    <ClInclude Include="GraphMatcher.h" />
+    <ClInclude Include="GraphMatchingEvaluator.h" />
+    <ClInclude Include="GraphNodeMatch.h" />
+    <ClInclude Include="MatchingStruct.h" />
+    <ClInclude Include="m_math_additions.h" />
+    <ClInclude Include="QuaternionsBetweenWormSkeletons.h" />
+    <ClInclude Include="SkeletonGraph.h" />
+    <ClInclude Include="SkeletonGraphNode.h" />
+    <ClInclude Include="SkeletonMatchNode.h" />
+    <ClInclude Include="SkeletonNode.h" />
+    <ClInclude Include="SM_lib.h" />
+    <ClInclude Include="s_skeletonNode.h" />
+    <ClInclude Include="USkeletonNode.h" />
+    <ClInclude Include="Utility.h" />
+    <ClInclude Include="ValueMatchingStruct.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\include\inline\meshes\MeshGraph.inl" />
+    <None Include="..\include\inline\meshes\meshSimplification.inl" />
+    <None Include="..\include\inline\meshes\structure.inl" />
+    <None Include="..\include\inline\mmath\mmath.inl" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

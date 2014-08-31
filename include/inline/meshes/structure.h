@@ -23,6 +23,8 @@ using namespace mmath;
 	#include "logs/log.h"
 #endif
 //---------------------------------------------------------------------------
+
+namespace structure {
 struct BoundingBox {
 	float x_min;
 	float x_max;
@@ -47,6 +49,7 @@ struct BoundingBox {
 		z_max = -FLT_MAX;
 	}
 };
+
 
 // This is our 2D point class.  This will be used to store the UV coordinates.
 struct tVector2 {
@@ -149,17 +152,21 @@ struct tChunk
 	unsigned int bytesRead;					// The amount of bytes read within that chunk
 };
 
+}
+
 //---------------------------------------------------------------------------
-void releaseStructure(t3DModel *pModel);
-void createModelNeighbours(t3DModel *pModel, float delta);
-int  findClosestPointID(t3DModel *pModel, CVector3 sourcePoint);
-CVector3 getVertexWithID(t3DModel *pModel, int id);
-void dumpNeighbours(t3DModel *pModel);
-void dumpDistances(t3DModel *pModel);
-void calculateVerticeCount(t3DObject *pObject);
-void calculateVerticeCount(t3DModel *pModel);
-int getTopPointID(t3DModel *pModel);
+void releaseStructure(structure::t3DModel *pModel);
+void createModelNeighbours(structure::t3DModel *pModel, float delta);
+int  findClosestPointID(structure::t3DModel *pModel, CVector3 sourcePoint);
+CVector3 getVertexWithID(structure::t3DModel *pModel, int id);
+void dumpNeighbours(structure::t3DModel *pModel);
+void dumpDistances(structure::t3DModel *pModel);
+void calculateVerticeCount(structure::t3DObject *pObject);
+void calculateVerticeCount(structure::t3DModel *pModel);
+int getTopPointID(structure::t3DModel *pModel);
 //---------------------------------------------------------------------------
+
+
 
 #include "structure.inl"
 

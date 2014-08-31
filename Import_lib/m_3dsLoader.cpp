@@ -25,17 +25,17 @@ CLoad3DS::CLoad3DS()
 /////
 ///////////////////////////////// IMPORT 3DS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*
 
-bool CLoad3DS::Import3DS(t3DModel *pModel, char *strFileName)
+bool CLoad3DS::Import3DS(structure::t3DModel *pModel, char *strFileName)
 {
-	m_CurrentChunk = new tChunk;				// Initialize and allocate our current chunk
-	m_TempChunk = new tChunk;					// Initialize and allocate a temporary chunk
+	m_CurrentChunk = new structure::tChunk;				// Initialize and allocate our current chunk
+	m_TempChunk = new structure::tChunk;					// Initialize and allocate a temporary chunk
 
 	char strMessage[255] = {0};
 	
 	actVertID = 0;
 
-	g_modelMax = BoundingBox();
-
+	g_modelMax = structure::BoundingBox();
+	
 	// Open the 3DS file
 	m_FilePointer = fopen(strFileName, "rb");
 
@@ -82,19 +82,19 @@ bool CLoad3DS::Import3DS(t3DModel *pModel, char *strFileName)
 	return 0;
 }
 
-void CLoad3DS::GenerateTextureCoords(t3DModel *pModel){
+void CLoad3DS::GenerateTextureCoords(structure::t3DModel *pModel){
 
 	int num = 0;
 
 	for (int i = 0; i < pModel->numOfObjects; i++){
-		t3DObject *pObject = &pModel->pObject[i];
+		structure::t3DObject *pObject = &pModel->pObject[i];
 		if (!pObject->bHasTexture)
 			num += pObject->numOfVerts;
 	}
 
 	int index = 0;
 	for (int i = 0; i < pModel->numOfObjects; i++){
-		t3DObject *pObject = &pModel->pObject[i];
+		structure::t3DObject *pObject = &pModel->pObject[i];
 		// if hasnt texture, generate UV coords
 		if (!pObject->bHasTexture){
 			delete[](pObject->pTexVerts);
@@ -133,14 +133,14 @@ void CLoad3DS::CleanUp()
 /////
 ///////////////////////////////// PROCESS NEXT CHUNK\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*
 
-void CLoad3DS::ProcessNextChunk(t3DModel *pModel, tChunk *pPreviousChunk, BoundingBox  *pModelMax)
+void CLoad3DS::ProcessNextChunk(structure::t3DModel *pModel, structure::tChunk *pPreviousChunk, structure::BoundingBox  *pModelMax)
 {
-	t3DObject newObject = {0};					// This is used to add to our object list
-	tMaterialInfo newTexture = {0};				// This is used to add to our material list
+	structure::t3DObject newObject = {0};					// This is used to add to our object list
+	structure::tMaterialInfo newTexture = {0};				// This is used to add to our material list
 	unsigned int version = 0;					// This will hold the file version
 	//int buffer[50000] = {0};					// This is used to read past unwanted data
 
-	m_CurrentChunk = new tChunk;				// Allocate a new chunk
+	m_CurrentChunk = new structure::tChunk;				// Allocate a new chunk
 
 	// Below we check our chunk ID each time we read a new chunk.  Then, if
 	// we want to extract the information from that chunk, we do so.
@@ -218,12 +218,12 @@ void CLoad3DS::ProcessNextChunk(t3DModel *pModel, tChunk *pPreviousChunk, Boundi
 			pModel->pObject.push_back(newObject);
 
 			// Initialize the object and all it's data members
-			memset(&(pModel->pObject[pModel->numOfObjects - 1]), 0, sizeof(t3DObject));
+			memset(&(pModel->pObject[pModel->numOfObjects - 1]), 0, sizeof(structure::t3DObject));
 
 			// Get the name of the object and store it, then add the read bytes to our byte counter.
 			m_CurrentChunk->bytesRead += GetString(pModel->pObject[pModel->numOfObjects - 1].strName);
 
-			(pModel->pObject[pModel->numOfObjects - 1]).bb = BoundingBox();
+			(pModel->pObject[pModel->numOfObjects - 1]).bb = structure::BoundingBox();
 
 			// Now proceed to read in the rest of the object information
 			ProcessNextObjectChunk(pModel, &(pModel->pObject[pModel->numOfObjects - 1]), m_CurrentChunk, pModelMax);
@@ -293,13 +293,13 @@ void CLoad3DS::ProcessNextChunk(t3DModel *pModel, tChunk *pPreviousChunk, Boundi
 /////
 ///////////////////////////////// PROCESS NEXT OBJECT CHUNK \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*
 
-void CLoad3DS::ProcessNextObjectChunk(t3DModel *pModel, t3DObject *pObject, tChunk *pPreviousChunk, BoundingBox *pModelMax)
+void CLoad3DS::ProcessNextObjectChunk(structure::t3DModel *pModel, structure::t3DObject *pObject, structure::tChunk *pPreviousChunk, structure::BoundingBox *pModelMax)
 {
 
 	//int buffer[50000] = {0};					// This is used to read past unwanted data
 
 	// Allocate a new chunk to work with
-	m_CurrentChunk = new tChunk;
+	m_CurrentChunk = new structure::tChunk;
 
 	// Continue to read these chunks until we read the end of this sub chunk
 	while (pPreviousChunk->bytesRead < pPreviousChunk->length)
@@ -368,12 +368,12 @@ void CLoad3DS::ProcessNextObjectChunk(t3DModel *pModel, t3DObject *pObject, tChu
 /////
 ///////////////////////////////// PROCESS NEXT MATERIAL CHUNK \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*
 
-void CLoad3DS::ProcessNextMaterialChunk(t3DModel *pModel, tChunk *pPreviousChunk)
+void CLoad3DS::ProcessNextMaterialChunk(structure::t3DModel *pModel, structure::tChunk *pPreviousChunk)
 {
 	//int buffer[50000] = {0};					// This is used to read past unwanted data
 
 	// Allocate a new chunk to work with
-	m_CurrentChunk = new tChunk;
+	m_CurrentChunk = new structure::tChunk;
 
 	// Continue to read these chunks until we read the end of this sub chunk
 	while (pPreviousChunk->bytesRead < pPreviousChunk->length)
@@ -429,7 +429,7 @@ void CLoad3DS::ProcessNextMaterialChunk(t3DModel *pModel, tChunk *pPreviousChunk
 /////
 ///////////////////////////////// READ CHUNK \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*
 
-void CLoad3DS::ReadChunk(tChunk *pChunk)
+void CLoad3DS::ReadChunk(structure::tChunk *pChunk)
 {
 	// This reads the chunk ID which is 2 bytes.
 	// The chunk ID is like OBJECT or MATERIAL.  It tells what data is
@@ -472,7 +472,7 @@ int CLoad3DS::GetString(char *pBuffer)
 /////
 ///////////////////////////////// READ COLOR \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*
 
-void CLoad3DS::ReadColorChunk(tMaterialInfo *pMaterial, tChunk *pChunk)
+void CLoad3DS::ReadColorChunk(structure::tMaterialInfo *pMaterial, structure::tChunk *pChunk)
 {
 	// Read the color chunk info
 	ReadChunk(m_TempChunk);
@@ -491,7 +491,7 @@ void CLoad3DS::ReadColorChunk(tMaterialInfo *pMaterial, tChunk *pChunk)
 /////
 ///////////////////////////////// READ VERTEX INDECES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*
 
-void CLoad3DS::ReadVertexIndices(t3DObject *pObject, tChunk *pPreviousChunk)
+void CLoad3DS::ReadVertexIndices(structure::t3DObject *pObject, structure::tChunk *pPreviousChunk)
 {
 	unsigned short index = 0;					// This is used to read in the current face index
 
@@ -504,8 +504,8 @@ void CLoad3DS::ReadVertexIndices(t3DObject *pObject, tChunk *pPreviousChunk)
 	pPreviousChunk->bytesRead += fread(&pObject->numOfFaces, 1, 2, m_FilePointer);
 
 	// Alloc enough memory for the faces and initialize the structure
-	pObject->pFaces =   new tFace [pObject->numOfFaces];
-	memset(pObject->pFaces, 0, sizeof(tFace)  * pObject->numOfFaces);
+	pObject->pFaces =   new structure::tFace [pObject->numOfFaces];
+	memset(pObject->pFaces, 0, sizeof(structure::tFace)  * pObject->numOfFaces);
 
 	// Go through all of the faces in this object
 	for(int i = 0; i < pObject->numOfFaces; i++)
@@ -533,7 +533,7 @@ void CLoad3DS::ReadVertexIndices(t3DObject *pObject, tChunk *pPreviousChunk)
 /////
 ///////////////////////////////// READ UV COORDINATES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*
 
-void CLoad3DS::ReadUVCoordinates(t3DObject *pObject, tChunk *pPreviousChunk)
+void CLoad3DS::ReadUVCoordinates(structure::t3DObject *pObject, structure::tChunk *pPreviousChunk)
 {
 	// In order to read in the UV indices for the object, we need to first
 	// read in the amount there are, then read them in.
@@ -557,7 +557,7 @@ void CLoad3DS::ReadUVCoordinates(t3DObject *pObject, tChunk *pPreviousChunk)
 /////
 ///////////////////////////////// READ VERTICES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*
 
-void CLoad3DS::ReadVertices(t3DObject *pObject, tChunk *pPreviousChunk, BoundingBox *pModelMax)
+void CLoad3DS::ReadVertices(structure::t3DObject *pObject, structure::tChunk *pPreviousChunk, structure::BoundingBox *pModelMax)
 {
 	// Like most chunks, before we read in the actual vertices, we need
 	// to find out how many there are to read in.  Once we have that number
@@ -639,7 +639,7 @@ void CLoad3DS::ReadVertices(t3DObject *pObject, tChunk *pPreviousChunk, Bounding
 /////
 ///////////////////////////////// READ OBJECT MATERIAL \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*
 
-void CLoad3DS::ReadObjectMaterial(t3DModel *pModel, t3DObject *pObject, tChunk *pPreviousChunk)
+void CLoad3DS::ReadObjectMaterial(structure::t3DModel *pModel, structure::t3DObject *pObject, structure::tChunk *pPreviousChunk)
 {
 	
 	
@@ -768,7 +768,7 @@ void generateTangent(CVector3 &s_tan, CVector3 &t_tan, CVector3 v1, CVector3 v2,
 
 
 
-void CLoad3DS::ComputeNormals(t3DModel *pModel)
+void CLoad3DS::ComputeNormals(structure::t3DModel *pModel)
 {
 	CVector3 vVector1, vVector2, vNormal, vPoly[3];
 
@@ -789,7 +789,7 @@ void CLoad3DS::ComputeNormals(t3DModel *pModel)
 	for(int index = 0; index < pModel->numOfObjects; index++)
 	{
 		// Get the current object
-		t3DObject *pObject = &(pModel->pObject[index]);
+		structure::t3DObject *pObject = &(pModel->pObject[index]);
 
 		// Here we allocate all the memory we need to calculate the normals
 		pObject->pFaceNormals	= new CVector3 [pObject->numOfFaces];

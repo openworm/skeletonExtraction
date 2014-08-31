@@ -1,6 +1,6 @@
 #include "m_assimpLoader.h"
 
-void ImportModel(t3DModel * p_3DModel, char * strFileName, ModelController::CModel * sdfController, SN::SkeletonNode * pNode){
+void ImportModel(meshes::Mesh * pModel, structure::t3DModel * p_3DModel, char * strFileName, ModelController::CModel * sdfController, SN::SkeletonNode * pNode){
 
 	releaseStructure(p_3DModel);
 	
@@ -22,14 +22,18 @@ void ImportModel(t3DModel * p_3DModel, char * strFileName, ModelController::CMod
 	}
 
 	p_3DModel->numOfObjects = scene->mNumMeshes;
-	p_3DModel->pObject = std::vector<t3DObject>(scene->mNumMeshes);
+	p_3DModel->pObject = std::vector<structure::t3DObject>(scene->mNumMeshes);
 
 	if (scene->HasMaterials()){
-		p_3DModel->pMaterials = std::vector<tMaterialInfo>(scene->mNumMaterials);
+		p_3DModel->pMaterials = std::vector<structure::tMaterialInfo>(scene->mNumMaterials);
+		pModel->materialDefinitions.reserve(scene->mNumMaterials);
+
 		p_3DModel->numOfMaterials = scene->mNumMaterials;
 		for (int t = 0; t < scene->mNumMaterials; t++){
-			tMaterialInfo pMat = tMaterialInfo();
+			structure::tMaterialInfo pMat = structure::tMaterialInfo();
 			aiMaterial * mat = scene->mMaterials[t];
+
+			meshes::Material material;
 
 			aiString name;
 			mat->Get(AI_MATKEY_NAME,name);
@@ -39,6 +43,8 @@ void ImportModel(t3DModel * p_3DModel, char * strFileName, ModelController::CMod
 			pMat.color[0] = 255 * color.r;
 			pMat.color[1] = 255 * color.g;
 			pMat.color[2] = 255 * color.b;
+
+			material.diffuseColor = glm::vec4(color.r, color.g, color.b, 1.0f);
 
 			int texIndex = 0;
 			aiString texPath;  // filename
@@ -52,11 +58,15 @@ void ImportModel(t3DModel * p_3DModel, char * strFileName, ModelController::CMod
 
 			strcpy(pMat.strName, name.data);
 
+			material.material = std::string(name.C_Str());
+			material.texFile = std::string(texPath.C_Str());
+
 			p_3DModel->pMaterials[t] = pMat;
+			pModel->materialDefinitions.push_back(material);
 		}
 	}
 
-	BoundingBox * pModelMax = new BoundingBox(); 
+	structure::BoundingBox * pModelMax = new structure::BoundingBox(); 
 	int i=0;
 
 	glLoadIdentity();
@@ -73,12 +83,21 @@ void ImportModel(t3DModel * p_3DModel, char * strFileName, ModelController::CMod
 	m[15] = 1.0;
 	p_3DModel->rootTrans = Mat4(m);
 
-	recursiveModelFill(&i, p_3DModel, scene, scene->mRootNode, pModelMax, pNode);
+	recursiveModelFill(&i, pModel, p_3DModel, scene, scene->mRootNode, pModelMax, pNode);
 
 	p_3DModel->modelbb = *pModelMax;
+
+	pModel->modelbb.x_max = pModelMax->x_max;
+	pModel->modelbb.x_min = pModelMax->x_min;
+
+	pModel->modelbb.y_max = pModelMax->y_max;
+	pModel->modelbb.y_min = pModelMax->y_min;
+
+	pModel->modelbb.z_max = pModelMax->z_max;
+	pModel->modelbb.z_min = pModelMax->z_min;
 }
 
-void recursiveModelFill(int *i, t3DModel * p_3DModel, const aiScene *sc,const aiNode* nd, BoundingBox * pModelMax, SN::SkeletonNode * pNode){
+void recursiveModelFill(int *i, meshes::Mesh * pModel, structure::t3DModel * p_3DModel, const aiScene *sc,const aiNode* nd, structure::BoundingBox * pModelMax, SN::SkeletonNode * pNode){
 
 	aiMatrix4x4 m = nd->mTransformation;
 	m.Transpose();
@@ -94,17 +113,17 @@ void recursiveModelFill(int *i, t3DModel * p_3DModel, const aiScene *sc,const ai
 
 	for (int n=0; n < nd->mNumMeshes; ++n) {
 		const struct aiMesh* tmpMesh = sc->mMeshes[nd->mMeshes[n]];
-		t3DObject pObject = t3DObject();
+		structure::t3DObject pObject = structure::t3DObject();
 
 		pObject.numOfFaces = tmpMesh->mNumFaces;
-		pObject.pFaces = new tFace[tmpMesh->mNumFaces];
+		pObject.pFaces = new structure::tFace[tmpMesh->mNumFaces];
 
 		//int index = 0;
 
 		for (unsigned int t = 0; t < tmpMesh->mNumFaces; ++t)
 		{
 			const struct aiFace* face = &tmpMesh->mFaces[t];
-			tFace pFace = tFace();
+			structure::tFace pFace = structure::tFace();
 			memcpy(&pFace.coordIndex, face->mIndices,3 * sizeof(unsigned int));
 			memcpy(&pFace.vertIndex, face->mIndices,3 * sizeof(unsigned int));
 
@@ -112,6 +131,10 @@ void recursiveModelFill(int *i, t3DModel * p_3DModel, const aiScene *sc,const ai
 			//index += 3;
 
 			pObject.pFaces[t] = pFace;
+
+			for (int v=0; v < 3; v++){
+				pModel->indices.push_back(face->mIndices[v]);
+			}
 		}
 
 		pObject.materialID = tmpMesh->mMaterialIndex;
@@ -138,6 +161,11 @@ void recursiveModelFill(int *i, t3DModel * p_3DModel, const aiScene *sc,const ai
 
 				pObject.pVerts[t] = pVert;
 
+				pModel->vertices.push_back(pVert.x);
+				pModel->vertices.push_back(pVert.y);
+				pModel->vertices.push_back(pVert.z);
+
+				
 				if ( pVert.x < pModelMax->x_min) {
 					pModelMax->x_min = pVert.x;
 				}
@@ -167,6 +195,9 @@ void recursiveModelFill(int *i, t3DModel * p_3DModel, const aiScene *sc,const ai
 				CVector2 pTex = CVector2();
 				memcpy(&pTex, &tmpMesh->mTextureCoords[0][t], 2 * sizeof(float));
 				pObject.pTexVerts[t] = pTex;
+
+				pModel->uvs.push_back(pTex.x);
+				pModel->uvs.push_back(pTex.y);
 			}
 
 		
@@ -182,6 +213,10 @@ void recursiveModelFill(int *i, t3DModel * p_3DModel, const aiScene *sc,const ai
 				CVector3 pNorm = CVector3();
 				memcpy(&pNorm, &tmpMesh->mNormals[t], 3 * sizeof(float));
 				pObject.pNormals[t] = pNorm;
+
+				pModel->normals.push_back(pNorm.x);
+				pModel->normals.push_back(pNorm.y);
+				pModel->normals.push_back(pNorm.z);
 			}
 		}
 		if (tmpMesh->HasTangentsAndBitangents()){
@@ -190,6 +225,10 @@ void recursiveModelFill(int *i, t3DModel * p_3DModel, const aiScene *sc,const ai
 				CVector3 pTang = CVector3();
 				memcpy(&pTang, &tmpMesh->mTangents[t], 3 * sizeof(float));
 				pObject.pTangents[t] = pTang;
+
+				pModel->normals.push_back(pTang.x);
+				pModel->normals.push_back(pTang.y);
+				pModel->normals.push_back(pTang.z);
 			}
 		}
 
@@ -230,7 +269,7 @@ void recursiveModelFill(int *i, t3DModel * p_3DModel, const aiScene *sc,const ai
 		//UNCOMMENT skl::
 		SN::SkeletonNode * pChildNode = new SN::SkeletonNode();
 		pNode->nodes.push_back(pChildNode);
-		recursiveModelFill(i ,p_3DModel, sc, nd->mChildren[c], pModelMax, pChildNode);
+		recursiveModelFill(i ,pModel, p_3DModel, sc, nd->mChildren[c], pModelMax, pChildNode);
 	}
 
 	//glPopMatrix();

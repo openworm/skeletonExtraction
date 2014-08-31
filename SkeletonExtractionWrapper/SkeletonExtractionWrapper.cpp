@@ -10,6 +10,9 @@
 
 #include <Import_lib/WormLoader.h>
 #include <Export_lib/ColladaExporter.h>
+#include <Export_lib/MatrixExport.h>
+
+#include <SM_lib/QuaternionsBetweenWormSkeletons.h>
 
 #include "Wrapper.h"
 
@@ -18,11 +21,28 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 
 /*******************************************************************************************************************************/
+//                                    PATHS
+/*******************************************************************************************************************************/
+
+	string positionsFile;
+	string membraneFile;
+	string colladaMeshFile;
+	string colladaMeshAndSkeletonFile;
+	string colladaAnimationFile;
+
+	string transformationsMatrixFile;
+	string transformationsQuaternionFile;
+
+/*******************************************************************************************************************************/
 //                                    BASIC OBJECTS
 /*******************************************************************************************************************************/
 
 	SN::SkeletonNode * pSkeletonRoot = new SN::SkeletonNode();
-	LBSE::Extractor oLBSExtractor;
+	lbse::Extractor oLBSExtractor;
+	meshes::IndexedFace * mesh = new meshes::IndexedFace();
+
+	Import::WormLoader wormLoader;
+	Export::ColladaExporter exporter;
 
 /*******************************************************************************************************************************/
 //                                    SETTINGS, PARAMS ...
@@ -30,6 +50,8 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	#define NUM_OF_CTRL_BONES 4
 	#define MAX_BONE_MAT 24
+
+	#define MAX_WORM_ITERATIONS 4000
 
 	float joiningTolerance = 0.0;
 	oLBSExtractor.laplacianScheme = LS_GLOBAL_JAMA_COTANGENT;
@@ -49,12 +71,20 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	// - call Loader_lib, load t3DModel
 
-	t3DModel g_3DModel;
-	int adaptVMdmax;
+	wormLoader.SetWormFile(positionsFile);
+	wormLoader.SetWormMeshFile(membraneFile);
+
+	wormLoader.ReadWormIteration(mesh, 3000);
+	wormLoader.ReadWormMesh(mesh);
+
+	createMeshGraph(mesh, oLBSExtractor.pMesh, oLBSExtractor.wL, oLBSExtractor.wH);
+
+	structure::t3DModel g_3DModel;
+	int adaptVMdmax = 0;
 
 	// load model from Worm file, timestep 1
 
-	loadModelToStructures(&oLBSExtractor, &g_3DModel, &adaptVMdmax, joiningTolerance);
+	//loadModelToStructures(&oLBSExtractor, &g_3DModel, &adaptVMdmax, joiningTolerance);
 
 
 /*******************************************************************************************************************************/
@@ -63,7 +93,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	// - call LBSE_lib, store skeleton in SN:SkeletonNode
 
-	int iterationNum;
+	int iterationNum = 0;
 
 	// set settings to extractor
 
@@ -84,62 +114,80 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	ObjectSkeletonShaderData wormData;
 
-	int offset = 0;
-
-	for(int i = 0; i < g_3DModel.numOfObjects; i++){
-		if(g_3DModel.pObject.size() <= 0) break;
-		t3DObject *pObject = &g_3DModel.pObject[i];
-
-		ObjectSkeletonShaderData skeletonData;
-
-		skeletonData.weights = new float[pObject->numOfVertices * NUM_OF_CTRL_BONES];
-		skeletonData.indices = new float[pObject->numOfVertices * NUM_OF_CTRL_BONES];
-
-		ga.computeObjectSkeletonShaderData(pSkeletonRoot, oLBSExtractor.pMesh, pObject, &skeletonData, pObject->numOfVertices, offset, true, distanceMatrix, NUM_OF_CTRL_BONES, MAX_BONE_MAT);
-
-		// copy skeletonData
-
-		wormData.weights = new float[skeletonData.numOfVertices * NUM_OF_CTRL_BONES];
-		wormData.indices = new float[skeletonData.numOfVertices * NUM_OF_CTRL_BONES];
-		memcpy(skeletonData.indices, skeletonData.indices, skeletonData.numOfVertices * NUM_OF_CTRL_BONES * sizeof(float));
-		memcpy(skeletonData.weights, skeletonData.weights, skeletonData.numOfVertices * NUM_OF_CTRL_BONES * sizeof(float));	
-
-		offset += pObject->numOfVerts;
-	}
-
+	calculateSkinningData(&ga, &wormData, &g_3DModel, pSkeletonRoot, &distanceMatrix, &oLBSExtractor, NUM_OF_CTRL_BONES, MAX_BONE_MAT);
 
 
 /*******************************************************************************************************************************/
-	// [3] Export mesh, extracted skeleton and weights into Collada (using Collada exporter)
+	// [3] Export mesh and mesh with extracted skeleton and weights into Collada (using Collada exporter)
 /*******************************************************************************************************************************/
 
 	// - call Exporter_lib to store mesh and skinning data in .dae
 
+	// export mesh only
+	exporter.Export(mesh, colladaMeshFile);
+
+	// export mesh and skinning data
+	meshes::MeshSkin * meshSkin = new meshes::MeshSkin(mesh);
+
+	for (int i=0; i < meshSkin->indices.size() / 3; i++){
+		meshSkin->influences.push_back(NUM_OF_CTRL_BONES);
+	}
+
+	for (int i=0; i < (meshSkin->indices.size() / 3) * NUM_OF_CTRL_BONES; i++){
+		meshSkin->jointIDs.push_back(wormData.indices[i]);
+	}
+
+	for (int i=0; i < (meshSkin->indices.size() / 3) * NUM_OF_CTRL_BONES; i++){
+		meshSkin->skinWeights.push_back(wormData.weights[i]);
+	}
+
+	exporter.Export(meshSkin, pSkeletonRoot, colladaMeshAndSkeletonFile);
+
 /*******************************************************************************************************************************/
-	// [4] Read other worm particle positions (from other timesteps) and extract skeletons
+//	Loop through all theE timesteps of the simulation - extract skeletons and compute skeleton transformations
 /*******************************************************************************************************************************/
 
-	// repeat steps [1-2] for other timesteps
+	int timestep = 0;
 
-	SN::SkeletonNode * pSkeletonRoot2 = new SN::SkeletonNode();
+	while (timestep < MAX_WORM_ITERATIONS){
 
-	// load model from Worm file, timestep 2
+		timestep++;
 
-	loadModelToStructures(&oLBSExtractor, &g_3DModel, &adaptVMdmax, joiningTolerance);
+		// [4] Read other worm particle positions (from other timesteps) and extract skeletons
 
-	oLBSExtractor.computeSkeleton(&g_3DModel, 0, pSkeletonRoot, &iterationNum, adaptVMdmax);
+		// repeat steps [1-2] for other timesteps
+
+		skl::SkeletonNode * pSkeletonRootNext = new skl::SkeletonNode();
+
+		// load model from Worm file, timestep 2
+
+		loadModelToStructures(&oLBSExtractor, &g_3DModel, &adaptVMdmax, joiningTolerance);
+
+		oLBSExtractor.computeSkeleton(&g_3DModel, 0, pSkeletonRootNext, &iterationNum, adaptVMdmax);
+
+		// [5] Calculate the transformation between two skeletons (two different timesteps of simulation)
+
+		// used SM_lib to compute the transformations
+
+		SM::CalculateWormTransformationMatrices((skl::SkeletonNode*)pSkeletonRoot, pSkeletonRootNext);
+
+		// [6] Export the transformations into separate files
+
+		Export::SaveQuaternionsToFile(pSkeletonRootNext, transformationsQuaternionFile);
+		Export::SaveMatricesToFile(pSkeletonRootNext, transformationsMatrixFile);
+
+		// use Exporter_lib
+
+	}
 
 /*******************************************************************************************************************************/
-	// [5] Calculate the transformation between two skeletons (two different timesteps of simulation)
+//	Export whole animation into Collada file
 /*******************************************************************************************************************************/
 
-	// used SM_lib to compute the transformations ??? or another lib ?
+	exporter.Export(meshSkin, pSkeletonRoot, colladaAnimationFile);
 
-/*******************************************************************************************************************************/
-	// [6] Export the transformations into separate files
-/*******************************************************************************************************************************/
-
-	// use Exporter_lib ? or the wrapper should do this functionality ?
+	delete[] wormData.indices;
+	delete[] wormData.weights;
 
 	return 0;
 }

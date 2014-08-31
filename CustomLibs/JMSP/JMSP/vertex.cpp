@@ -19,15 +19,17 @@
 #include "vertex.h"
 #include "mesh.h"
 
+using namespace jmsp;
+
 // Friend functions for input and output
 
-std::ostream&
+/*std::ostream&
 operator<<(std::ostream& os, const vertex& vo)
 
 {
 //	return (os << "<" << vo._myVertex.x << ", " << vo._myVertex.y << ", " << vo._myVertex.z << ">");
 	os << " Index: " << vo.getIndex() << " ";
-	os << vo.getXYZ(); // for some reason this isn't working as a friend function, not sure why
+//	os << vo.getXYZ(); // for some reason this isn't working as a friend function, not sure why
 							// it is pulling ostream from the STL typedef, not the regular ostream, though.
 	set<int>::iterator pos;
 	os << " Vert Neighbors:";
@@ -45,7 +47,7 @@ operator<<(std::ostream& os, const vertex& vo)
 	os << " Cost: " << vo.getCost();
 	os << " Min Vert: " << vo.minCostEdgeVert();
 	return os;
-}
+}*/
 
 // Calculate the Quadric 4x4 matrix
 void 

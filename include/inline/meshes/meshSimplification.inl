@@ -2,17 +2,17 @@
 inline MeshSimplify::MeshSimplify(){
 	g_pMesh = NULL;
 	g_pProgMesh = NULL;
-	g_edgemethod = PMesh::QUADRICTRI;
+	g_edgemethod = jmsp::PMesh::QUADRICTRI;
 }	
 
-inline void MeshSimplify::setInitMesh(MeshGraph * pMesh, t3DModel * pModel){
+inline void MeshSimplify::setInitMesh(MeshGraph * pMesh, structure::t3DModel * pModel){
 	delete g_pMesh;
 	g_pMesh = NULL;
 
-	g_pMesh = new Mesh();
+	g_pMesh = new jmsp::Mesh();
 	for (int i = 0; i < pMesh->numOfVertices; i++){
 
-		vertex v(pMesh->pVerts[i].x, pMesh->pVerts[i].y, pMesh->pVerts[i].z);
+		jmsp::vertex v(pMesh->pVerts[i].x, pMesh->pVerts[i].y, pMesh->pVerts[i].z);
 		v.setIndex(i);
 
 		g_pMesh->_vlist.push_back(v);
@@ -20,7 +20,7 @@ inline void MeshSimplify::setInitMesh(MeshGraph * pMesh, t3DModel * pModel){
 
 	int offset = 0;
 	for (int o = 0; o < pModel->numOfObjects; o++){
-		t3DObject * pObject = &pModel->pObject[o];
+		structure::t3DObject * pObject = &pModel->pObject[o];
 		for (int i = 0; i < pObject->numOfFaces; i++){
 
 			int v1, v2, v3;
@@ -30,7 +30,7 @@ inline void MeshSimplify::setInitMesh(MeshGraph * pMesh, t3DModel * pModel){
 			v2 = pMesh->indices[offset + pObject->pFaces[i].vertIndex[1]];
 			v3 = pMesh->indices[offset + pObject->pFaces[i].vertIndex[2]];
 
-			triangle t(g_pMesh, v1, v2, v3);
+			jmsp::triangle t(g_pMesh, v1, v2, v3);
 			t.setIndex(i);
 
 			g_pMesh->_plist.push_back(t); // push_back puts a *copy* of the element at the end of the list
@@ -55,16 +55,16 @@ inline void MeshSimplify::setInitMesh(MeshGraph * pMesh, t3DModel * pModel){
 
 	delete g_pProgMesh;
 	g_pProgMesh = NULL;
-	g_pProgMesh = new PMesh(g_pMesh, g_edgemethod);
+	g_pProgMesh = new jmsp::PMesh(g_pMesh, g_edgemethod);
 }
 
 inline void MeshSimplify::setMeshGraphVertices(MeshGraph * pMesh, MeshGraph * pMesh2){
 	
-	Mesh* g_pMeshNew = new Mesh();
+	jmsp::Mesh* g_pMeshNew = new jmsp::Mesh();
 
 	for (int i = 0; i < pMesh->numOfVertices; i++){
 
-		vertex v(pMesh->pVerts[i].x, pMesh->pVerts[i].y, pMesh->pVerts[i].z);
+		jmsp::vertex v(pMesh->pVerts[i].x, pMesh->pVerts[i].y, pMesh->pVerts[i].z);
 
 		CVector3 v1 = pMesh->pVerts[i];
 		CVector3 v2 = pMesh2->pVerts[i];
@@ -119,7 +119,7 @@ inline void MeshSimplify::setMeshGraphVertices(MeshGraph * pMesh, MeshGraph * pM
 			int v2 = pMesh->triangleIndices[j * 3 + 1];
 			int v3 = pMesh->triangleIndices[j * 3 + 2];
 
-			triangle t(g_pMeshNew, v1, v2, v3);
+			jmsp::triangle t(g_pMeshNew, v1, v2, v3);
 			t.setIndex(j);
 
 			g_pMeshNew->_plist.push_back(t); // push_back puts a *copy* of the element at the end of the list
@@ -150,7 +150,7 @@ inline void MeshSimplify::setMeshGraphVertices(MeshGraph * pMesh, MeshGraph * pM
 
 	delete g_pProgMesh;
 	g_pProgMesh = NULL;
-	g_pProgMesh = new PMesh(g_pMesh, g_edgemethod);
+	g_pProgMesh = new jmsp::PMesh(g_pMesh, g_edgemethod);
 }
 
 inline void MeshSimplify::simplifyMesh(int numberOfCollapses){
@@ -161,12 +161,12 @@ inline void MeshSimplify::simplifyMesh(int numberOfCollapses){
 	}
 }
 
-inline void MeshSimplify::getVerticesToMeshGraph(MeshGraph * pMeshOld, t3DModel * pModel){
+inline void MeshSimplify::getVerticesToMeshGraph(MeshGraph * pMeshOld, structure::t3DModel * pModel){
 	MeshGraph * pMesh = new MeshGraph();
 
 	#ifdef _LOG
 		Timerlog timerlog = Timerlog("createMeshGraph from simplified mesh");
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD createMeshGraph STARTED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD createMeshGraph STARTED");
 	#endif
 
 	vector<CVector3> v;
@@ -180,7 +180,7 @@ inline void MeshSimplify::getVerticesToMeshGraph(MeshGraph * pMeshOld, t3DModel 
 	int joinIdx = 0;
 
 	#ifdef _LOG
-		log(LOG_LEVEL_METHODSTARTEND, "START createMeshGraph - vertices contruction");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "START createMeshGraph - vertices contruction");
 	#endif
 
 	int maxIndex = 0;
@@ -188,15 +188,15 @@ inline void MeshSimplify::getVerticesToMeshGraph(MeshGraph * pMeshOld, t3DModel 
 
 	for (int j=0; j<g_pProgMesh->numTris(); j++){
 			
-		triangle t;
+		jmsp::triangle t;
 		if (g_pProgMesh->getTri(j, t) && t.isActive()){
-			const vertex& v1 = t.getVert1vertex();
-			const vertex& v2 = t.getVert2vertex();
-			const vertex& v3 = t.getVert3vertex();
+			const jmsp::vertex& v1 = t.getVert1vertex();
+			const jmsp::vertex& v2 = t.getVert2vertex();
+			const jmsp::vertex& v3 = t.getVert3vertex();
 
-			Vec3 v1pos = v1.getXYZ();
-			Vec3 v2pos = v2.getXYZ();
-			Vec3 v3pos = v3.getXYZ();
+			jmsp::Vec3 v1pos = v1.getXYZ();
+			jmsp::Vec3 v2pos = v2.getXYZ();
+			jmsp::Vec3 v3pos = v3.getXYZ();
 
 			CVector3 p1 = CVector3(v1pos.x, v1pos.y, v1pos.z);
 			CVector3 p2 = CVector3(v2pos.x, v2pos.y, v2pos.z);
@@ -264,16 +264,16 @@ inline void MeshSimplify::getVerticesToMeshGraph(MeshGraph * pMeshOld, t3DModel 
 	for (int j=0; j<g_pProgMesh->numTris(); j++)
 	{
 
-		triangle t;
+		jmsp::triangle t;
 		if (g_pProgMesh->getTri(j, t) && t.isActive())
 		{
-			const vertex& v1 = t.getVert1vertex();
-			const vertex& v2 = t.getVert2vertex();
-			const vertex& v3 = t.getVert3vertex();
+			const jmsp::vertex& v1 = t.getVert1vertex();
+			const jmsp::vertex& v2 = t.getVert2vertex();
+			const jmsp::vertex& v3 = t.getVert3vertex();
 
-			Vec3 v1pos = v1.getXYZ();
-			Vec3 v2pos = v2.getXYZ();
-			Vec3 v3pos = v3.getXYZ();
+			jmsp::Vec3 v1pos = v1.getXYZ();
+			jmsp::Vec3 v2pos = v2.getXYZ();
+			jmsp::Vec3 v3pos = v3.getXYZ();
 
 			CVector3 p1 = CVector3(v1pos.x, v1pos.y, v1pos.z);
 			CVector3 p2 = CVector3(v2pos.x, v2pos.y, v2pos.z);
@@ -324,10 +324,10 @@ inline void MeshSimplify::getVerticesToMeshGraph(MeshGraph * pMeshOld, t3DModel 
 	#ifdef _LOG
 		timerlog.addEnd();
 
-		log(LOG_LEVEL_DUMP, "Matica E");
-		log(LOG_LEVEL_DUMP, pMesh->E);
+		logg.log(LOG_LEVEL_DUMP, "Matica E");
+		logg.log(LOG_LEVEL_DUMP, pMesh->E);
 
-		log(LOG_LEVEL_METHODSTARTEND, "METHOD createMeshGraph ENDED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD createMeshGraph ENDED");
 
 		timerlog.logExecutionTimes();
 	#endif

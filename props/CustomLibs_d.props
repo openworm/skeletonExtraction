@@ -8,7 +8,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <Link>
-      <AdditionalDependencies>GDSW_lib_d.lib;LBSE_lib_d.lib;PCT_lib_d.lib;Import_lib_d.lib;Export_lib_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>GDSW_lib_d.lib;LBSE_lib_d.lib;PCT_lib_d.lib;SM_lib_d.lib;Import_lib_d.lib;Export_lib_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

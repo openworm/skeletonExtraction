@@ -44,7 +44,7 @@ public:
 	float GeodesicDistance(MeshGraph * pMesh,  Array2D<float> distanceMatrix, CVector3 p1, int vertexIndex, bool firstSkeletonPoint);
 	void findXMinInTree(MeshGraph * pMesh, Array2D<float> distanceMatrix, int x, SN::SkeletonNode *node, SN::SkeletonNode * mins, int vertexIndex);
 	int  findClosestPointIndex(MeshGraph *pMesh, CVector3 sourcePoint);
-	void computeObjectSkeletonShaderData(SN::SkeletonNode* currentSkeletonRoot, MeshGraph * pMesh, t3DObject *pObject, ObjectSkeletonShaderData * data, int length, int indexOffset, bool isMeshGraphComputed, Array2D<float> distanceMatrix, int numOfControlBones, int maxBones);
+	void computeObjectSkeletonShaderData(SN::SkeletonNode* currentSkeletonRoot, MeshGraph * pMesh, structure::t3DObject *pObject, ObjectSkeletonShaderData * data, int length, int indexOffset, bool isMeshGraphComputed, Array2D<float> distanceMatrix, int numOfControlBones, int maxBones);
 };
 //---------------------------------------------------------------------------
 #endif

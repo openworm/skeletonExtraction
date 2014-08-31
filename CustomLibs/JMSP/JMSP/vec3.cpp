@@ -20,11 +20,13 @@
 
 #include "vec3.h"
 
-std::ostream&
+using namespace jmsp;
+
+/*std::ostream&
 operator<<(std::ostream& os, const Vec3& vo)
 {
 	return os << "<" << vo.x << ", " << vo.y << ", " << vo.z << ">";
-}
+}*/
 
 /* NOT IMPLEMENTED
 istream& operator>>(istream &io, Vec3 &vi)

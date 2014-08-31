@@ -45,7 +45,7 @@ using namespace mmath;
 
 #include <PCT_lib/pct_PointCloudTriangulation.h>
 
-namespace LBSE {
+namespace lbse {
 	struct Weights {
 		float wL;
 		float wH;
@@ -65,10 +65,16 @@ namespace LBSE {
 	};
 //---------------------------------------------------------------------------
 	class Extractor {
+
 		public:
 			Extractor();
 			~Extractor();
 
+			float default_wA;
+			float default_wB;
+			bool default_s_doBranchingSimplification;
+
+			OpenCLManager openCLManager;
 			int numOfIter;
 			bool stopContractionByIteration;
 			bool stopContractionByRatio;
@@ -89,13 +95,13 @@ namespace LBSE {
 			float groupingTolerance; // distance limit which determinates if two vertices are the same in mesh contraction
 			float groupingToleranceSDFMulti;
 
-			//void computeSkeleton(t3DModel *pModel, int sourcePointID, SN::SkeletonNode * skeleton, int * ite, bool &recreateOperator, float modelMaxDim);
-			void computeSkeleton(t3DModel *pModel, int sourcePointID, SN::SkeletonNode * skeleton, int * ite, float modelMaxDim);
+			//void computeSkeleton(structure::t3DModel *pModel, int sourcePointID, SN::SkeletonNode * skeleton, int * ite, bool &recreateOperator, float modelMaxDim);
+			void computeSkeleton(structure::t3DModel *pModel, int sourcePointID, SN::SkeletonNode * skeleton, int * ite, float modelMaxDim);
 			void applyConnectivitySurgery(SN::SkeletonNode * node, float modelMaxDim);
 
-			float calculateVolumeFromMesh(MeshGraph * mesh, t3DModel *pModel, int subdivision);
-			float calculateVolumeFromMesh(MeshGraph * mesh, t3DModel *pModel);
-			void restoreMeshVolume(MeshGraph * mesh, t3DModel *pModel);
+			float calculateVolumeFromMesh(MeshGraph * mesh, structure::t3DModel *pModel, int subdivision);
+			float calculateVolumeFromMesh(MeshGraph * mesh, structure::t3DModel *pModel);
+			void restoreMeshVolume(MeshGraph * mesh, structure::t3DModel *pModel);
 			//float calculateConvexHullVolume(CVector3 * points);
 			void logContraction(MeshGraph * mesh1, MeshGraph * mesh2);
 			bool checkContractedMesh(MeshGraph * pMesh);
@@ -107,9 +113,9 @@ namespace LBSE {
 			SN::SkeletonNode * rerootSkeleton(int newrootId, SN::SkeletonNode* pSkelet);
 
 			template<typename T>
-			void recomputeModelValuesToMeshgraph(MeshGraph * pMesh, t3DModel *pModel, T * sdfValues, T * sdfvec);
-			void getMGPositionVector(MeshGraph * pMesh, t3DModel *pModel, float * newpos);
-			void addRandomNoiseToMeshGraph(MeshGraph * pMesh, t3DModel * pModel, float scale);
+			void recomputeModelValuesToMeshgraph(MeshGraph * pMesh, structure::t3DModel *pModel, T * sdfValues, T * sdfvec);
+			void getMGPositionVector(MeshGraph * pMesh, structure::t3DModel *pModel, float * newpos);
+			void addRandomNoiseToMeshGraph(MeshGraph * pMesh, structure::t3DModel * pModel, float scale);
 
 			//void subdivideSkeleton();
 
@@ -155,8 +161,7 @@ namespace LBSE {
 			bool useSDFBasedGroupingDistance;
 			bool useSDFBasedLaplacianWeights;
 			Weights * separateWeights;
-			void calculateSDFForMeshGraph(MeshGraph * pMesh, t3DModel * pModel, float * sdfValuesNormalizedMG, CVector3 ** sdfHalfVectors, CVector3 * sdfHalfVectorsMG);
-			OpenCLManager openCLManager;
+			void calculateSDFForMeshGraph(MeshGraph * pMesh, structure::t3DModel * pModel, float * sdfValuesNormalizedMG, CVector3 ** sdfHalfVectors, CVector3 * sdfHalfVectorsMG);
 	};
 }
 //---------------------------------------------------------------------------

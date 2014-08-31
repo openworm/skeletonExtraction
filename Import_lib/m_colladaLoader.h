@@ -190,12 +190,12 @@ class CColladaLoader
 		const string& semantic,
 		const string& srcID,
 		int offset);
-	bool addGeometry(vector<tMaterialInfo> infos, t3DModel * pModel, daeElement* root);
-	bool addControllers(ObjectSkeletonShaderData * objectSkeletonDataArray, SN::SkeletonNode * skeletonroot,  t3DModel * pModel, daeElement* root);
-	bool addImages(t3DModel * pModel, daeElement* root);
-	bool addEffects(t3DModel * pModel, daeElement* root);
-	bool addMaterials(t3DModel * pModel, daeElement* root);
-	bool addVisualScene(t3DModel * pModel, bool exportSkeleton, SN::SkeletonNode * skeletonroot, daeElement* root);
+	bool addGeometry(vector<tMaterialInfo> infos, structure::t3DModel * pModel, daeElement* root);
+	bool addControllers(ObjectSkeletonShaderData * objectSkeletonDataArray, SN::SkeletonNode * skeletonroot,  structure::t3DModel * pModel, daeElement* root);
+	bool addImages(structure::t3DModel * pModel, daeElement* root);
+	bool addEffects(structure::t3DModel * pModel, daeElement* root);
+	bool addMaterials(structure::t3DModel * pModel, daeElement* root);
+	bool addVisualScene(structure::t3DModel * pModel, bool exportSkeleton, SN::SkeletonNode * skeletonroot, daeElement* root);
 
 public:
 	//CColladaLoader();
@@ -203,8 +203,8 @@ public:
 
 	//
 	CMesh* LoadColladaFile(const string& strFilePath);
-	bool LoadColladaModel(int importStyle, t3DModel * pModel, SN::SkeletonNode * bproot, vector<ObjectSkeletonShaderData*> &skeletonData, const string file);
-	bool ExportToFile(t3DModel * pModel, ObjectSkeletonShaderData * objectSkeletonDataArray, const string file, SN::SkeletonNode * root, bool exportSkeleton);
+	bool LoadColladaModel(int importStyle, structure::t3DModel * pModel, SN::SkeletonNode * bproot, vector<ObjectSkeletonShaderData*> &skeletonData, const string file);
+	bool ExportToFile(structure::t3DModel * pModel, ObjectSkeletonShaderData * objectSkeletonDataArray, const string file, SN::SkeletonNode * root, bool exportSkeleton);
 };
 
 CVector3 multiplyVectorAndMatrix(CVector3 v, domFloat4x4 m);

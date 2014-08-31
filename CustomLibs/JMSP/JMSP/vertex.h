@@ -32,6 +32,7 @@ using namespace std;
 #include "vec3.h"
 #include "triangle.h"
 
+namespace jmsp {
 
 class Mesh;
 
@@ -163,7 +164,7 @@ public:
 	bool operator!=(const vertex& v) {return (_myVertex != v._myVertex || _vertexNormal != v._vertexNormal);};
 
 	// Input and Output
-	friend std::ostream&	operator<<(std::ostream& , const vertex& );
+//	friend std::ostream&	operator<<(std::ostream& , const vertex& );
 
 //	friend istream&
 //	operator>>(istream& is, vertex& vi);
@@ -298,5 +299,7 @@ private:
 		}
 	}
 };
+
+}
 
 #endif // #ifndef __vertex_h

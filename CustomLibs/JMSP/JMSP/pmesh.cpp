@@ -32,6 +32,7 @@
 // Used for debugging
 #undef PRINT_DEBUG_INFO
 
+using namespace jmsp;
 
 // Constructor.  This will create the edge collapse list by
 // calling createEdgeCollapseList

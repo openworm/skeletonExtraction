@@ -91,9 +91,11 @@ xcopy "$(ProjectDir)*.h"  "$(SolutionDir)include\$(ProjectName)\" /y /e</Command
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ColladaExporter.cpp" />
+    <ClCompile Include="MatrixExport.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ColladaExporter.h" />
+    <ClInclude Include="MatrixExport.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,4 +1,4 @@
-﻿Build started 8/15/2014 2:14:10 PM.
+﻿Build started 8/31/2014 1:19:04 PM.
      1>Project "D:\Projects\OpenWorm\SDF_lib\SDF_lib.vcxproj" on node 4 (Rebuild target(s)).
      1>_PrepareForClean:
          Deleting file "Debug\SDF_lib.lastbuildstate".
@@ -11,4 +11,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:00.07
+Time Elapsed 00:00:00.06

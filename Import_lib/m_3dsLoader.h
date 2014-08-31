@@ -50,61 +50,62 @@ using namespace mmath;
 
 #define MAX_TEXTURES 100								// The maximum amount of textures to load
 // This class handles all of the loading code
+
 //---------------------------------------------------------------------------
 class CLoad3DS{
 public:
 	CLoad3DS();		// This inits the data members
 
 	// This is the function that you call to load the 3DS
-	bool Import3DS(t3DModel *pModel, char *strFileName);
+	bool Import3DS(structure::t3DModel *pModel, char *strFileName);
 
     // The file pointer
 	FILE *m_FilePointer;
 
-	BoundingBox g_modelMax;
+	structure::BoundingBox g_modelMax;
 
 	// This computes the vertex normals for the object (used for lighting)
-	void ComputeNormals(t3DModel *pModel);
+	void ComputeNormals(structure::t3DModel *pModel);
 
 private:
 	// This reads in a string and saves it in the char array passed in
 	int GetString(char * pBuffer);
 
 	// This reads the next chunk
-	void ReadChunk(tChunk *);
+	void ReadChunk(structure::tChunk *);
 
 	// This reads the next large chunk
-	void ProcessNextChunk(t3DModel *pModel, tChunk *, BoundingBox *pObjectMax);
+	void ProcessNextChunk(structure::t3DModel *pModel, structure::tChunk *, structure::BoundingBox *pObjectMax);
 
 	// This reads the object chunks
-	void ProcessNextObjectChunk(t3DModel *pModel, t3DObject *pObject, tChunk *, BoundingBox *pObjectMax);
+	void ProcessNextObjectChunk(structure::t3DModel *pModel, structure::t3DObject *pObject, structure::tChunk *, structure::BoundingBox *pObjectMax);
 
 	// This reads the material chunks
-	void ProcessNextMaterialChunk(t3DModel *pModel, tChunk *);
+	void ProcessNextMaterialChunk(structure::t3DModel *pModel, structure::tChunk *);
 
 	// This reads the RGB value for the object's color
-	void ReadColorChunk(tMaterialInfo *pMaterial, tChunk *pChunk);
+	void ReadColorChunk(structure::tMaterialInfo *pMaterial, structure::tChunk *pChunk);
 
 	// This reads the objects vertices
-	void ReadVertices(t3DObject *pObject, tChunk *pChunk, BoundingBox *pObjectMax);
+	void ReadVertices(structure::t3DObject *pObject, structure::tChunk *pChunk, structure::BoundingBox *pObjectMax);
 
 	// This reads the objects face information
-	void ReadVertexIndices(t3DObject *pObject, tChunk *);
+	void ReadVertexIndices(structure::t3DObject *pObject, structure::tChunk *);
 
 	// This reads the texture coodinates of the object
-	void ReadUVCoordinates(t3DObject *pObject, tChunk *);
+	void ReadUVCoordinates(structure::t3DObject *pObject, structure::tChunk *);
 
 	// This reads in the material name assigned to the object and sets the materialID
-	void ReadObjectMaterial(t3DModel *pModel, t3DObject *pObject, tChunk *pPreviousChunk);
+	void ReadObjectMaterial(structure::t3DModel *pModel, structure::t3DObject *pObject, structure::tChunk *pPreviousChunk);
 
-	void GenerateTextureCoords(t3DModel *pModel);
+	void GenerateTextureCoords(structure::t3DModel *pModel);
 
 	// This frees memory and closes the file
 	void CleanUp();
 
 	// These are used through the loading process to hold the chunk information
-	tChunk *m_CurrentChunk;
-	tChunk *m_TempChunk;
+	structure::tChunk *m_CurrentChunk;
+	structure::tChunk *m_TempChunk;
 
 	int buffer[50000];
 

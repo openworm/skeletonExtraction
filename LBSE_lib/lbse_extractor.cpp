@@ -7,7 +7,12 @@
 
 //---------------------------------------------------------------------------
 
-LBSE::Extractor::Extractor(){
+lbse::Extractor::Extractor(){
+
+	default_wA = 1.0f;
+	default_wB = 0.1f;
+	default_s_doBranchingSimplification = true;
+
 	numOfIter = 3;
 	mainComponentIndex = 0;
 	stopContractionByIteration = true;
@@ -48,7 +53,7 @@ LBSE::Extractor::Extractor(){
 
 }
 //---------------------------------------------------------------------------
-LBSE::Extractor::~Extractor(){
+lbse::Extractor::~Extractor(){
 	//delete[] modelSkeletonData.boneMatrices;
 	//modelSkeletonData.boneMatrices = NULL;
 	delete pSurgeryGraph;
@@ -59,15 +64,15 @@ LBSE::Extractor::~Extractor(){
 		delete sdmr;*/
 }
 //---------------------------------------------------------------------------
-void LBSE::Extractor::setsL(float _sL){
+void lbse::Extractor::setsL(float _sL){
 	sL = _sL;
 }
 //---------------------------------------------------------------------------
-void LBSE::Extractor::setwL(float _wL){
+void lbse::Extractor::setwL(float _wL){
 	wL = _wL;
 }
 //---------------------------------------------------------------------------
-void LBSE::Extractor::setwH(float _wH){
+void lbse::Extractor::setwH(float _wH){
 	wH = _wH;
 	if (pMesh != NULL){
 		for (int i = 0; i < pMesh->numOfVertices; i++)
@@ -78,11 +83,11 @@ void LBSE::Extractor::setwH(float _wH){
 			originalMesh->wH[i]  = _wH;
 		}
 }
-void LBSE::Extractor::setwC(float _wC){
+void lbse::Extractor::setwC(float _wC){
 	wC = _wC;
 }
 //---------------------------------------------------------------------------
-float * LBSE::Extractor::computeOptimalJoiningTolerance(int &numOfComponents, vector<int> &compMapping){
+float * lbse::Extractor::computeOptimalJoiningTolerance(int &numOfComponents, vector<int> &compMapping){
 	bool * mark = new bool[pMesh->numOfVertices];
 	for (int i = 0; i < pMesh->numOfVertices; i++)
 		mark[i] = false;
@@ -158,7 +163,7 @@ float * LBSE::Extractor::computeOptimalJoiningTolerance(int &numOfComponents, ve
 	return joinings;
 }
 //---------------------------------------------------------------------------
-void LBSE::Extractor::optimizeMeshGraphComponents(){
+void lbse::Extractor::optimizeMeshGraphComponents(){
 	#ifdef _LOG
 		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD optimizeMeshGraphComponents STARTED");
 	#endif
@@ -271,7 +276,7 @@ void LBSE::Extractor::optimizeMeshGraphComponents(){
 	#endif
 }
 //---------------------------------------------------------------------------
-float LBSE::Extractor::calculateVolumeFromMesh(MeshGraph * mesh, t3DModel *pModel, int subdivision){
+float lbse::Extractor::calculateVolumeFromMesh(MeshGraph * mesh, structure::t3DModel *pModel, int subdivision){
 	#ifdef _LOG
 		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD calculateVolumeFromMesh STARTED");
 	#endif
@@ -293,7 +298,7 @@ float LBSE::Extractor::calculateVolumeFromMesh(MeshGraph * mesh, t3DModel *pMode
 
 				int offset = 0;
 				for (int i = 0; i < pModel->numOfObjects; i++){
-					t3DObject *pObject = &pModel->pObject[i];
+					structure::t3DObject *pObject = &pModel->pObject[i];
 					for(int j = 0; j < pObject->numOfFaces; j++){
 						p[0] = mesh->pVerts[mesh->indices[offset + pObject->pFaces[j].vertIndex[0]]];
 						p[1] = mesh->pVerts[mesh->indices[offset + pObject->pFaces[j].vertIndex[1]]];
@@ -310,7 +315,7 @@ float LBSE::Extractor::calculateVolumeFromMesh(MeshGraph * mesh, t3DModel *pMode
 	return vol;
 }
 //---------------------------------------------------------------------------
-float LBSE::Extractor::calculateVolumeFromMesh(MeshGraph * mesh, t3DModel *pModel){
+float lbse::Extractor::calculateVolumeFromMesh(MeshGraph * mesh, structure::t3DModel *pModel){
 	#ifdef _LOG
 		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD calculateVolumeFromMesh STARTED");
 	#endif
@@ -320,7 +325,7 @@ float LBSE::Extractor::calculateVolumeFromMesh(MeshGraph * mesh, t3DModel *pMode
 
 	int offset = 0;
 	for (int i = 0; i < pModel->numOfObjects; i++){
-		t3DObject *pObject = &pModel->pObject[i];
+		structure::t3DObject *pObject = &pModel->pObject[i];
 		for(int j = 0; j < pObject->numOfFaces; j++){
 			p[0] = mesh->pVerts[mesh->indices[offset + pObject->pFaces[j].vertIndex[0]]];
 			p[1] = mesh->pVerts[mesh->indices[offset + pObject->pFaces[j].vertIndex[1]]];
@@ -341,7 +346,7 @@ float LBSE::Extractor::calculateVolumeFromMesh(MeshGraph * mesh, t3DModel *pMode
 	return vol;
 }
 //---------------------------------------------------------------------------
-void LBSE::Extractor::restoreMeshVolume(MeshGraph * mesh, t3DModel *pModel){
+void lbse::Extractor::restoreMeshVolume(MeshGraph * mesh, structure::t3DModel *pModel){
 
 	#ifdef _LOG
 		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD calculateVolumeFromMesh STARTED");
@@ -358,7 +363,7 @@ void LBSE::Extractor::restoreMeshVolume(MeshGraph * mesh, t3DModel *pModel){
 
 }
 //---------------------------------------------------------------------------
-void LBSE::Extractor::logContraction(MeshGraph * mesh1, MeshGraph * mesh2){
+void lbse::Extractor::logContraction(MeshGraph * mesh1, MeshGraph * mesh2){
 	#ifdef _LOG
 	for (int i = 0; i < mesh1->numOfVertices; i++) {
 		logg.log(LOG_LEVEL_C_PARAMS, "posun vertexu ", i);
@@ -367,14 +372,14 @@ void LBSE::Extractor::logContraction(MeshGraph * mesh1, MeshGraph * mesh2){
 	#endif
 }
 
-int LBSE::Extractor::calculateNumOfBones(SN::SkeletonNode * node){
+int lbse::Extractor::calculateNumOfBones(SN::SkeletonNode * node){
 	int sum = 1;
 	for (int i=0; i < node->nodes.size(); i++)
 		sum += calculateNumOfBones((SN::SkeletonNode*)node->nodes[i]);
 	return sum;
 }
 
-bool LBSE::Extractor::checkContractedMesh(MeshGraph * mesh){
+bool lbse::Extractor::checkContractedMesh(MeshGraph * mesh){
 	for (int i = 0; i < mesh->numOfVertices; i++) {
 		if (ISNAN(mesh->pVerts[i].x) || mesh->pVerts[i].x > FLT_MAX || mesh->pVerts[i].x < -FLT_MAX)
 			return false;
@@ -387,7 +392,7 @@ bool LBSE::Extractor::checkContractedMesh(MeshGraph * mesh){
 }
 
 //---------------------------------------------------------------------------
-void LBSE::Extractor::computeSkeleton(t3DModel *pModel, int sourcePointID, SN::SkeletonNode * node, int * ite, float modelMaxDim){
+void lbse::Extractor::computeSkeleton(structure::t3DModel *pModel, int sourcePointID, SN::SkeletonNode * node, int * ite, float modelMaxDim){
 
 	#ifdef _LOG
 		Timerlog timerlog = Timerlog("computeSkeleton");
@@ -674,7 +679,7 @@ void LBSE::Extractor::computeSkeleton(t3DModel *pModel, int sourcePointID, SN::S
 		int offset = 0;
 
 		for (int i = 0; i < pModel->numOfObjects; i++){
-		t3DObject * pObject = &pModel->pObject[i];
+		structure::t3DObject * pObject = &pModel->pObject[i];
 		for (int j = 0; j < pObject->numOfFaces; j++){
 
 		vPoly[0] = pMesh->pVerts[pMesh->indices[offset + pObject->pFaces[j].vertIndex[0]]];
@@ -722,10 +727,10 @@ void LBSE::Extractor::computeSkeleton(t3DModel *pModel, int sourcePointID, SN::S
 	}
 }
 
-/*void LBSE::Extractor::meshgraphVertexPositionsToModel(MeshGraph * pMesh, t3DModel * pModel){
+/*void lbse::Extractor::meshgraphVertexPositionsToModel(MeshGraph * pMesh, structure::t3DModel * pModel){
 	int offset=0;
 	for (int i = 0; i < pModel->numOfObjects; i++){
-		t3DObject * pObject = &pModel->pObject[i];
+		structure::t3DObject * pObject = &pModel->pObject[i];
 		for (int j = 0; j < pObject->numOfFaces; j++){
 			int idx0 = offset + pObject->pFaces[j].vertIndex[0];
 			int idx1 = offset + pObject->pFaces[j].vertIndex[1];
@@ -738,11 +743,12 @@ void LBSE::Extractor::computeSkeleton(t3DModel *pModel, int sourcePointID, SN::S
 	}
 }*/
 
-void LBSE::Extractor::applyConnectivitySurgery(SN::SkeletonNode * node, float modelMaxDim)
+void lbse::Extractor::applyConnectivitySurgery(SN::SkeletonNode * node, float modelMaxDim)
 {
 	// connectivity surgery
 	delete pSurgeryGraph;
 	pSurgeryGraph = NULL;
+
 	pSurgeryGraph = createSurgeryGraphFromMeshGraph(pMesh);
 
 	float threshold = modelMaxDim / (100.0f/groupingTolerance);
@@ -759,7 +765,7 @@ void LBSE::Extractor::applyConnectivitySurgery(SN::SkeletonNode * node, float mo
 	
 }
 
-void LBSE::Extractor::calculateSDFForMeshGraph(MeshGraph * pMesh, t3DModel * pModel, float * sdfValuesNormalizedMG, CVector3 ** sdfHalfVectors, CVector3 * sdfHalfVectorsMG){
+void lbse::Extractor::calculateSDFForMeshGraph(MeshGraph * pMesh, structure::t3DModel * pModel, float * sdfValuesNormalizedMG, CVector3 ** sdfHalfVectors, CVector3 * sdfHalfVectorsMG){
 
 	float * newpos = new float[pModel->numOfVerts * 3];
 
@@ -800,13 +806,13 @@ void LBSE::Extractor::calculateSDFForMeshGraph(MeshGraph * pMesh, t3DModel * pMo
 	delete[] sdfValuesNormalized;
 }
 
-void LBSE::Extractor::addRandomNoiseToMeshGraph(MeshGraph * pMesh, t3DModel * pModel, float scale){
+void lbse::Extractor::addRandomNoiseToMeshGraph(MeshGraph * pMesh, structure::t3DModel * pModel, float scale){
 
 	srand (time(NULL));
 
 	int offset=0;
 	for (int i = 0; i < pModel->numOfObjects; i++){
-		t3DObject * pObject = &pModel->pObject[i];
+		structure::t3DObject * pObject = &pModel->pObject[i];
 		for (int j = 0; j < pObject->numOfFaces; j++){
 			int idx0 = offset + pObject->pFaces[j].vertIndex[0];
 			int idx1 = offset + pObject->pFaces[j].vertIndex[1];
@@ -826,7 +832,7 @@ void LBSE::Extractor::addRandomNoiseToMeshGraph(MeshGraph * pMesh, t3DModel * pM
 
 //---------------------------------------------------------------------------
 template<typename T>
-void LBSE::Extractor::recomputeModelValuesToMeshgraph(MeshGraph * pMesh, t3DModel *pModel, T * sdfValues, T * sdfvec){
+void lbse::Extractor::recomputeModelValuesToMeshgraph(MeshGraph * pMesh, structure::t3DModel *pModel, T * sdfValues, T * sdfvec){
 	int maxMeshIdx = 0;
 	int maxModelIdx = 0;
 
@@ -834,7 +840,7 @@ void LBSE::Extractor::recomputeModelValuesToMeshgraph(MeshGraph * pMesh, t3DMode
 	for(int i = 0; i < pModel->numOfObjects; i++)
 	{
 		if(pModel->pObject.size() <= 0) break;
-		t3DObject *pObject = &(pModel->pObject[i]);
+		structure::t3DObject *pObject = &(pModel->pObject[i]);
 
 		int length = pObject->numOfVertices;
 
@@ -859,7 +865,7 @@ void LBSE::Extractor::recomputeModelValuesToMeshgraph(MeshGraph * pMesh, t3DMode
 
 //---------------------------------------------------------------------------
 
-void LBSE::Extractor::getMGPositionVector(MeshGraph * pMesh, t3DModel *pModel, float * newpos){
+void lbse::Extractor::getMGPositionVector(MeshGraph * pMesh, structure::t3DModel *pModel, float * newpos){
 
 	int maxMeshIdx = 0;
 	int maxModelIdx = 0;
@@ -868,7 +874,7 @@ void LBSE::Extractor::getMGPositionVector(MeshGraph * pMesh, t3DModel *pModel, f
 	for(int i = 0; i < pModel->numOfObjects; i++)
 	{
 		if(pModel->pObject.size() <= 0) break;
-		t3DObject *pObject = &(pModel->pObject[i]);
+		structure::t3DObject *pObject = &(pModel->pObject[i]);
 
 		int length = pObject->numOfVertices;
 
@@ -899,7 +905,7 @@ void LBSE::Extractor::getMGPositionVector(MeshGraph * pMesh, t3DModel *pModel, f
 
 }
 
-SN::SkeletonNode * LBSE::Extractor::rerootSkeleton(int newrootId, SN::SkeletonNode* pSkelet){
+SN::SkeletonNode * lbse::Extractor::rerootSkeleton(int newrootId, SN::SkeletonNode* pSkelet){
 	vector<SN::SkeletonNode*> queue;
 	queue.push_back(pSkelet);
 	SN::SkeletonNode * imaginary = pSkelet->father;
@@ -950,8 +956,10 @@ SN::SkeletonNode * LBSE::Extractor::rerootSkeleton(int newrootId, SN::SkeletonNo
 		if (lastSon != NULL)
 			pNode->father = lastSon;
 	}
-	pSkelet = copySkeletonNode(newroot);
+
+	copySkeletonNode(newroot, pSkelet);
 	pSkelet->father = imaginary;
 
 	return pSkelet;
 }
+

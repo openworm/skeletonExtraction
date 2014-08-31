@@ -147,7 +147,7 @@ void GraphAlgorithms::findXMinInTree(MeshGraph * pMesh, Array2D<float> distanceM
 	}
 }
 
-void GraphAlgorithms::computeObjectSkeletonShaderData(SN::SkeletonNode* currentSkeletonRoot, MeshGraph * pMesh, t3DObject *pObject, ObjectSkeletonShaderData * data, int length, int indexOffset, bool isMeshGraphComputed, Array2D<float> distanceMatrix, int numOfControlBones, int maxBones){
+void GraphAlgorithms::computeObjectSkeletonShaderData(SN::SkeletonNode* currentSkeletonRoot, MeshGraph * pMesh, structure::t3DObject *pObject, ObjectSkeletonShaderData * data, int length, int indexOffset, bool isMeshGraphComputed, Array2D<float> distanceMatrix, int numOfControlBones, int maxBones){
 	if (isMeshGraphComputed)
 		pObject->skinning = true;
 

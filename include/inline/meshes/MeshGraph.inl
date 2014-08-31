@@ -2,8 +2,8 @@
 inline void halfEdgeCollapse(SurgeryGraph * pGraph, int i, int j, int * actualNumOfBones, bool updateQ){
 		// half-edge collapse mesh (i->j), copy to j edges from i and set to -1 edges in i
 		#ifdef _LOG
-			Log::log(LOG_LEVEL_C_PARAMS, "Vrchol I",i);
-			Log::log(LOG_LEVEL_C_PARAMS, "do vrchola J ",j);
+			logg.log(LOG_LEVEL_C_PARAMS, "Vrchol I",i);
+			logg.log(LOG_LEVEL_C_PARAMS, "do vrchola J ",j);
 		#endif
 
 		// update Q matrix
@@ -11,10 +11,10 @@ inline void halfEdgeCollapse(SurgeryGraph * pGraph, int i, int j, int * actualNu
 			pGraph->QMatrices[j] = pGraph->QMatrices[j] + pGraph->QMatrices[i];
 
 		#ifdef _LOG
-				Log::log(LOG_LEVEL_C_PARAMS, "pGraph->numOfVertices : ", pGraph->numOfVertices);
+				logg.log(LOG_LEVEL_C_PARAMS, "pGraph->numOfVertices : ", pGraph->numOfVertices);
 
-				Log::log(LOG_LEVEL_C_PARAMS, "pointClouds pre vrchol : ",j);
-				Log::log(LOG_LEVEL_C_PARAMS, "pointClouds velkost pred presunom : ",(int)pGraph->pointClouds[j].size());
+				logg.log(LOG_LEVEL_C_PARAMS, "pointClouds pre vrchol : ",j);
+				logg.log(LOG_LEVEL_C_PARAMS, "pointClouds velkost pred presunom : ",(int)pGraph->pointClouds[j].size());
 		#endif
 
 		for (int k=0; k< pGraph->pointClouds[i].size(); k++)
@@ -22,7 +22,7 @@ inline void halfEdgeCollapse(SurgeryGraph * pGraph, int i, int j, int * actualNu
 		pGraph->pointClouds[i].clear();
 
 		#ifdef _LOG
-			Log::log(LOG_LEVEL_C_PARAMS, "pointClouds velkost po presune : ",(int)pGraph->pointClouds[j].size());
+			logg.log(LOG_LEVEL_C_PARAMS, "pointClouds velkost po presune : ",(int)pGraph->pointClouds[j].size());
 		#endif
 
 		for (int k = 0; k < pGraph->numOfVertices; k++) {
@@ -50,20 +50,20 @@ inline void halfEdgeCollapse(SurgeryGraph * pGraph, int i, int j, int * actualNu
 		pGraph->E[i][j] = false;
 
 		#ifdef _LOG
-			Log::log(LOG_LEVEL_DUMP, "Matica E");
-			Log::log(LOG_LEVEL_DUMP, pGraph->E);
+			logg.log(LOG_LEVEL_DUMP, "Matica E");
+			logg.log(LOG_LEVEL_DUMP, pGraph->E);
 		#endif
 		(*actualNumOfBones)--;
 }
 
 //---------------------------------------------------------------------------
 inline void halfEdgeCollapse(MeshGraph * pMesh, boost::unordered_map<int, std::vector<int> > &mgDegeneratesMapping, int i, int j){
-		/*Log::log(0, "E pred HEC: ");
-		Log::log(0, pMesh->E);
+		/*logg.log(0, "E pred HEC: ");
+		logg.log(0, pMesh->E);
 */
-		//Log::log(LOG_LEVEL_WARNING, "Aplikuje sa kontrakcna half-edge collapse");
-		//Log::log(LOG_LEVEL_WARNING, "i: ",i);
-		//Log::log(LOG_LEVEL_WARNING, "-> j: ",j);
+		//logg.log(LOG_LEVEL_WARNING, "Aplikuje sa kontrakcna half-edge collapse");
+		//logg.log(LOG_LEVEL_WARNING, "i: ",i);
+		//logg.log(LOG_LEVEL_WARNING, "-> j: ",j);
 
 	/*	CVector3 * newpoints = new CVector3[pMesh->numOfVertices - 1];
 		float * newwH = new float[pMesh->numOfVertices - 1];
@@ -83,8 +83,8 @@ inline void halfEdgeCollapse(MeshGraph * pMesh, boost::unordered_map<int, std::v
 		pMesh->E[j][i] = false;
 		pMesh->E[i][j] = false;
 
-		//Log::log(0, "E po HEC: ");
-		//Log::log(0, pMesh->E);
+		//logg.log(0, "E po HEC: ");
+		//logg.log(0, pMesh->E);
 
 	/*	for (int m=0; m < i; m++){
 			for (int n=0; n < i; n++)
@@ -155,10 +155,10 @@ inline void halfEdgeCollapse(MeshGraph * pMesh, boost::unordered_map<int, std::v
 }
 
 //---------------------------------------------------------------------------
-/*inline bool isMeshTriangle(MeshGraph * pMesh, t3DModel *pModel, int a,int b,int c){
+/*inline bool isMeshTriangle(MeshGraph * pMesh, structure::t3DModel *pModel, int a,int b,int c){
 	int offset = 0;
 	for (int j = 0; j < pModel->numOfObjects; j++){
-		t3DObject *pObject = &pModel->pObject[j];
+		structure::t3DObject *pObject = &pModel->pObject[j];
 		for (int k = 0; k < pObject->numOfFaces; k++){
 			int ind0 = pMesh->indices[offset + pObject->pFaces[k].vertIndex[0]];
 			int ind1 = pMesh->indices[offset + pObject->pFaces[k].vertIndex[1]];
@@ -196,7 +196,7 @@ inline bool isMeshTriangle(MeshGraph * pMesh, int a,int b,int c){
 }
 
 //---------------------------------------------------------------------------
-inline void createMeshGraph(t3DModel *pModel,MeshGraph * pMesh, VertexJoiningVisualization * pJoining, float * joinings, float delta, float wL, float wH, int numOfComponents, std::vector<int> compMapping){
+inline void createMeshGraph(structure::t3DModel *pModel,MeshGraph * pMesh, VertexJoiningVisualization * pJoining, float * joinings, float delta, float wL, float wH, int numOfComponents, std::vector<int> compMapping){
 
 	#ifdef _LOG
 		Timerlog timerlog = Timerlog("createMeshGraph");
@@ -211,7 +211,7 @@ inline void createMeshGraph(t3DModel *pModel,MeshGraph * pMesh, VertexJoiningVis
 	//pMesh = new MeshGraph();
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD createMeshGraph STARTED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD createMeshGraph STARTED");
 	#endif
 
 	std::vector<CVector3> v;
@@ -226,7 +226,7 @@ inline void createMeshGraph(t3DModel *pModel,MeshGraph * pMesh, VertexJoiningVis
 	int joinIdx = 0;
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "START createMeshGraph - vertices contruction");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "START createMeshGraph - vertices contruction");
 	#endif
 
 	std::vector<int> pindices;
@@ -234,7 +234,7 @@ inline void createMeshGraph(t3DModel *pModel,MeshGraph * pMesh, VertexJoiningVis
 	float joining = 0.0f;
 
 	for (int i = 0; i < pModel->numOfObjects; i++){
-		t3DObject *pObject = &pModel->pObject[i];
+		structure::t3DObject *pObject = &pModel->pObject[i];
 		//pObject->pMeshGraphIndices = new int[pObject->numOfVerts];
 		//for (int k = 0; k < pObject->numOfVerts; k++)
 			//pObject->pMeshGraphIndices[k] = -1;
@@ -289,7 +289,7 @@ inline void createMeshGraph(t3DModel *pModel,MeshGraph * pMesh, VertexJoiningVis
 	}
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "END createMeshGraph - vertices contruction");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "END createMeshGraph - vertices contruction");
 	#endif
 
 	// take only 100 closest neighbourhs
@@ -299,9 +299,9 @@ inline void createMeshGraph(t3DModel *pModel,MeshGraph * pMesh, VertexJoiningVis
 	//mean face area
 	pMesh->numOfFaces = numOfFaces;
 	pMesh->faceAreaSum = area;
-	/*Log::log(2, "Avarage model Area: ", (pMesh->faceAreaSum / (float)pMesh->numOfFaces));
+	/*logg.log(2, "Avarage model Area: ", (pMesh->faceAreaSum / (float)pMesh->numOfFaces));
 	float t = pMesh->faceAreaSum/(pMesh->faceAreaSum / (float)pMesh->numOfFaces);
-	Log::log(LOG_LEVEL_C_PARAMS, "term t :", t);
+	logg.log(LOG_LEVEL_C_PARAMS, "term t :", t);
 	pMesh->wL = wL * t;*/
 
 	pMesh->numOfVertices = num;
@@ -339,7 +339,7 @@ inline void createMeshGraph(t3DModel *pModel,MeshGraph * pMesh, VertexJoiningVis
 	int * numIndex = new int[3];
 
 	#ifdef _LOG
-		Log::log(LOG_LEVEL_METHODSTARTEND, "START createMeshGraph - joining contruction");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "START createMeshGraph - joining contruction");
 	#endif
 
 	std::vector<CVector3> joiningFrom;
@@ -348,7 +348,7 @@ inline void createMeshGraph(t3DModel *pModel,MeshGraph * pMesh, VertexJoiningVis
 		// for each selected node find his neighbours
 		offset = 0;
 		for (int j = 0; j < pModel->numOfObjects; j++){
-			t3DObject *pObject = &pModel->pObject[j];
+			structure::t3DObject *pObject = &pModel->pObject[j];
 			for (int k = 0; k < pObject->numOfFaces; k++){
 				for(int whichVertex = 0; whichVertex < 3; whichVertex++){
 					int index = pObject->pFaces[k].vertIndex[whichVertex];
@@ -409,7 +409,7 @@ inline void createMeshGraph(t3DModel *pModel,MeshGraph * pMesh, VertexJoiningVis
 
 		timerlog.addStart("create joining visualziation");
 
-		Log::log(LOG_LEVEL_METHODSTARTEND, "END createMeshGraph - joining contruction");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "END createMeshGraph - joining contruction");
 	#endif
 
 	// CHECK THE E MATRIX, IF ALL EDGES ARE IN TRIANGLE
@@ -471,10 +471,10 @@ inline void createMeshGraph(t3DModel *pModel,MeshGraph * pMesh, VertexJoiningVis
 	#ifdef _LOG
 		timerlog.addEnd();
 
-		Log::log(LOG_LEVEL_DUMP, "Matica E");
-		Log::log(LOG_LEVEL_DUMP, pMesh->E);
+		logg.log(LOG_LEVEL_DUMP, "Matica E");
+		logg.log(LOG_LEVEL_DUMP, pMesh->E);
 
-		Log::log(LOG_LEVEL_METHODSTARTEND, "METHOD createMeshGraph ENDED");
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD createMeshGraph ENDED");
 
 		timerlog.logExecutionTimes();
 	#endif
@@ -482,6 +482,60 @@ inline void createMeshGraph(t3DModel *pModel,MeshGraph * pMesh, VertexJoiningVis
 	//pMesh->numOfVertices = neigh.size();
 
 } 
+
+inline void createMeshGraph(meshes::IndexedFace *mesh, MeshGraph * pMesh, float wL, float wH){
+
+	pMesh->numOfVertices = mesh->vertices.size() / 3;
+	delete[] pMesh->pVerts;
+	pMesh->pVerts = NULL;
+	pMesh->pVerts = new CVector3[pMesh->numOfVertices];
+
+	delete[] pMesh->wH;
+	pMesh->wH = NULL;
+	pMesh->wH = new float[pMesh->numOfVertices];
+	delete[] pMesh->wHorig;
+	pMesh->wHorig = NULL;
+	pMesh->wHorig = new float[pMesh->numOfVertices];
+
+	if (mesh->indices.size() != 0){
+		delete[] pMesh->triangleIndices;
+		pMesh->triangleIndices = NULL;
+	
+		pMesh->triangleIndices = new int[mesh->indices.size()];
+		pMesh->triangleIndices = &(mesh->indices[0]);
+
+		pMesh->numOfFaces = mesh->indices.size() / 3;
+	}
+
+	for (int i=0; i < mesh->vertices.size() / 3; i++){
+		pMesh->pVerts[i] = CVector3(mesh->vertices[i * 3], mesh->vertices[i * 3 + 1], mesh->vertices[i * 3 + 2]);
+	}
+
+	pMesh->E = Array2D<bool>(pMesh->numOfVertices,pMesh->numOfVertices, false);
+
+	for (int i=0; i < mesh->indices.size() / 3; i++){
+		int i1 = mesh->indices[i * 3];
+		int i2 = mesh->indices[i * 3 + 1];
+		int i3 = mesh->indices[i * 3 + 2];
+
+		pMesh->E[i1][i2] = true;
+		pMesh->E[i2][i3] = true;
+		pMesh->E[i3][i1] = true;
+
+		pMesh->E[i2][i1] = true;
+		pMesh->E[i3][i2] = true;
+		pMesh->E[i1][i3] = true;
+	}
+
+	pMesh->wL = wL;
+
+	for (int i = 0; i < pMesh->numOfVertices; i++){
+		pMesh->wH[i] = wH;
+		pMesh->wHorig[i] = wH;
+	}
+
+}
+
 
 inline void calculateOneRingExtent(MeshGraph * pMesh, float * p, std::vector<std::set<int>> globalNeighbourhoods){
 
