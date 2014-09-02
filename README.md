@@ -1,47 +1,68 @@
-PROJECTS IN VISUAL STUDIO SOLUTION (COMPONENTS UNDER DEVELOPMENT):
+###PROJECTS:###
+*All projects are in this repository's [Visual Studio Solution](http://msdn.microsoft.com/en-us/library/bb165951(v=vs.80).aspx) [file](https://github.com/openworm/skeletonExtraction/blob/master/OpenWormSkeletonExtraction.sln).*
 
-1) GDSW_lib [Geodesic Distance Skinning Weights]
-- library computes geodesic distance on the mesh surface using Floyd-Warshall algorithm. 
-- the geodesic distance is than used for computation of skinning weights
-- it is a very trivial approach how skinning weights can be computed
-- more complex approach might be needed in the future
+**1) GDSW_lib** [Geodesic Distance Skinning Weights]
+- Library computes geodesic distance on the mesh surface using Floyd-Warshall algorithm. 
+- The geodesic distance is than used for computation of skinning weights
+- It is a very trivial approach how skinning weights can be computed
+- A more complex approach might be needed in the future
 
-:: main functions ::
+*Main functions:*
+```
 void FloydWarshall(MeshGraph * pMesh, Array2D<float>& M)
-- computes distances on the graph
+```
+- Computes distances on the graph
 
-2) LBSE_lib [Laplacian Based Skeleton Extraction]
-- library uses Laplacian based skeleton contraction for extraction of the skeleton from input mesh
-- the resulting skeleton is a tree structure
+**2) LBSE_lib** [Laplacian-Based Skeleton Extraction]
+- Library uses Laplacian based skeleton contraction for extraction of the skeleton from input mesh
+- The resulting skeleton is a tree structure
 
-:: main functions ::
-void computeSkeleton(t3DModel *pModel, int sourcePointID, SN::SkeletonNode * skeleton, int * ite, bool &recreateOperator, float modelMaxDim)
-- computes skeleton from input mesh
+*Main functions:*
+```
+void computeSkeleton(t3DModel *pModel, 
+                     int sourcePointID, 
+                     SN::SkeletonNode * skeleton, 
+                     int * ite, 
+                     bool &recreateOperator, 
+                     float modelMaxDim)
+```
+- Computes skeleton from input mesh
 
-3) PCT_lib [Point Cloud Triangulation]
-- library computes triangulation from input point cloud
-- the global triangulation is composed from local Delaunay triangulations
+**3) PCT_lib** [Point Cloud Triangulation]
+- Library computes triangulation from input point cloud
+- The global triangulation is composed from local Delaunay triangulations
 
-:: main functions ::
-void computeLocalTriangulationFromPoints(int index, int numOfPoints, float * points, int &numOfIndices, int ** indices, std::vector<std::set<int>> globalNeighbourhoods, float * nor, bool visualization = false)
-- computes local triangulation
-
-void computeGlobalTriangulationFromPoints(int numOfPoints, float * points, int &numOfIndices, int ** indices, float ** normals, bool visualization = false);
+*Main functions:*
+```
+void computeLocalTriangulationFromPoints(int index, int numOfPoints, 
+                                         float * points, int &numOfIndices, 
+                                         int ** indices, 
+                                         std::vector<std::set<int>> globalNeighbourhoods, 
+                                         float * nor, bool visualization = false)
+```
+- Computes local triangulation
+```
+void computeGlobalTriangulationFromPoints(int numOfPoints, 
+                                          float * points, 
+                                          int &numOfIndices, 
+                                          int ** indices, 
+                                          float ** normals, 
+                                          bool visualization = false)
+```
 - computes global triangulation
 
-4) SDF_lib [Shape Diameter Function]
-- not yet needed, but I have left it there for keeping compatibility of source files between my repo and this repo
+**4) SDF_lib** [Shape Diameter Function]
+- Not yet needed, but I have left it there for keeping compatibility of source files between my repo and this repo.
 
-PREPROCESSOR DEFINITIONS:
-
+###PREPROCESSOR DEFINITIONS:###
+```
 D_SCL_SECURE_NO_WARNINGS;_NLOG;_NMMGR;NOMINMAX;
+```
+###HOW IT WORKS:###
 
-HOW DOES IT WORK:
+When a process wants to extract a skeleton from an input mesh, the process has to call the `"computeSkeleton"` method from `LBSE_lib`. Next, for extraction of skinning weights, the `GDSW_lib` has to be used.
 
-When a process wants to extract a skeleton from an input mesh, the process has to call "computeSkeleton" method from 
-LBSE_lib. Next, for extraction of skinning weights, the GDSW_lib has to be used.
-
-LIBRARIES NEEDED TO RUN EXTRACTION:
+###LIBRARIES NEEDED TO RUN EXTRACTION:###
 
 - Boost - used for serialization of the skeletons, can be removed later if serialization is not needed
 - TNT - vectors and matrices used in Jama
