@@ -3,37 +3,37 @@
 
 //---------------------------------------------------------------------------
 
-void contractMeshGraph(int laplacianScheme, MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingExtent, float * curOneRingArea, int kneigh, vector<std::set<int>> globalNeighbourhoods, OpenCLContext oclc, CVector3 * centerPoints, PointCloudTriangulation::DeleunayTriangulator * pTriangulator, OpenCLManager openCLManager){ //ModelController::CModel * sdfController
+void contractMeshGraph(int laplacianScheme, MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingExtent, float * curOneRingArea, int kneigh, vector<std::set<int>> globalNeighbourhoods, OpenCLContext oclc, CVector3 * sdfHalfVec, PointCloudTriangulation::DeleunayTriangulator * pTriangulator, OpenCLManager openCLManager){ //ModelController::CModel * sdfController
 	switch(laplacianScheme){
 
-	case LS_GLOBAL_JAMA_COTANGENT: 
+	case LaplacianScheme::LS_GLOBAL_JAMA_COTANGENT: 
 		contractMeshGraphCPUCotangent(pMesh, mgDegeneratesMapping, it, LImage, sL, curOneRingArea); 
 		break;
-	case LS_GLOBAL_JAMA_POINTCLOUD:
+	case LaplacianScheme::LS_GLOBAL_JAMA_POINTCLOUD:
 		contractMeshGraphCPUPointCloud(pMesh, mgDegeneratesMapping, it, LImage, sL, curOneRingExtent, curOneRingArea, kneigh, globalNeighbourhoods, pTriangulator); 
 		break;
-	case LS_GLOBAL_VCL_COTANGENT: 
+	case LaplacianScheme::LS_GLOBAL_VCL_COTANGENT: 
 		contractMeshGraphGPUVCL(pMesh,mgDegeneratesMapping, it, LImage, sL, curOneRingArea); 
 		break;
-	case LS_LOCAL_JAMA_COTANGENT: 
+	case LaplacianScheme::LS_LOCAL_JAMA_COTANGENT: 
 		contractMeshGraphParallelCPU(pMesh, mgDegeneratesMapping, it, LImage, sL, curOneRingArea); 
 		break;
-	case LS_LOCAL_OCL_COTANGENT:
+	case LaplacianScheme::LS_LOCAL_OCL_COTANGENT:
 		contractMeshGraphParallelOpenCL(pMesh, mgDegeneratesMapping, it, LImage, sL, curOneRingArea, openCLManager); 
 		break;
-	case LS_GLOBAL_VCLLSM_COTANGENT: 
+	case LaplacianScheme::LS_GLOBAL_VCLLSM_COTANGENT: 
 		contractMeshGraphGPUVCL_LSM(pMesh, mgDegeneratesMapping, it, LImage, sL, curOneRingArea); 
 		break;
-	case LS_GLOBAL_CPU_COTANGENT_PCL: 
+	case LaplacianScheme::LS_GLOBAL_CPU_COTANGENT_PCL: 
 		contractMeshGraphCPUPCL(pMesh, mgDegeneratesMapping, it, LImage, sL, curOneRingArea); 
 		break;
-	case LS_GLOBAL_VCLLSMSDF_COTANGENT:
-		contractMeshGraphGPUVCL_LSM_SDF(pMesh, centerPoints, mgDegeneratesMapping, it, LImage, sL, curOneRingArea);				
+	case LaplacianScheme::LS_GLOBAL_VCLLSMSDF_COTANGENT:
+		contractMeshGraphGPUVCL_LSM_SDF(pMesh, sdfHalfVec, mgDegeneratesMapping, it, LImage, sL, curOneRingArea);				
 		break;	
-	case LS_LOCAL_JAMASDF_COTANGENT:
-		contractMeshGraphParallelCPU_SDF(pMesh, centerPoints, mgDegeneratesMapping, it, LImage, sL, curOneRingArea);				
+	case LaplacianScheme::LS_LOCAL_JAMASDF_COTANGENT:
+		contractMeshGraphParallelCPU_SDF(pMesh, sdfHalfVec, mgDegeneratesMapping, it, LImage, sL, curOneRingArea);				
 		break;	
-	case LS_GLOBAL_OCL_JACOBI_COTANGENT:
+	case LaplacianScheme::LS_GLOBAL_OCL_JACOBI_COTANGENT:
 		contractMeshGraphParallelOpenCLJacobi(pMesh, mgDegeneratesMapping, sL, curOneRingArea, oclc, openCLManager);
 		break;
 	default: contractMeshGraphGPUVCL_LSM(pMesh, mgDegeneratesMapping, it, LImage, sL, curOneRingArea);
@@ -195,7 +195,6 @@ Array2D< float > calculateLaplacianMatrix(MeshGraph * pMesh){
 			}
 
 			delete[] a;
-			a = NULL;
 
 			return L;
 }
@@ -369,6 +368,12 @@ void contractMeshGraphParallelOpenCL(MeshGraph * pMesh, boost::unordered_map<int
 	// call opencl computation of laplace contraction
 	openCLManager.openCL_LaplaceContraction(pMesh->pVerts, inputVertices, numOfVertices, &Lm(0,0), maxNeigh,  neighbourhoods, pMesh->wL, pMesh->wH);
 
+	delete[] inputVertices;
+	delete[] neighbourhoods;
+	delete[] neighSize;
+	delete[] neighbourIndices;
+		
+
 	#ifdef _LOG
 		timerlog.addEnd();
 
@@ -519,6 +524,14 @@ void contractMeshGraphParallelOpenCLInterop(int * ite, MeshGraph * pMesh, boost:
 		inputVertices[numOfVertices + i] = pMesh->pVerts[i].y;
 		inputVertices[2 * numOfVertices + i] = pMesh->pVerts[i].z;
 	}
+
+	delete[] inputVertices;
+	delete[] neighbourhoods;
+	delete[] neighbourhoods2;
+	delete[] neighSize;
+	delete[] neighSize2;
+	delete[] neighbourIndices;
+	delete[] neighbourIndices2;
 
 
 	#ifdef _LOG
@@ -759,6 +772,14 @@ void contractMeshGraphParallelOpenCL2ring(MeshGraph * pMesh, boost::unordered_ma
 	// call opencl computation of laplace contraction
 	openCLManager.openCL_LaplaceContraction2ring(pMesh->pVerts, inputVertices, numOfVertices, &Lm(0,0), maxNeigh,  neighbourhoods, maxNeigh2,  neighbourhoods2, pMesh->wL, pMesh->wH);
 
+	delete[] inputVertices;
+	delete[] neighbourhoods;
+	delete[] neighbourhoods2;
+	delete[] neighSize;
+	delete[] neighSize2;
+	delete[] neighbourIndices;
+	delete[] neighbourIndices2;
+
 	#ifdef _LOG
 		timerlog.addEnd();
 
@@ -940,6 +961,7 @@ void contractMeshGraphParallelOpenCLJacobi(MeshGraph * pMesh, boost::unordered_m
 	// call opencl computation of laplace contraction
 	openCLManager.openCL_LaplaceContractionJacobi(pMesh->pVerts, inputVertices, numOfVertices, &ASquared(0,0), &B(0,0), pMesh->gMeshgraphPositionsVB, oclc);
 
+	delete[] inputVertices;
 
 	#ifdef _LOG
 		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD contractMeshGraph ENDED");
@@ -1094,6 +1116,8 @@ void contractMeshGraphParallelOpenCLJacobiInterop(int * ite, MeshGraph * pMesh, 
 
 	// call opencl computation of laplace contraction
 	openCLManager.openCL_LaplaceContractionJacobi(pMesh->pVerts, inputVertices, numOfVertices, &ASquared(0,0), &B(0,0), pMesh->gMeshgraphPositionsVB, oclc);
+
+	delete[] inputVertices;
 
 
 	#ifdef _LOG
@@ -1277,7 +1301,7 @@ float solveParallelWithJama(int idx, Array2D< float >  L_global, float* input, u
 
 //---------------------------------------------------------------------------
 
-float solveParallelWithJama_SDF(int idx, float * centerPoints, Array2D< float >  L_global, float* input, unsigned int numOfVertices,  MeshGraph * pMesh,  unsigned int maxNeigh,  int* neighbourhoods){
+float solveParallelWithJama_SDF(int idx, float * sdfHalfVec, Array2D< float >  L_global, float* input, unsigned int numOfVertices,  MeshGraph * pMesh,  unsigned int maxNeigh,  int* neighbourhoods){
 
 	int idxmod = idx % numOfVertices;
 
@@ -1358,7 +1382,7 @@ float solveParallelWithJama_SDF(int idx, float * centerPoints, Array2D< float > 
 	for (int i = 0; i < n; i++){
 		int curNeigh = neighbourhoods[idxmod * (maxNeigh + 1) + i + 1];
 		B[n + i] = (float)(input[curNeigh + (idx - idxmod)] * WH[i][i]);
-		B[2 * n + i] = (float)(centerPoints[curNeigh + (idx - idxmod)] * WC[i][i]);
+		B[2 * n + i] = (float)(sdfHalfVec[curNeigh + (idx - idxmod)] * WC[i][i]);
 	}
 
 	JAMA::QR<float> qr(A);
@@ -1591,6 +1615,12 @@ void contractMeshGraphParallelCPU(MeshGraph * pMesh, boost::unordered_map<int, v
 		pMesh->pVerts[i] = CVector3((float)results[i], (float)results[numOfVertices + i], (float)results[2 * numOfVertices + i]);
 	}
 
+	delete[] inputVertices;
+	delete[] results;
+	delete[] neighbourhoods;
+	delete[] neighSize;
+
+
 	/*for (int i = 0; i < pMesh->numOfVertices; i++)
 		pMesh->pVerts[i] = CVector3((float)V[i][0], (float)V[i][1], (float)V[i][2]);*/
 
@@ -1603,7 +1633,7 @@ void contractMeshGraphParallelCPU(MeshGraph * pMesh, boost::unordered_map<int, v
 
 }
 
-void contractMeshGraphParallelCPU_SDF(MeshGraph * pMesh, CVector3 * centerPoints, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea){
+void contractMeshGraphParallelCPU_SDF(MeshGraph * pMesh, CVector3 * sdfHalfVec, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea){
 	#ifdef _LOG
 		Timerlog timerlog = Timerlog("contractMeshGraphParallelCPU");
 	#endif
@@ -1704,9 +1734,9 @@ void contractMeshGraphParallelCPU_SDF(MeshGraph * pMesh, CVector3 * centerPoints
 		inputVertices[numOfVertices + i] = pMesh->pVerts[i].y;
 		inputVertices[2 * numOfVertices + i] = pMesh->pVerts[i].z;
 
-		center[i] = centerPoints[i].x;
-		center[numOfVertices + i] = centerPoints[i].y;
-		center[2 * numOfVertices + i] = centerPoints[i].z;
+		center[i] = sdfHalfVec[i].x;
+		center[numOfVertices + i] = sdfHalfVec[i].y;
+		center[2 * numOfVertices + i] = sdfHalfVec[i].z;
 	}
 
 	float * results = new float[3 * numOfVertices];
@@ -1725,6 +1755,11 @@ void contractMeshGraphParallelCPU_SDF(MeshGraph * pMesh, CVector3 * centerPoints
 	for (int i = 0; i<numOfVertices; i++){
 		pMesh->pVerts[i] = CVector3((float)results[i], (float)results[numOfVertices + i], (float)results[2 * numOfVertices + i]);
 	}
+
+	delete[] inputVertices;
+	delete[] neighbourhoods;
+	delete[] neighSize;
+	delete[] center;
 
 	/*for (int i = 0; i < pMesh->numOfVertices; i++)
 		pMesh->pVerts[i] = CVector3((float)V[i][0], (float)V[i][1], (float)V[i][2]);*/
@@ -1836,11 +1871,11 @@ void contractMeshGraphCPUCotangent(MeshGraph * pMesh, boost::unordered_map<int, 
 	 }
 
 	#ifdef _LOG
-		 logg.log(LOG_LEVEL_DUMP, "Matica wL");
-		 logg.log(LOG_LEVEL_DUMP, WL);
+		 logg.log(0, "Matica wL");
+		 logg.log(0, WL);
 
-		 logg.log(LOG_LEVEL_DUMP, "Matica wH");
-		 logg.log(LOG_LEVEL_DUMP, WH);
+		 logg.log(0, "Matica wH");
+		 logg.log(0, WH);
 	#endif
 
 	 UPA = WL * L;
@@ -1858,8 +1893,8 @@ void contractMeshGraphCPUCotangent(MeshGraph * pMesh, boost::unordered_map<int, 
 			 					}
 
 	#ifdef _LOG
-		 logg.log(LOG_LEVEL_DUMP, "Matica UPA");
-		 logg.log(LOG_LEVEL_DUMP, UPA);
+		 logg.log(0, "Matica UPA");
+		 logg.log(0, UPA);
 	#endif
 
 	// now solve the system using TNT and JAMA with QR decomposition
@@ -1873,8 +1908,10 @@ void contractMeshGraphCPUCotangent(MeshGraph * pMesh, boost::unordered_map<int, 
 			A[i][j] = (float)UPA[i][j];
 	}
 
-	 //logg.log(0, "Matica A");
-	 //logg.log(0, A);
+	#ifdef _LOG
+		logg.log(0, "Matica A");
+		logg.log(0, A);
+	#endif
 
 	 B = Array2D<float>(2 * pMesh->numOfVertices, 3, 0.0f);
 
@@ -1885,8 +1922,10 @@ void contractMeshGraphCPUCotangent(MeshGraph * pMesh, boost::unordered_map<int, 
 		B[pMesh->numOfVertices + i][2] = (float)(pMesh->pVerts[i].z * pMesh->wH[i]);
 	}
 
-	//logg.log(0, "Matica B");
-	//logg.log(0, B);
+	#ifdef _LOG
+		logg.log(0, "Matica B");
+		logg.log(0, B);
+	#endif
 
 	#ifdef _LOG
 		timerlog.addEnd();
@@ -1897,8 +1936,10 @@ void contractMeshGraphCPUCotangent(MeshGraph * pMesh, boost::unordered_map<int, 
 	JAMA::QR<float> qr(A);
 	V = qr.solve(B);
 
-	//logg.log(0, "Nove vrcholy");
-	//logg.log(0, V);
+	#ifdef _LOG
+		logg.log(0, "Nove vrcholy");
+		logg.log(0, V);
+	#endif
 
 	//delete[] curOneRingArea;
 	//curOneRingArea = NULL;
@@ -2118,6 +2159,8 @@ void findNearestKNeighbours(MeshGraph * pMesh, int idx, int kneigh, int * neighb
 			}
 
 		}
+
+		delete[] distances;
 }
 
 //---------------------------------------------------------------------------
@@ -2233,7 +2276,7 @@ void contractMeshGraphCPUPointCloud(MeshGraph * pMesh, boost::unordered_map<int,
 
 			float * nor = new float[3];
 
-			// UNCOMMENT pTriangulator->computeLocalTriangulationFromPoints(i, pMesh->numOfVertices, verts, numOfTrians, &indices, globalNeighbourhoods, nor, true);
+			pTriangulator->computeLocalTriangulationFromPoints(i, pMesh->numOfVertices, verts, numOfTrians, &indices, globalNeighbourhoods, nor, true);
 
 			for (int j=0; j<numOfTrians; j++){
 				E_local[indices[j * 3]][indices[j * 3 + 1]] = true;
@@ -2245,8 +2288,6 @@ void contractMeshGraphCPUPointCloud(MeshGraph * pMesh, boost::unordered_map<int,
 			}
 
 		// calculate Laplacian L from one ring area
-
-		float *a = new float[2];
 
 		for (int j = 0; j < pMesh->numOfVertices; j++)
 			if (E_local[i][j] && i != j){
@@ -2290,9 +2331,6 @@ void contractMeshGraphCPUPointCloud(MeshGraph * pMesh, boost::unordered_map<int,
 					}
 				} 
 			}
-
-			delete[] a;
-			a = NULL;
 
 		  /////////////////////////////////
 	}
@@ -3052,7 +3090,7 @@ void contractMeshGraphGPUVCL_LSM(MeshGraph * pMesh, boost::unordered_map<int, ve
 
 //---------------------------------------------------------------------------
 
-void contractMeshGraphGPUVCL_LSM_SDF(MeshGraph * pMesh, CVector3* centerPoints, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea){
+void contractMeshGraphGPUVCL_LSM_SDF(MeshGraph * pMesh, CVector3* sdfHalfVec, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea){
 
 	/*
 	Zakladna pointa tejto metody je, ze okrem zakladnych 2ch rovnic kje jedna nuluje laplacian a druha holduje vrcholy pribudne tretia:
@@ -3210,9 +3248,9 @@ void contractMeshGraphGPUVCL_LSM_SDF(MeshGraph * pMesh, CVector3* centerPoints, 
 			}
 
 			for (int i = 0; i < pMesh->numOfVertices; i++){
-				Bvec_x(2 * pMesh->numOfVertices + i) = (double)centerPoints[i].x * pMesh->wC;
-				Bvec_y(2 * pMesh->numOfVertices + i) = (double)centerPoints[i].y * pMesh->wC;
-				Bvec_z(2 * pMesh->numOfVertices + i) = (double)centerPoints[i].z * pMesh->wC;
+				Bvec_x(2 * pMesh->numOfVertices + i) = (double)(pMesh->pVerts[i].x + sdfHalfVec[i].x) * pMesh->wC;
+				Bvec_y(2 * pMesh->numOfVertices + i) = (double)(pMesh->pVerts[i].y + sdfHalfVec[i].y) * pMesh->wC;
+				Bvec_z(2 * pMesh->numOfVertices + i) = (double)(pMesh->pVerts[i].z + sdfHalfVec[i].z) * pMesh->wC;
 			}
 			// X
 
@@ -3337,7 +3375,7 @@ void contractMeshGraphGPUVCL_LSM_SDF(MeshGraph * pMesh, CVector3* centerPoints, 
 
 //---------------------------------------------------------------------------
 
-void contractMeshGraphGPUVCL_LSM_SDF_C(MeshGraph * pMesh, CVector3* centerPoints, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea){
+void contractMeshGraphGPUVCL_LSM_SDF_C(MeshGraph * pMesh, CVector3* sdfHalfVec, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea){
 
 	// vertices are controcted only to SDF center, Laplacian smoothing is noot used...
 
@@ -3506,14 +3544,14 @@ void contractMeshGraphGPUVCL_LSM_SDF_C(MeshGraph * pMesh, CVector3* centerPoints
 			}
 
 			for (int i = 0; i < pMesh->numOfVertices; i++){
-				Bvec_x(2 * pMesh->numOfVertices + i) = (double)centerPoints[i].x * pMesh->wC;
-				Bvec_y(2 * pMesh->numOfVertices + i) = (double)centerPoints[i].y * pMesh->wC;
-				Bvec_z(2 * pMesh->numOfVertices + i) = (double)centerPoints[i].z * pMesh->wC;
+				Bvec_x(2 * pMesh->numOfVertices + i) = (double)sdfHalfVec[i].x * pMesh->wC;
+				Bvec_y(2 * pMesh->numOfVertices + i) = (double)sdfHalfVec[i].y * pMesh->wC;
+				Bvec_z(2 * pMesh->numOfVertices + i) = (double)sdfHalfVec[i].z * pMesh->wC;
 			}*/
 			for (int i = 0; i < pMesh->numOfVertices; i++){
-				Bvec_x(i) = (double)centerPoints[i].x * pMesh->wC;
-				Bvec_y(i) = (double)centerPoints[i].y * pMesh->wC;
-				Bvec_z(i) = (double)centerPoints[i].z * pMesh->wC;
+				Bvec_x(i) = (double)sdfHalfVec[i].x * pMesh->wC;
+				Bvec_y(i) = (double)sdfHalfVec[i].y * pMesh->wC;
+				Bvec_z(i) = (double)sdfHalfVec[i].z * pMesh->wC;
 			}
 			// X
 
@@ -3642,4 +3680,5 @@ void contractMeshGraphGPUVCL_LSM_SDF_C(MeshGraph * pMesh, CVector3* centerPoints
 						#endif
 }
 
-#pragma package(smart_init)
+
+

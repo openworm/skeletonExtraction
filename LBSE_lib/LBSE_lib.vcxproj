@@ -53,7 +53,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)\include;$(IncludePath);C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\include;D:\Projects\OpenWorm\CustomLibs\JMSP</IncludePath>
+    <IncludePath>$(SolutionDir)\include;$(IncludePath);C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\include;D:\Projects\OpenWorm\CustomLibs\JMSP;$(SolutionDir)\include\SDF_lib\Controllers;$(SolutionDir)\include\SDF_lib\Helpers;$(SolutionDir)\include\SDF_lib\Structures;$(SolutionDir)\include\SDF_lib\Structures\Generic;$(SolutionDir)\include\SDF_lib\Structures\Math;$(SolutionDir)include\SDF_lib\Structures\Mesh;$(SolutionDir)\include\SDF_lib\Structures\ShapeDiameterFunction</IncludePath>
     <LibraryPath>$(SolutionDir)\Debug;$(LibraryPath);C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Lib</LibraryPath>
     <ExecutablePath>$(VCInstallDir)bin;$(WindowsSDK_ExecutablePath_x86);$(VSInstallDir)Common7\Tools\bin;$(VSInstallDir)Common7\tools;$(VSInstallDir)Common7\ide;$(ProgramFiles)\HTML Help Workshop;$(MSBuildToolsPath32);$(VSInstallDir);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin</ExecutablePath>
     <TargetName>$(ProjectName)_d</TargetName>

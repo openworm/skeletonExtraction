@@ -3,6 +3,13 @@
 void ImportModel(meshes::Mesh * pModel, structure::t3DModel * p_3DModel, char * strFileName, ModelController::CModel * sdfController, SN::SkeletonNode * pNode){
 
 	releaseStructure(p_3DModel);
+	pModel->materialDefinitions.clear();
+	pModel->materialIndices.clear();
+	pModel->indices.clear();
+	pModel->uvs.clear();
+	pModel->vertices.clear();
+	pModel->tangents.clear();
+	pModel->normals.clear();
 	
 	// Create an instance of the Importer class
 	Assimp::Importer importer;
@@ -12,7 +19,7 @@ void ImportModel(meshes::Mesh * pModel, structure::t3DModel * p_3DModel, char * 
 	const aiScene* scene = importer.ReadFile( pFile, aiProcess_JoinIdenticalVertices | aiProcess_Triangulate | aiProcess_SplitLargeMeshes | aiProcess_FindDegenerates | aiProcess_FindInvalidData | aiProcess_ValidateDataStructure);
 	// | aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices  | aiProcess_Triangulate  | aiProcess_ImproveCacheLocality
 
-	// UNCOMMENT sdfController->LoadAssimp((aiScene*)scene);
+	sdfController->LoadAssimp((aiScene*)scene);
 
 	// If the import failed, report it
 	if(!scene)

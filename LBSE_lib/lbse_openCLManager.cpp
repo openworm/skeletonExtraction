@@ -1,5 +1,3 @@
-
-
 //---------------------------------------------------------------------------
 #include "lbse_openCLManager.h"
 
@@ -21,16 +19,16 @@ unsigned long OpenCLManager::getFileLength2(std::ifstream& file)
 	return len;
 }
 
-char * OpenCLManager::loadKernelSource(char* filename)
+void OpenCLManager::loadKernelSource(char* filename, std::string * pText)
 {
 	char* kernelSource;
 	std::ifstream file;
 	file.open(filename, std::ios::in);
-	if(!file) return NULL;
+	if(!file) return;
 
 	unsigned long len = getFileLength2(file);
 
-	if (len==0) return NULL;
+	if (len==0) return;
 
 	kernelSource = (char*) new char[len+1];
 	kernelSource[len] = 0;
@@ -48,7 +46,8 @@ char * OpenCLManager::loadKernelSource(char* filename)
 	}
 
 	kernelSource[i] = 0;
-	return kernelSource;
+	*(pText) = std::string(kernelSource);
+	delete[] kernelSource;
 }
 
 void OpenCLManager::openCL_LaplaceContraction(CVector3 * output, float* input, unsigned int numOfVertices, float * Lcomplete, unsigned int maxNeigh,  int* neighbourhoods, float wL_, float * wH_)
@@ -83,10 +82,12 @@ void OpenCLManager::openCL_LaplaceContraction(CVector3 * output, float* input, u
 		timerlog.addStart("Kernel prepairing and building");
 	#endif
 
-	char *KernelSource = (char*)loadKernelSource((char*)(projectDir + std::string("OpenCLKernels\\kernel-QRlocal.cl")).c_str());
+	std::string kernelText;
+	loadKernelSource((char*)(projectDir + std::string("OpenCLKernels\\kernel-QRlocal.cl")).c_str(), &kernelText);
+	char * kernelSource = (char *)kernelText.c_str();
 
 	// replace value of MAX_SIZE_NEIGHBOURHOOD
-	std::string stringToReplace = std::string(KernelSource);
+	std::string stringToReplace = std::string(kernelSource);
 	int idx = stringToReplace.find("const int MAX_SIZE_NEIGHBOURHOOD = $;");
 
 	if (idx > 0){
@@ -95,7 +96,7 @@ void OpenCLManager::openCL_LaplaceContraction(CVector3 * output, float* input, u
 		std::string textNeigh = std::string(strBuffer);
 
 		for (int i=0; i < textNeigh.size(); i++)
-			KernelSource[idx + i] = strBuffer[i];
+			kernelSource[idx + i] = strBuffer[i];
 
 		printf(strBuffer);
 		printf("\n");
@@ -154,12 +155,14 @@ void OpenCLManager::openCL_LaplaceContraction(CVector3 * output, float* input, u
 
 	// Create the compute program from the source buffer
 
-	program = clCreateProgramWithSource(context, 1, (const char **) & KernelSource, NULL, &err);
+	program = clCreateProgramWithSource(context, 1, (const char **) & kernelSource, NULL, &err);
 
 	if (!program)
 	{
 		printf("Error: Failed to create compute program!\n");
 	}
+
+	delete[] kernelSource;
 
 	// Build the program executable
 
@@ -313,6 +316,8 @@ void OpenCLManager::openCL_LaplaceContraction(CVector3 * output, float* input, u
 		output[i] = CVector3(results[i], results[numOfVertices + i], results[2*numOfVertices + i]);
 	}
 
+	delete[] results;
+
 	// Shutdown and cleanup
 
 	#ifdef _LOG
@@ -337,6 +342,9 @@ void OpenCLManager::openCL_LaplaceContraction(CVector3 * output, float* input, u
 	clReleaseCommandQueue(commands);
 	clReleaseContext(context);
 
+	delete[] wL;
+	delete[] wH;
+
 	#ifdef _LOG
 		timerlog.addEnd();
 
@@ -360,6 +368,8 @@ void OpenCLManager::initializeInteropContext(OpenCLContext * oclc){
 	size_t ext_size = 1024;
 	char* ext_string = (char*)malloc(ext_size);
 	err = clGetDeviceInfo(oclc->device_id, CL_DEVICE_EXTENSIONS, ext_size, ext_string, &ext_size);
+
+	delete[] ext_string;
 
 	// Create CL context properties, add WGL context & handle to DC
 
@@ -414,10 +424,12 @@ void OpenCLManager::openCL_LaplaceContractionInterop(int * ite, CVector3 * outpu
 		timerlog.addStart("Kernel - loading");
 	#endif
 
-	char *KernelSource = (char*)loadKernelSource((char*)(projectDir + std::string("OpenCLKernels\\kernel-QRlocalInterop.cl")).c_str());
+	std::string kernelText;
+	loadKernelSource((char*)(projectDir + std::string("OpenCLKernels\\kernel-QRlocalInterop.cl")).c_str(), &kernelText);
+	char * kernelSource = (char*)kernelText.c_str();
 
 	// replace value of MAX_SIZE_NEIGHBOURHOOD
-	std::string stringToReplace = std::string(KernelSource);
+	std::string stringToReplace = std::string(kernelSource);
 	int idx = stringToReplace.find("const int MAX_SIZE_NEIGHBOURHOOD = $;");
 
 	if (idx > 0){
@@ -426,7 +438,7 @@ void OpenCLManager::openCL_LaplaceContractionInterop(int * ite, CVector3 * outpu
 		std::string textNeigh = std::string(strBuffer);
 
 		for (int i=0; i < textNeigh.size(); i++)
-			KernelSource[idx + i] = strBuffer[i];
+			kernelSource[idx + i] = strBuffer[i];
 
 		printf(strBuffer);
 		printf("\n");
@@ -434,7 +446,7 @@ void OpenCLManager::openCL_LaplaceContractionInterop(int * ite, CVector3 * outpu
 
 
 	// replace value of MAX_SIZE_NEIGHBOURHOOD2
-	std::string stringToReplace2 = std::string(KernelSource);
+	std::string stringToReplace2 = std::string(kernelSource);
 	int idx2 = stringToReplace.find("const int MAX_SIZE_NEIGHBOURHOOD2 = $;");
 
 	if (idx2 > 0){
@@ -443,7 +455,7 @@ void OpenCLManager::openCL_LaplaceContractionInterop(int * ite, CVector3 * outpu
 		std::string textNeigh2 = std::string(strBuffer2);
 
 		for (int i=0; i < textNeigh2.size(); i++)
-			KernelSource[idx2 + i] = strBuffer2[i];
+			kernelSource[idx2 + i] = strBuffer2[i];
 
 		printf(strBuffer2);
 		printf("\n");
@@ -489,12 +501,14 @@ void OpenCLManager::openCL_LaplaceContractionInterop(int * ite, CVector3 * outpu
 
 	// Create the compute program from the source buffer
 
-	program = clCreateProgramWithSource(oclc.context, 1, (const char **) & KernelSource, NULL, &err);
+	program = clCreateProgramWithSource(oclc.context, 1, (const char **) & kernelSource, NULL, &err);
 
 	if (!program)
 	{
 		printf("Error: Failed to create compute program!\n");
 	}
+
+	delete[] kernelSource;
 
 	// Build the program executable
 
@@ -683,6 +697,11 @@ void OpenCLManager::openCL_LaplaceContractionInterop(int * ite, CVector3 * outpu
 	clReleaseCommandQueue(commands);
 	clReleaseContext(oclc.context);
 
+	delete[] wL;
+	delete[] wH;
+
+	delete[] results;
+
 	#ifdef _LOG
 		timerlog.addEnd();
 	#endif
@@ -724,10 +743,12 @@ void OpenCLManager::openCL_LaplaceContraction2ring(CVector3 * output, float* inp
 		timerlog.addStart("Kernel prepairing and building");
 	#endif
 
-	char *KernelSource = (char*)loadKernelSource((char*)(solutionDir + std::string("OpenCLKernels\\kernel-QRlocal2ring.cl")).c_str());
+	std::string kernelText;
+	loadKernelSource((char*)(solutionDir + std::string("OpenCLKernels\\kernel-QRlocal2ring.cl")).c_str(), &kernelText);
+	std::string KernelSource = std::string(kernelText);
 
 	// replace value of MAX_SIZE_NEIGHBOURHOOD
-	std::string stringToReplace = std::string(KernelSource);
+	std::string stringToReplace = std::string(KernelSource.c_str());
 	int idx = stringToReplace.find("const int MAX_SIZE_NEIGHBOURHOOD = $;");
 
 	if (idx > 0){
@@ -743,7 +764,7 @@ void OpenCLManager::openCL_LaplaceContraction2ring(CVector3 * output, float* inp
 	}
 
 	// replace value of MAX_SIZE_NEIGHBOURHOOD2
-	std::string stringToReplace2 = std::string(KernelSource);
+	std::string stringToReplace2 = std::string(KernelSource.c_str());
 	int idx2 = stringToReplace.find("const int MAX_SIZE_NEIGHBOURHOOD2 = $;");
 
 	if (idx2 > 0){
@@ -999,6 +1020,10 @@ void OpenCLManager::openCL_LaplaceContraction2ring(CVector3 * output, float* inp
 	clReleaseCommandQueue(commands);
 	clReleaseContext(context);
 
+	delete[] results;
+	delete[] wL;
+	delete[] wH;
+
 	#ifdef _LOG
 
 		timerlog.addEnd();
@@ -1050,7 +1075,9 @@ void OpenCLManager::openCL_LaplaceContractionJacobi(CVector3 * output, float* in
 		timerlog.addStart("Kernel - loading");
 	#endif
 
-	char *KernelSource = (char*)loadKernelSource((char*)(solutionDir + std::string("OpenCLKernels\\kernel-Jacobi.cl")).c_str());
+	std::string kernelText;
+	loadKernelSource((char*)(solutionDir + std::string("OpenCLKernels\\kernel-Jacobi.cl")).c_str(), &kernelText);
+	char * kernelSource = (char*)kernelText.c_str();
 
 	
 	#ifdef _LOG
@@ -1103,7 +1130,7 @@ void OpenCLManager::openCL_LaplaceContractionJacobi(CVector3 * output, float* in
 
 	// Create the compute program from the source buffer
 
-	program = clCreateProgramWithSource(oclc.context, 1, (const char **) & KernelSource, NULL, &err);
+	program = clCreateProgramWithSource(oclc.context, 1, (const char **) & kernelSource, NULL, &err);
 
 	if (!program)
 	{
@@ -1308,6 +1335,10 @@ void OpenCLManager::openCL_LaplaceContractionJacobi(CVector3 * output, float* in
 	clReleaseKernel(kernel);
 	clReleaseCommandQueue(commands);
 	clReleaseContext(oclc.context);
+
+	delete[] results;
+	delete[] wL;
+	delete[] wH;
 
 	#ifdef _LOG
 		timerlog.addEnd();

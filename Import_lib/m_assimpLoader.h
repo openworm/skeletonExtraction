@@ -25,7 +25,7 @@
 using namespace mmath;
 #include <meshes/structure.h>
 #include <meshes/Mesh.h>
-//#include "s_skeletonNode.h"
+//#include <inline/SkeletonNode/s_skeletonNode.h>
 #include <SkeletonNode/SkeletonNode.h>
 
 //#include "SDF_Library.h"

@@ -8,6 +8,8 @@
 #include <LBSE_lib/lbse_extractor.h>
 #include <LBSE_lib/lbse_skeleton.h>
 
+#include <SDF_lib/sdf_extractor.h>
+
 #include <Import_lib/WormLoader.h>
 #include <Export_lib/ColladaExporter.h>
 #include <Export_lib/MatrixExport.h>
@@ -39,6 +41,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	SN::SkeletonNode * pSkeletonRoot = new SN::SkeletonNode();
 	lbse::Extractor oLBSExtractor;
+	sdf::Extractor oSDFExtractor;
 	meshes::IndexedFace * mesh = new meshes::IndexedFace();
 
 	Import::WormLoader wormLoader;
@@ -54,15 +57,15 @@ int _tmain(int argc, _TCHAR* argv[])
 	#define MAX_WORM_ITERATIONS 4000
 
 	float joiningTolerance = 0.0;
-	oLBSExtractor.laplacianScheme = LS_GLOBAL_JAMA_COTANGENT;
-	oLBSExtractor.numOfIter = 4;
-	oLBSExtractor.groupingTolerance = 5;
-	oLBSExtractor.wA = 1.0;
+	//oLBSExtractor.laplacianScheme = LS_GLOBAL_JAMA_COTANGENT;
+	//oLBSExtractor.numOfIter = 4;
+	oLBSExtractor.groupingTolerance = 2.5;
+/*	oLBSExtractor.wA = 1.0;
 	oLBSExtractor.wB = 0.1;
 	oLBSExtractor.wL = 1.0;
 	oLBSExtractor.wC = 1.0;
 	oLBSExtractor.wH = 1.0;
-	oLBSExtractor.sL = 3.0;
+	oLBSExtractor.sL = 3.0;*/
 	oLBSExtractor.wantedNumOfBones = 24;
 
 /*******************************************************************************************************************************/
@@ -88,18 +91,10 @@ int _tmain(int argc, _TCHAR* argv[])
 
 
 /*******************************************************************************************************************************/
-	// [2] Perform skeleton extraction on the meshgraph
+	// [2] Perform SDF median skeleton extraction on the meshgraph
 /*******************************************************************************************************************************/
 
-	// - call LBSE_lib, store skeleton in SN:SkeletonNode
-
-	int iterationNum = 0;
-
-	// set settings to extractor
-
-	oLBSExtractor.computeSkeleton(&g_3DModel, 0, pSkeletonRoot, &iterationNum, adaptVMdmax);
-
-	//int currentNumberOfSkeletonBones = oLBSExtractor.currentNumberOfSkeletonBones;
+	skeletonExtractionSDF(pSkeletonRoot, &oLBSExtractor, &oSDFExtractor, &adaptVMdmax);
 	
 /*******************************************************************************************************************************/
 	// [3] Calculate skinning weights using inverse geodesic distance
@@ -158,12 +153,15 @@ int _tmain(int argc, _TCHAR* argv[])
 		// repeat steps [1-2] for other timesteps
 
 		skl::SkeletonNode * pSkeletonRootNext = new skl::SkeletonNode();
+		int iterationNum;
 
 		// load model from Worm file, timestep 2
 
 		loadModelToStructures(&oLBSExtractor, &g_3DModel, &adaptVMdmax, joiningTolerance);
 
-		oLBSExtractor.computeSkeleton(&g_3DModel, 0, pSkeletonRootNext, &iterationNum, adaptVMdmax);
+		skeletonExtractionSDF(pSkeletonRootNext, &oLBSExtractor, &oSDFExtractor, &adaptVMdmax);
+
+		// save skeleton from each timestep for debuging
 
 		// [5] Calculate the transformation between two skeletons (two different timesteps of simulation)
 

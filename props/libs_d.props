@@ -4,11 +4,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <LibraryPath>$(SolutionDir)\Lib\lib\debug\OpenMesh;$(SolutionDir)\Lib\lib\debug\Boost;$(SolutionDir)\Lib\lib\debug\;$(SolutionDir)\Lib\lib\;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(SolutionDir)\Lib\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\Lib\include;$(IncludePath);$(SolutionDir)\include\SDF_lib\Controllers;$(SolutionDir)\include\SDF_lib\Helpers;$(SolutionDir)\include\SDF_lib\Structures;$(SolutionDir)\include\SDF_lib\Structures\Generic;$(SolutionDir)\include\SDF_lib\Structures\Math;$(SolutionDir)include\SDF_lib\Structures\Mesh;$(SolutionDir)\include\SDF_lib\Structures\ShapeDiameterFunction</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <Link>
-      <AdditionalDependencies>fade2D_vc11_Debug.lib;tinyxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fade2D_vc11_Debug.lib;tinyxml2.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup />

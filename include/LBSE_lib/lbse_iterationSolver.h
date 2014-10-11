@@ -1,9 +1,4 @@
-#ifndef s_iterationSolverH
-#define s_iterationSolverH
-//---------------------------------------------------------------------------
-/*#ifdef _MMGR
-	#include "c_newdeleteOriginal.h"
-#endif*/
+#pragma once
 
 #include <windows.h>
 #include <vector>
@@ -28,56 +23,34 @@
 #include <viennacl/linalg/qr.hpp>
 #include <viennacl/ocl/backend.hpp>
 
-/*#include <pcl/point_types.h>
-#include <pcl/kdtree/kdtree_flann.h>
-#include <pcl/features/normal_3d.h>
-#include <pcl/surface/gp3.h>
-#include <pcl/visualization/cloud_viewer.h>*/
-
-//#include "ceres.h"
-//#include "solver.h"
-
 using namespace TNT;
-//using namespace std;
 using namespace stdext;
 using namespace JAMA;
-//using namespace System::Runtime::InteropServices;
-
-/*#ifdef _MMGR
-	#include "c_newdeleteDebug.h"
-#endif*/
-
-#include <set>
-#include <PCT_lib/pct_PointCloudTriangulation.h>
 
 #ifdef _LOG
 	#include <logs/log.h>
 	#include <logs/timerlog.h>
 #endif
 
-//#include "c_config.h"
 #include <meshes/structure.h>
 #include <meshes/MeshGraph.h>
+
 #include "LBSE_lib/lbse_openCLManager.h"
-#include <PCT_lib/pct_PCLManager.h>
 
-
- // table with constants for all the laplacian schemas 
-
-const int LS_GLOBAL_JAMA_COTANGENT = 0;                // | OK              | GLOBAL | CPU          | WHILE   | MESH | cotangent schema->funguje, akurat je pomala
-const int LS_GLOBAL_JAMA_POINTCLOUD = 1;               // | NEJDE           | GLOBAL | CPU          | WHILE   | PCD  | lokalna Deleunayovka->ide, ale laplacian sa sprava divno     
-const int LS_GLOBAL_CPU_COTANGENT_PCL = 2;             // | NEJDE           | GLOBAL | CPU          | WHILE   | PCD  | PCL vytvori triangulaciu z PC, na nej cotangent schema
-const int LS_GLOBAL_VCL_COTANGENT = 3;                 // | OK              | GLOBAL | VIENNACL/GPU | WHILE   | MESH | zrata sa Laplacian cez cotangent schemu, potom sa rata system paralellne cez ViennaCL
-const int LS_GLOBAL_VCLLSM_COTANGENT = 4;              // | OK              | GLOBAL | VIENNACL/GPU | WHILE   | MESH | Laplacian cez cotangent schemu, potom sa rata system paralellne cez ViennaCL, trochu rychlejsie
-const int LS_LOCAL_JAMA_COTANGENT = 5;                 // | OK,NEKON KOSTRA | LOCAL  | CPU          | WHILE   | MESH | Laplacian sa rata lokalne, rata sa sekvencne po vertexoch na CPU
-const int LS_LOCAL_OCL_COTANGENT = 6;                  // | OK,NEKON KOSTRA | LOCAL  | OPENCL / GPU | WHILE   | MESH | Laplacian sa rata lokalne, rata sa paralelne per vertexh na GPU
-const int LS_LOCAL_OCL_QR_INTEROP_COTANGENT = 7;       // | OK,NEKON KOSTRA | LOCAL  | OPENCL / GPU | INTEROP | MESH | Laplacian sa rata lokalne, rata sa paralelne QR dekompozicia na GPU, interop na vozualizaciu
-const int LS_GLOBAL_OCL_JACOBI_COTANGENT = 8;          // | OK,NEKON NUMERI | GLOBAL | OPENCL / GPU | WHILE   | MESH | globalny system sa riesi iteracnou matodou, ktora sa riesi paralelne per vertex na GPU
-const int LS_GLOBAL_OCL_JACOBI_INTEROP_COTANGENT = 9;  // | OK,NEKON NUMERI | GLOBAL | OPENCL / GPU | INTEROP | MESH | globalny system sa riesi iteracnou matodou, ktora sa riesi paralelne per vertex na GPU, interop
-const int LS_GLOBAL_VCLLSMSDF_COTANGENT = 10;          // | OK              | GLOBAL | VIENNACL/GPU | WHILE   | MESH | Laplacian cez cotangent schemu, potom sa rata system paralellne cez ViennaCL, vyuzitie SDF
-const int LS_LOCAL_JAMASDF_COTANGENT = 11;             // | OK,NEKON KOSTRA | LOCAL  | CPU          | WHILE   | MESH | Laplacian sa rata lokalne, rata sa sekvencne po vertexoch na CPU, vyuzitie SDF
-
-//---------------------------------------------------------------------------
+namespace LaplacianScheme {
+	static const int LS_GLOBAL_JAMA_COTANGENT = 0;                // | OK              | GLOBAL | CPU          | WHILE   | MESH | cotangent schema->funguje, akurat je pomala
+	static const int LS_GLOBAL_JAMA_POINTCLOUD = 1;               // | NEJDE           | GLOBAL | CPU          | WHILE   | PCD  | lokalna Deleunayovka->ide, ale laplacian sa sprava divno     
+	static const int LS_GLOBAL_CPU_COTANGENT_PCL = 2;             // | NEJDE           | GLOBAL | CPU          | WHILE   | PCD  | PCL vytvori triangulaciu z PC, na nej cotangent schema
+	static const int LS_GLOBAL_VCL_COTANGENT = 3;                 // | OK              | GLOBAL | VIENNACL/GPU | WHILE   | MESH | zrata sa Laplacian cez cotangent schemu, potom sa rata system paralellne cez ViennaCL
+	static const int LS_GLOBAL_VCLLSM_COTANGENT = 4;              // | OK              | GLOBAL | VIENNACL/GPU | WHILE   | MESH | Laplacian cez cotangent schemu, potom sa rata system paralellne cez ViennaCL, trochu rychlejsie
+	static const int LS_LOCAL_JAMA_COTANGENT = 5;                 // | OK,NEKON KOSTRA | LOCAL  | CPU          | WHILE   | MESH | Laplacian sa rata lokalne, rata sa sekvencne po vertexoch na CPU
+	static const int LS_LOCAL_OCL_COTANGENT = 6;                  // | OK,NEKON KOSTRA | LOCAL  | OPENCL / GPU | WHILE   | MESH | Laplacian sa rata lokalne, rata sa paralelne per vertexh na GPU
+	static const int LS_LOCAL_OCL_QR_INTEROP_COTANGENT = 7;       // | OK,NEKON KOSTRA | LOCAL  | OPENCL / GPU | INTEROP | MESH | Laplacian sa rata lokalne, rata sa paralelne QR dekompozicia na GPU, interop na vozualizaciu
+	static const int LS_GLOBAL_OCL_JACOBI_COTANGENT = 8;          // | OK,NEKON NUMERI | GLOBAL | OPENCL / GPU | WHILE   | MESH | globalny system sa riesi iteracnou matodou, ktora sa riesi paralelne per vertex na GPU
+	static const int LS_GLOBAL_OCL_JACOBI_INTEROP_COTANGENT = 9;  // | OK,NEKON NUMERI | GLOBAL | OPENCL / GPU | INTEROP | MESH | globalny system sa riesi iteracnou matodou, ktora sa riesi paralelne per vertex na GPU, interop
+	static const int LS_GLOBAL_VCLLSMSDF_COTANGENT = 10;          // | OK              | GLOBAL | VIENNACL/GPU | WHILE   | MESH | Laplacian cez cotangent schemu, potom sa rata system paralellne cez ViennaCL, vyuzitie SDF
+	static const int LS_LOCAL_JAMASDF_COTANGENT = 11;             // | OK,NEKON KOSTRA | LOCAL  | CPU          | WHILE   | MESH | Laplacian sa rata lokalne, rata sa sekvencne po vertexoch na CPU, vyuzitie SDF
+}
 
 // main method for contraction of meshgraph for all the laplacian schemas
 void contractMeshGraph(int laplacianScheme, MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingExtent, float * curOneRingArea, int kneigh, vector<std::set<int>> globalNeighbourhoods, OpenCLContext oclc, CVector3 * sdfValues, PointCloudTriangulation::DeleunayTriangulator * pTriangulator, OpenCLManager openCLManager); //ModelController::CModel * sdfController
@@ -102,9 +75,9 @@ void contractMeshGraphCPUPointCloud(MeshGraph * pMesh, boost::unordered_map<int,
 void contractMeshGraphGPUVCL(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea);
 void contractMeshGraphGPUVCL_LSM(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea);
 void contractMeshGraphCPUPCL(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea);
-void contractMeshGraphGPUVCL_LSM_SDF(MeshGraph * pMesh, CVector3 * centerPoints, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea);
-void contractMeshGraphGPUVCL_LSM_SDF_C(MeshGraph * pMesh, CVector3 * centerPoints, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea);
-void contractMeshGraphParallelCPU_SDF(MeshGraph * pMesh, CVector3 * centerPoints, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea);
+void contractMeshGraphGPUVCL_LSM_SDF(MeshGraph * pMesh, CVector3 * sdfHalfVec, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea);
+void contractMeshGraphGPUVCL_LSM_SDF_C(MeshGraph * pMesh, CVector3 * sdfHalfVec, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea);
+void contractMeshGraphParallelCPU_SDF(MeshGraph * pMesh, CVector3 * sdfHalfVec, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int it, BYTE * LImage, float sL, float * curOneRingArea);
 
 /* 
 	local parallel methods for meshgraph contraction, both CPU and OpenCL
@@ -121,7 +94,5 @@ void contractMeshGraphParallelOpenCLJacobiInterop(int * ite, MeshGraph * pMesh, 
 */
 
 float solveParallelWithJama(int idx, Array2D< float >  L_global, float* input, unsigned int numOfVertices,  MeshGraph * pMesh,  unsigned int maxNeigh,  int* neighbourhoods);
-float solveParallelWithJama_SDF(int idx, float * centerPoints, Array2D< float >  L_global, float* input, unsigned int numOfVertices,  MeshGraph * pMesh,  unsigned int maxNeigh,  int* neighbourhoods);
+float solveParallelWithJama_SDF(int idx, float * sdfHalfVec, Array2D< float >  L_global, float* input, unsigned int numOfVertices,  MeshGraph * pMesh,  unsigned int maxNeigh,  int* neighbourhoods);
 //---------------------------------------------------------------------------
-
-#endif

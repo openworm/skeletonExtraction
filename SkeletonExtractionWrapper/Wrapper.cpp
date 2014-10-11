@@ -56,3 +56,44 @@ void calculateSkinningData(GraphAlgorithms * pGa, ObjectSkeletonShaderData * pWo
 		offset += pObject->numOfVerts;
 	}
 }
+
+void skeletonExtractionSDF(SN::SkeletonNode * pSkeletonRoot, lbse::Extractor * pLBSExtractor, sdf::Extractor * pSDFExtractor, int * adaptVMdmax){
+	//calculate sdf half vectors for mesh graph
+
+	int size = 0;
+
+	pLBSExtractor->sdfModelController->ComputeSDF();
+	pLBSExtractor->isSDFvaluesComputed = true;
+
+	float * sdf = pLBSExtractor->sdfModelController->GetSDF(size, true); 
+
+	pLBSExtractor->sdfSize = size;
+
+	float * normals = pLBSExtractor->sdfModelController->GetNormals(size);
+
+	pLBSExtractor->sdfHalfVectors = new CVector3[size];
+	for (int i=0; i < size; i++){
+		pLBSExtractor->sdfHalfVectors[i] = CVector3(normals[i * 3], normals[i * 3 + 1], normals[i * 3 + 2]) * (float)(sdf[i] / -2.0);
+		pLBSExtractor->sdfHalfVectorsMG[i] = pLBSExtractor->sdfHalfVectors[i];
+	}
+
+	//shift mesh graph vertices into the medial axis
+
+	for (int i=0; i < pLBSExtractor->pMesh->numOfVertices; i++){
+		pLBSExtractor->pMesh->pVerts[i] = pLBSExtractor->originalMesh->pVerts[i] + pLBSExtractor->sdfHalfVectorsMG[i];
+	}
+
+	//median-merge shifted vertices and create polyline MeshGraph
+
+	if (pLBSExtractor->polyMesh != NULL)
+		delete pLBSExtractor->polyMesh;
+
+	pLBSExtractor->polyMesh = new MeshGraph();
+
+	float threshold = *adaptVMdmax / (100.0f/pLBSExtractor->groupingTolerance);
+	pSDFExtractor->applyMedianMerge(pLBSExtractor->polyMesh, pLBSExtractor->pMesh, threshold);
+
+	//create skeleton from polyline meshgraph
+
+	pLBSExtractor->applyConnectivitySurgery(false, pSkeletonRoot, *adaptVMdmax);
+}

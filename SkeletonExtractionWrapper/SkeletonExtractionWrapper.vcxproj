@@ -53,7 +53,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\Lib\include\jama;$(IncludePath)</IncludePath>
+    <IncludePath>$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -72,11 +72,12 @@
       <AdditionalDependencies>fade2D_vc11_Debug.lib;tinyxml2.lib;JMSP.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy "D:\Projects\_shared\GDSW_lib\*.h"  "D:\Projects\OpenWorm\GDSW_lib\" /y /e
-xcopy "D:\Projects\_shared\GDSW_lib\*.cpp"  "D:\Projects\OpenWorm\GDSW_lib\" /y /e
+      <Command>xcopy "D:\Projects\_shared\include\inline\meshes\*.*"  "D:\Projects\OpenWorm\GDSW_lib\include\inline\meshes\" /y /e
+xcopy "D:\Projects\_shared\include\inline\mmath\*.*"  "D:\Projects\OpenWorm\GDSW_lib\include\inline\mmath\" /y /e
+xcopy "D:\Projects\_shared\include\inline\SkeletonNode\*.*"  "D:\Projects\OpenWorm\GDSW_lib\include\inline\SkeletonNode\" /y /e
 
-xcopy "D:\Projects\_shared\LBSE_lib\*.h"  "D:\Projects\OpenWorm\LBSE_lib\" /y /e
-xcopy "D:\Projects\_shared\LBSE_lib\*.cpp"  "D:\Projects\OpenWorm\LBSE_lib\" /y /e
+xcopy "D:\Projects\_shared\GDSW_lib\*.h"  "D:\Projects\OpenWorm\GDSW_lib\" /y /e
+xcopy "D:\Projects\_shared\GDSW_lib\*.cpp"  "D:\Projects\OpenWorm\GDSW_lib\" /y /e
 
 xcopy "D:\Projects\_shared\PCT_lib\*.h"  "D:\Projects\OpenWorm\PCT_lib\" /y /e
 xcopy "D:\Projects\_shared\PCT_lib\*.cpp"  "D:\Projects\OpenWorm\PCT_lib\" /y /e
@@ -121,12 +122,28 @@ xcopy "D:\Projects\_shared\Export_lib\*.cpp"  "D:\Projects\OpenWorm\Export_lib\"
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\inline\meshes\CVectorMesh.h" />
+    <ClInclude Include="..\include\inline\meshes\IndexedFace.h" />
+    <ClInclude Include="..\include\inline\meshes\Mesh+Skin.h" />
+    <ClInclude Include="..\include\inline\meshes\Mesh.h" />
+    <ClInclude Include="..\include\inline\meshes\MeshGraph.h" />
+    <ClInclude Include="..\include\inline\meshes\meshSimplification.h" />
+    <ClInclude Include="..\include\inline\meshes\SerializableMesh+Skin.h" />
+    <ClInclude Include="..\include\inline\meshes\structure.h" />
+    <ClInclude Include="..\include\inline\mmath\mmath.h" />
+    <ClInclude Include="..\include\inline\SkeletonNode\SkeletonNode.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Wrapper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SkeletonExtractionWrapper.cpp" />
     <ClCompile Include="Wrapper.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\include\inline\meshes\MeshGraph.inl" />
+    <None Include="..\include\inline\meshes\meshSimplification.inl" />
+    <None Include="..\include\inline\meshes\structure.inl" />
+    <None Include="..\include\inline\mmath\mmath.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

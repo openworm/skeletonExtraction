@@ -1,31 +1,4 @@
-#ifndef lbse_extractorH
-#define lbse_extractorH
-//---------------------------------------------------------------------------
-/*#ifdef _MMGR
-	#include "c_newdeleteOriginal.h"
-#endif*/
-
-/*#pragma warning(push, 0)
-
-#include <boost/archive/xml_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/algorithm/string.hpp>
-
-#pragma pop*/
-
-//#include <GLDebugger\gldebugger.h>
-
-//using namespace boost::archive;
-
-/*#ifdef _MMGR
-	#include "c_newdeleteDebug.h"
-#endif*/
-
-//#include "SDF_Library.h"
-//#include "SDF_lib/Structures/Math/Vector4.h"
-//using namespace MathStructures;
+#pragma once
 
 #include "lbse_iterationSolver.h"
 #include <SkeletonNode/SkeletonNode.h>
@@ -33,11 +6,17 @@
 #include "LBSE_lib/lbse_skeleton.h"
 #include <GDSW_lib/gdsw_graphAlgorithms.h>
 #include <mmath/mmath.h>
+
+#include <SDF_lib/SDF_Library.h>
+
+//#include <GLDebugger/gldebugger.h>
+
 using namespace mmath;
+using namespace meshes;
 
 #ifdef _LOG
-	#include "logs/log.h"
-	#include "logs/timerlog.h"
+#include "logs/log.h"
+#include "logs/timerlog.h"
 #endif
 
 #include <meshes/meshSimplification.h>
@@ -63,106 +42,104 @@ namespace lbse {
 			wC = _wc;
 		}
 	};
-//---------------------------------------------------------------------------
+	//---------------------------------------------------------------------------
 	class Extractor {
 
-		public:
-			Extractor();
-			~Extractor();
+		float config_wA;
+		float config_wB;
+		bool config_s_doBranchingSimplification;
 
-			float default_wA;
-			float default_wB;
-			bool default_s_doBranchingSimplification;
+	public:
 
-			OpenCLManager openCLManager;
-			int numOfIter;
-			bool stopContractionByIteration;
-			bool stopContractionByRatio;
+		Extractor();
+		~Extractor();
 
-			float adaptVMdmax;
-			int mainComponentIndex;
-			int maxBones; // max number, higher ids arent bone ids
-			float volumeTreshold;
-			//bool isMeshGraphComputed;
-			bool isGeometryContracted;
-			bool isSkeletonComputed;
-			bool doBranchingSimplification;
-			bool doDisplacementShifting;
-			int numOfBones;  // number of bones really
-			int wantedNumOfBones;   // number of bones chosen with slider
-			MeshSimplify g_MeshSimplify;
-			//float joiningTolerance; // distance limit which determinates if two vertices are neihgbouring
-			float groupingTolerance; // distance limit which determinates if two vertices are the same in mesh contraction
-			float groupingToleranceSDFMulti;
+		int numOfIter;
+		bool stopContractionByIteration;
+		bool stopContractionByRatio;
 
-			//void computeSkeleton(structure::t3DModel *pModel, int sourcePointID, SN::SkeletonNode * skeleton, int * ite, bool &recreateOperator, float modelMaxDim);
-			void computeSkeleton(structure::t3DModel *pModel, int sourcePointID, SN::SkeletonNode * skeleton, int * ite, float modelMaxDim);
-			void applyConnectivitySurgery(SN::SkeletonNode * node, float modelMaxDim);
+		float adaptVMdmax;
+		int mainComponentIndex;
+		int maxBones; // max number, higher ids arent bone ids
+		float volumeTreshold;
 
-			float calculateVolumeFromMesh(MeshGraph * mesh, structure::t3DModel *pModel, int subdivision);
-			float calculateVolumeFromMesh(MeshGraph * mesh, structure::t3DModel *pModel);
-			void restoreMeshVolume(MeshGraph * mesh, structure::t3DModel *pModel);
-			//float calculateConvexHullVolume(CVector3 * points);
-			void logContraction(MeshGraph * mesh1, MeshGraph * mesh2);
-			bool checkContractedMesh(MeshGraph * pMesh);
-			
-			float * computeOptimalJoiningTolerance(int &numOfComponents, vector<int> &compMapping);
-			int calculateNumOfBones(SN::SkeletonNode * node);
-			void optimizeMeshGraphComponents();
+		bool isGeometryContracted;
+		bool isSkeletonComputed;
+		bool doBranchingSimplification;
+		bool doDisplacementShifting;
+		int numOfBones;  // number of bones really
+		int wantedNumOfBones;   // number of bones chosen with slider
+		MeshSimplify g_MeshSimplify;
+		float groupingTolerance; // distance limit which determinates if two vertices are the same in mesh contraction
+		float groupingToleranceSDFMulti;
 
-			SN::SkeletonNode * rerootSkeleton(int newrootId, SN::SkeletonNode* pSkelet);
+		void computeSkeleton(structure::t3DModel *pModel, int sourcePointID, SN::SkeletonNode * skeleton, int * ite, float modelMaxDim);
+		void applyConnectivitySurgery(bool applyLBSEPostprocessing, SN::SkeletonNode * node, float modelMaxDim);
+		//void mergedMGToSkeleton(SN::SkeletonNode * node, float modelMaxDim);
 
-			template<typename T>
-			void recomputeModelValuesToMeshgraph(MeshGraph * pMesh, structure::t3DModel *pModel, T * sdfValues, T * sdfvec);
-			void getMGPositionVector(MeshGraph * pMesh, structure::t3DModel *pModel, float * newpos);
-			void addRandomNoiseToMeshGraph(MeshGraph * pMesh, structure::t3DModel * pModel, float scale);
+		float calculateVolumeFromMesh(MeshGraph * mesh, structure::t3DModel *pModel, int subdivision);
+		float calculateVolumeFromMesh(MeshGraph * mesh, structure::t3DModel *pModel);
+		void restoreMeshVolume(MeshGraph * mesh, structure::t3DModel *pModel);
+		void logContraction(MeshGraph * mesh1, MeshGraph * mesh2);
+		bool checkContractedMesh(MeshGraph * pMesh);
 
-			//void subdivideSkeleton();
+		void computeOptimalJoiningTolerance(int &numOfComponents, vector<int> &compMapping, float * thresholds);
+		int calculateNumOfBones(SN::SkeletonNode * node);
+		void optimizeMeshGraphComponents();
 
-			OpenCLContext openCLContext;
-			bool groupingWithoutEdge;
-			bool cyclicSkeleton;
-			int currentNumberOfSkeletonBones;
-			vector<int> skeletonMeshGraphIndices;
-			SurgeryGraph * pSurgeryGraph;
-			MeshGraph * pMesh;
-			MeshGraph * pMeshOpenCL;
-			MeshGraph * originalMesh;
-			float origVolume;
-			float contractedVolume;
-			bool doSimplifyMeshAfterIteration;
-			bool doAddRandomNoiseAfterIteration;
-			PointCloudTriangulation::DeleunayTriangulator * pTriangulator;
-			// mapovanie meshgraphu, ktore nastava pri vypocte laplacianu z iterativnom kontrahovani meshgraphu
-			// degenerovane trojuholniky sa halfedgecollapsnu, hrani sa zmenia
-			boost::unordered_map<int, vector<int> > mgDegeneratesMapping;
-			bool transferInteroperabilityMesh;
-			int laplacianScheme;
-			BYTE * LImage;
-			float wL;
-			float wH;
-			float sL;
-			float wC;
-			float wA;
-			float wB;
-			// UNCOMMENT ModelController::CModel	* sdfModelController;
-			CVector3 * sdfHalfVectors;
-			CVector3 * sdfHalfVectorsMG;
-			float * sdfValuesNormalizedMG;
-			int sdfSize;
-			bool isSDFvaluesComputed;
-			bool useResolutionIndependencyTerm;
-			void setsL(float _sL);
-			void setwL(float _wL);
-			void setwH(float _wH);
-			void setwC(float _wC);
-			bool doComputeSDF;
-			bool useSeparateWeigthsEachIterations;
-			bool useSDFBasedGroupingDistance;
-			bool useSDFBasedLaplacianWeights;
-			Weights * separateWeights;
-			void calculateSDFForMeshGraph(MeshGraph * pMesh, structure::t3DModel * pModel, float * sdfValuesNormalizedMG, CVector3 ** sdfHalfVectors, CVector3 * sdfHalfVectorsMG);
+		SN::SkeletonNode * rerootSkeleton(int newrootId, SN::SkeletonNode* pSkelet);
+
+		template<typename T>
+		void recomputeModelValuesToMeshgraph(MeshGraph * pMesh, structure::t3DModel *pModel, T * sdfValues, T * sdfvec);
+		void getMGPositionVector(MeshGraph * pMesh, structure::t3DModel *pModel, float * newpos);
+		void addRandomNoiseToMeshGraph(MeshGraph * pMesh, structure::t3DModel * pModel, float scale);
+
+		void meshgraphVertexPositionsToModel(MeshGraph * pMesh, structure::t3DModel * pModel);
+
+		OpenCLContext openCLContext;
+		bool groupingWithoutEdge;
+		bool cyclicSkeleton;
+		int currentNumberOfSkeletonBones;
+		vector<int> skeletonMeshGraphIndices;
+		SurgeryGraph * pSurgeryGraph;
+		MeshGraph * pMesh;
+		MeshGraph * polyMesh;
+		MeshGraph * pMeshOpenCL;
+		MeshGraph * originalMesh;
+		float origVolume;
+		float contractedVolume;
+		bool doSimplifyMeshAfterIteration;
+		bool doAddRandomNoiseAfterIteration;
+		PointCloudTriangulation::DeleunayTriangulator * pTriangulator;
+
+		boost::unordered_map<int, vector<int> > mgDegeneratesMapping;
+		bool transferInteroperabilityMesh;
+		int laplacianScheme;
+		BYTE * LImage;
+		float wL;
+		float wH;
+		float sL;
+		float wC;
+		float wA;
+		float wB;
+		ModelController::CModel	* sdfModelController;
+		CVector3 * sdfHalfVectors;
+		CVector3 * sdfHalfVectorsMG;
+		float * sdfValuesNormalizedMG;
+		int sdfSize;
+		bool isSDFvaluesComputed;
+		bool useResolutionIndependencyTerm;
+		void setsL(float _sL);
+		void setwL(float _wL);
+		void setwH(float _wH);
+		void setwC(float _wC);
+		bool doComputeSDF;
+		bool useSeparateWeigthsEachIterations;
+		bool useSDFBasedGroupingDistance;
+		bool useSDFBasedLaplacianWeights;
+		Weights * separateWeights;
+		void calculateSDFForMeshGraph(MeshGraph * pMesh, structure::t3DModel * pModel, float * sdfValuesNormalizedMG, CVector3 ** sdfHalfVectors, CVector3 * sdfHalfVectorsMG);
+		OpenCLManager openCLManager;
 	};
 }
 //---------------------------------------------------------------------------
-#endif

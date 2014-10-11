@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="inline libs">
+      <UniqueIdentifier>{d7d76580-db8a-49a1-8908-ec4707f7d030}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -24,6 +27,36 @@
     <ClInclude Include="Wrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\inline\meshes\CVectorMesh.h">
+      <Filter>inline libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inline\meshes\IndexedFace.h">
+      <Filter>inline libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inline\meshes\Mesh+Skin.h">
+      <Filter>inline libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inline\meshes\Mesh.h">
+      <Filter>inline libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inline\meshes\MeshGraph.h">
+      <Filter>inline libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inline\meshes\meshSimplification.h">
+      <Filter>inline libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inline\meshes\SerializableMesh+Skin.h">
+      <Filter>inline libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inline\meshes\structure.h">
+      <Filter>inline libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inline\mmath\mmath.h">
+      <Filter>inline libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inline\SkeletonNode\SkeletonNode.h">
+      <Filter>inline libs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SkeletonExtractionWrapper.cpp">
@@ -32,5 +65,19 @@
     <ClCompile Include="Wrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\include\inline\meshes\MeshGraph.inl">
+      <Filter>inline libs</Filter>
+    </None>
+    <None Include="..\include\inline\meshes\meshSimplification.inl">
+      <Filter>inline libs</Filter>
+    </None>
+    <None Include="..\include\inline\meshes\structure.inl">
+      <Filter>inline libs</Filter>
+    </None>
+    <None Include="..\include\inline\mmath\mmath.inl">
+      <Filter>inline libs</Filter>
+    </None>
   </ItemGroup>
 </Project>

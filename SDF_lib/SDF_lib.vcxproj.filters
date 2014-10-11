@@ -13,8 +13,117 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Controllers">
+      <UniqueIdentifier>{3dc24f93-c821-45c7-b0be-3b495eb368bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Helpers">
+      <UniqueIdentifier>{4fe3e9b1-cb8d-4af1-938c-764698a69e00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Structures">
+      <UniqueIdentifier>{f8f47c6d-e21e-4dbf-9eab-cf65b653bf2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Structures\Mesh">
+      <UniqueIdentifier>{cf631822-da32-4b63-921b-314204070e4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Structures\SDF">
+      <UniqueIdentifier>{45795760-b6d0-43ab-ba3c-e01d65026b84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Controllers">
+      <UniqueIdentifier>{9158ae83-d447-400f-a832-1aa7881ccb13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Helpers">
+      <UniqueIdentifier>{92cca9d8-d2df-4b70-8d0c-0328dab6dcaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Structures">
+      <UniqueIdentifier>{ebfd141c-2ab8-425f-8065-1dd4b73ab4a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Structures\Generic">
+      <UniqueIdentifier>{1f830e9a-5c67-4060-8cb1-ff16fc8bb3cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Structures\Math">
+      <UniqueIdentifier>{de5ba8ee-6f36-4b2a-a9ea-a69ab8042063}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Structures\Mesh">
+      <UniqueIdentifier>{c228a84a-a8df-4198-8f2e-3eccdfd613ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Structures\SDF">
+      <UniqueIdentifier>{bcfec9e6-ada4-4f99-bb96-b8ee91435411}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="sdf_extractor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDF_Library.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Controllers\Assimp.cpp">
+      <Filter>Source Files\Controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="Controllers\Model.cpp">
+      <Filter>Source Files\Controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="Controllers\SDFController.cpp">
+      <Filter>Source Files\Controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="Helpers\MathHelper.cpp">
+      <Filter>Source Files\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="Structures\Mesh\Vertex.cpp">
+      <Filter>Source Files\Structures\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Structures\Mesh\Octree.cpp">
+      <Filter>Source Files\Structures\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Structures\Mesh\Face.cpp">
+      <Filter>Source Files\Structures\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Structures\ShapeDiameterFunction\CSDF.cpp">
+      <Filter>Source Files\Structures\SDF</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="sdf_extractor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDF_Library.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Controllers\Assimp.h">
+      <Filter>Header Files\Controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="Controllers\Model.h">
+      <Filter>Header Files\Controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="Controllers\SDFController.h">
+      <Filter>Header Files\Controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\MathHelper.h">
+      <Filter>Header Files\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Structures\Generic\LinkedList.h">
+      <Filter>Header Files\Structures\Generic</Filter>
+    </ClInclude>
+    <ClInclude Include="Structures\Math\Vector4.h">
+      <Filter>Header Files\Structures\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Structures\Math\Mat4.h">
+      <Filter>Header Files\Structures\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Structures\Mesh\Vertex.h">
+      <Filter>Header Files\Structures\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Structures\Mesh\Octree.h">
+      <Filter>Header Files\Structures\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Structures\Mesh\Face.h">
+      <Filter>Header Files\Structures\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Structures\ShapeDiameterFunction\CSDF.h">
+      <Filter>Header Files\Structures\SDF</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

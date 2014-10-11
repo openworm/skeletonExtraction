@@ -3,21 +3,15 @@
 
 #define ISNAN(x) ((x) != (x))
 
-//using namespace System::Runtime::InteropServices;
-
-//---------------------------------------------------------------------------
-
 lbse::Extractor::Extractor(){
-
-	default_wA = 1.0f;
-	default_wB = 0.1f;
-	default_s_doBranchingSimplification = true;
+	config_wA = 1.0f;
+	config_wB = 0.1f;
+	config_s_doBranchingSimplification = true;
 
 	numOfIter = 3;
 	mainComponentIndex = 0;
 	stopContractionByIteration = true;
 	stopContractionByRatio = false;
-	//joiningTolerance = 0;//config.JOINING_TOLERANCE;
 	groupingTolerance = 5;//config.GROUPING_TOLERANCE;
 	sL = 3.0;//config.sL; 
 	wL = 1.0;//config.wL; // 0.0025 before
@@ -25,7 +19,7 @@ lbse::Extractor::Extractor(){
 	wC = 1.0;
 	wA = 1.0;//config.wA;
 	wB = 0.1;//config.wB;
-	laplacianScheme = LS_GLOBAL_JAMA_COTANGENT;
+	laplacianScheme = LaplacianScheme::LS_GLOBAL_JAMA_COTANGENT;
 	groupingWithoutEdge = false;
 	volumeTreshold = 1.0f / 100.0;//(float)config.VOLUME_THRESHOLD;
 	maxBones = 24;//config.MAX_BONE_MAT;
@@ -47,47 +41,42 @@ lbse::Extractor::Extractor(){
 	useSeparateWeigthsEachIterations = false;
 	separateWeights = new Weights[5];
 	pTriangulator = new PointCloudTriangulation::DeleunayTriangulator();
-	
 	pTriangulator->setKNeighParams(0.02, 8, 12);
 	pTriangulator->setCenterFactorParams(0.2, 0.5, 2.0);
-
 }
-//---------------------------------------------------------------------------
+
 lbse::Extractor::~Extractor(){
-	//delete[] modelSkeletonData.boneMatrices;
-	//modelSkeletonData.boneMatrices = NULL;
 	delete pSurgeryGraph;
 	pSurgeryGraph = NULL;
-	/*if (sdm != NULL)
-		delete sdm;
-	if (sdmr != NULL)
-		delete sdmr;*/
+
+	delete pTriangulator;
+	pTriangulator = NULL;
 }
+
 //---------------------------------------------------------------------------
 void lbse::Extractor::setsL(float _sL){
 	sL = _sL;
 }
-//---------------------------------------------------------------------------
 void lbse::Extractor::setwL(float _wL){
 	wL = _wL;
 }
-//---------------------------------------------------------------------------
 void lbse::Extractor::setwH(float _wH){
 	wH = _wH;
 	if (pMesh != NULL){
 		for (int i = 0; i < pMesh->numOfVertices; i++)
 			pMesh->wH[i]  = _wH;
-		}
+	}
 	if (originalMesh != NULL){
 		for (int i = 0; i < originalMesh->numOfVertices; i++)
 			originalMesh->wH[i]  = _wH;
-		}
+	}
 }
 void lbse::Extractor::setwC(float _wC){
 	wC = _wC;
 }
+
 //---------------------------------------------------------------------------
-float * lbse::Extractor::computeOptimalJoiningTolerance(int &numOfComponents, vector<int> &compMapping){
+void lbse::Extractor::computeOptimalJoiningTolerance(int &numOfComponents, vector<int> &compMapping, float * thresholds){
 	bool * mark = new bool[pMesh->numOfVertices];
 	for (int i = 0; i < pMesh->numOfVertices; i++)
 		mark[i] = false;
@@ -123,16 +112,14 @@ float * lbse::Extractor::computeOptimalJoiningTolerance(int &numOfComponents, ve
 		}
 	}
 
-	float * joinings = new float[componentIndex + 1];
 	numOfComponents = componentIndex + 1;
 
 	if (componentIndex == 0){
-		joinings[0] = 0.0f;
-		return joinings;
+		thresholds[0] = 0.0f;
 	}
 
 	for (int i = 0; i <componentIndex + 1; i++)
-		joinings[i] = FLT_MAX;
+		thresholds[i] = FLT_MAX;
 	// for each component find minimal joining to get him joined
 	for (int i = 0; i <componentIndex + 1; i++)
 		for (int j = i + 1; j <componentIndex + 1; j++){
@@ -140,10 +127,10 @@ float * lbse::Extractor::computeOptimalJoiningTolerance(int &numOfComponents, ve
 			for (int x = 0; x < components[i].size(); x++)				
 				for (int y = 0; y < components[j].size(); y++){
 						float distance = Distance(pMesh->pVerts[components[i][x]], pMesh->pVerts[components[j][y]]);
-						if(distance < joinings[i])
-							joinings[i] = distance;
-						if(distance < joinings[j])
-							joinings[j] = distance;
+						if(distance < thresholds[i])
+							thresholds[i] = distance;
+						if(distance < thresholds[j])
+							thresholds[j] = distance;
 				}
 		}
 
@@ -155,12 +142,11 @@ float * lbse::Extractor::computeOptimalJoiningTolerance(int &numOfComponents, ve
 	for (int i = 0; i <componentIndex + 1; i++){
 		#ifdef _LOG
 			logg.log(LOG_LEVEL_C_PARAMS, "minimal joining for component: ", i);
-			logg.log(LOG_LEVEL_C_PARAMS, "value: ", joinings[i]);
+			logg.log(LOG_LEVEL_C_PARAMS, "value: ", thresholds[i]);
 		#endif
-		joinings[i] = joinings[i] * 1.001f;
+		thresholds[i] = thresholds[i] * 1.001f;
 	}
 
-	return joinings;
 }
 //---------------------------------------------------------------------------
 void lbse::Extractor::optimizeMeshGraphComponents(){
@@ -200,6 +186,8 @@ void lbse::Extractor::optimizeMeshGraphComponents(){
 				}
 		}
 	}
+
+	delete[] mark;
 
 	// ak je iba 1 komponent, nic nemenime
 	if (components.size() == 1)
@@ -337,6 +325,8 @@ float lbse::Extractor::calculateVolumeFromMesh(MeshGraph * mesh, structure::t3DM
 		offset += pObject->numOfVerts;
 	}
 
+	delete[] p;
+
 	vol = vol / 6.0;
 
     #ifdef _LOG
@@ -403,8 +393,13 @@ void lbse::Extractor::computeSkeleton(structure::t3DModel *pModel, int sourcePoi
 	if (wantedNumOfBones < numOfBones)
 		numOfBones = wantedNumOfBones;
 
-	float * sdfValuesNormalized = new float[pMesh->numOfVertices];
-	float * sdfValues = new float[pMesh->numOfVertices];
+	float * sdfValuesNormalized = NULL;
+	float * sdfValues = NULL; 
+
+	if (sdfSize > 0){	
+		sdfValuesNormalized = new float[pMesh->numOfVertices];
+		sdfValues = new float[pMesh->numOfVertices];
+	}
 
 	if (!isGeometryContracted){
 		#ifdef _LOG
@@ -448,10 +443,10 @@ void lbse::Extractor::computeSkeleton(structure::t3DModel *pModel, int sourcePoi
 		bool goBack = false;
 		*ite = 1;
 
-		vector<std::set<int>> globalNeighbourhoods;// UNCOMMENT  = pTriangulator->computeGlobalNeighbourhood(MG2PCTMG(pMesh));
+		vector<std::set<int>> globalNeighbourhoods = pTriangulator->computeGlobalNeighbourhood(MG2PCTMG(pMesh));
 
 
-		if (laplacianScheme == LS_GLOBAL_JAMA_POINTCLOUD){
+		if (laplacianScheme == LaplacianScheme::LS_GLOBAL_JAMA_POINTCLOUD){
 			calculateOneRingExtent(pMesh, pMesh->origOneRingExtent, globalNeighbourhoods);
 		}
 
@@ -462,6 +457,7 @@ void lbse::Extractor::computeSkeleton(structure::t3DModel *pModel, int sourcePoi
 
 		float * curOneRingArea = new float[pMesh->numOfVertices];
 		float * curOneRingExtent = new float[pMesh->numOfVertices];
+
 		for (int i=0; i < pMesh->numOfVertices; i++){
 			curOneRingArea[i] = pMesh->origOneRingArea[i];
 			avarageCurOneRingArea += pMesh->origOneRingArea[i];
@@ -485,15 +481,15 @@ void lbse::Extractor::computeSkeleton(structure::t3DModel *pModel, int sourcePoi
 			wC = separateWeights[0].wC;
 		}
 
-		if (laplacianScheme == LS_GLOBAL_JAMA_POINTCLOUD){
+		if (laplacianScheme == LaplacianScheme::LS_GLOBAL_JAMA_POINTCLOUD){
 			//pMesh->wL = wL * (1.0 / (5.0 * avarageCurOneRingExtent));
 			pMesh->wL = wL * (0.002 * avarageCurOneRingExtent);
 		}
 
-		if (laplacianScheme == LS_GLOBAL_JAMA_COTANGENT || laplacianScheme == LS_GLOBAL_VCL_COTANGENT ||
-			laplacianScheme == LS_LOCAL_JAMA_COTANGENT || laplacianScheme == LS_LOCAL_OCL_COTANGENT || 
-			laplacianScheme == LS_GLOBAL_VCLLSM_COTANGENT || laplacianScheme == LS_GLOBAL_CPU_COTANGENT_PCL ||
-			laplacianScheme == LS_LOCAL_OCL_QR_INTEROP_COTANGENT || laplacianScheme == LS_GLOBAL_VCLLSMSDF_COTANGENT || LS_LOCAL_JAMASDF_COTANGENT){
+		if (laplacianScheme == LaplacianScheme::LS_GLOBAL_JAMA_COTANGENT || laplacianScheme == LaplacianScheme::LS_GLOBAL_VCL_COTANGENT ||
+			laplacianScheme == LaplacianScheme::LS_LOCAL_JAMA_COTANGENT || laplacianScheme == LaplacianScheme::LS_LOCAL_OCL_COTANGENT || 
+			laplacianScheme == LaplacianScheme::LS_GLOBAL_VCLLSM_COTANGENT || laplacianScheme == LaplacianScheme::LS_GLOBAL_CPU_COTANGENT_PCL ||
+			laplacianScheme == LaplacianScheme::LS_LOCAL_OCL_QR_INTEROP_COTANGENT || laplacianScheme == LaplacianScheme::LS_GLOBAL_VCLLSMSDF_COTANGENT || LaplacianScheme::LS_LOCAL_JAMASDF_COTANGENT){
 				pMesh->wL = wL * (0.001 * sqrt(avarageCurOneRingArea));
 		}
 
@@ -525,14 +521,14 @@ void lbse::Extractor::computeSkeleton(structure::t3DModel *pModel, int sourcePoi
 		}
 
 
-		if (laplacianScheme == LS_LOCAL_OCL_QR_INTEROP_COTANGENT){
+		if (laplacianScheme == LaplacianScheme::LS_LOCAL_OCL_QR_INTEROP_COTANGENT){
 			// tato metoda riesi Laplacian iba vo one-rin areas a rata to paralelne na celom meshi, iteracie su vizualizaovane cez interoperability -> nekonverguje
-			contractMeshGraphParallelOpenCLInterop(ite, pMeshOpenCL, mgDegeneratesMapping, sL, curOneRingArea, numOfIter, openCLContext, openCLManager);
+			//contractMeshGraphParallelOpenCLInterop(ite, pMeshOpenCL, mgDegeneratesMapping, sL, curOneRingArea, numOfIter, openCLContext, openCLManager);
 			contractedVolume = calculateVolumeFromMesh(pMeshOpenCL, pModel);
 			//copyMeshGraph(pMesh, pMeshLastIteration);
-		} else if (laplacianScheme == LS_GLOBAL_OCL_JACOBI_INTEROP_COTANGENT){
+		} else if (laplacianScheme == LaplacianScheme::LS_GLOBAL_OCL_JACOBI_INTEROP_COTANGENT){
 			 // tato metoda paralelizuje jednu iteraciu kontrakcie na celom mesi, vie to paralelne zratat pre kazdy vertex, iteracie su vizualizaovane cez interoperability -> nekonverguje 
-		  	  contractMeshGraphParallelOpenCLJacobiInterop(ite, pMeshOpenCL, mgDegeneratesMapping, sL, curOneRingArea, numOfIter, openCLContext, openCLManager);
+		  	 //contractMeshGraphParallelOpenCLJacobiInterop(ite, pMeshOpenCL, mgDegeneratesMapping, sL, curOneRingArea, numOfIter, openCLContext, openCLManager);
 			} 
 		else {
 			while ((*ite <= numOfIter || !stopContractionByIteration) && (isOverThreshold || !stopContractionByRatio)){
@@ -542,7 +538,7 @@ void lbse::Extractor::computeSkeleton(structure::t3DModel *pModel, int sourcePoi
 				#ifdef _LOG
 					char * s = new char[255];
 					int iternum = (*ite);
-					sprintf_s ( s, sizeof(s), "contraction %i", iternum);
+					sprintf_s ( s, 255, "contraction %i", iternum);
 
 					logg.log(LOG_LEVEL_NOTE, "Po Contraction ITERATION : ", iternum);
 					timerlog.addStart(s);
@@ -550,7 +546,7 @@ void lbse::Extractor::computeSkeleton(structure::t3DModel *pModel, int sourcePoi
 
 
 				// add random noise each iteration of local Laplacian
-				if (laplacianScheme == LS_LOCAL_OCL_COTANGENT && doAddRandomNoiseAfterIteration){
+				if (laplacianScheme == LaplacianScheme::LS_LOCAL_OCL_COTANGENT && doAddRandomNoiseAfterIteration){
 					addRandomNoiseToMeshGraph(pMesh, pModel, 0.01);
 				}
 
@@ -563,7 +559,7 @@ void lbse::Extractor::computeSkeleton(structure::t3DModel *pModel, int sourcePoi
 					// calculate sdf for contracted mesh graph positions
 					calculateSDFForMeshGraph(pMesh, pModel, sdfValuesNormalizedMG, &(sdfHalfVectors), sdfHalfVectorsMG);
 
-					// UNCOMMENT gldAddModelData("test model", sdfValuesNormalizedMG);
+					//gldAddModelData("test model", sdfValuesNormalizedMG);
 
 				}
 
@@ -589,11 +585,11 @@ void lbse::Extractor::computeSkeleton(structure::t3DModel *pModel, int sourcePoi
 
 				} else {
 
-					if (laplacianScheme == LS_GLOBAL_JAMA_COTANGENT || laplacianScheme == LS_GLOBAL_VCL_COTANGENT || 
-						laplacianScheme == LS_LOCAL_JAMA_COTANGENT || laplacianScheme == LS_LOCAL_OCL_COTANGENT || 
-						laplacianScheme == LS_GLOBAL_VCLLSM_COTANGENT || laplacianScheme == LS_GLOBAL_VCLLSMSDF_COTANGENT || LS_LOCAL_JAMASDF_COTANGENT){
+					if (laplacianScheme == LaplacianScheme::LS_GLOBAL_JAMA_COTANGENT || laplacianScheme == LaplacianScheme::LS_GLOBAL_VCL_COTANGENT || 
+						laplacianScheme == LaplacianScheme::LS_LOCAL_JAMA_COTANGENT || laplacianScheme == LaplacianScheme::LS_LOCAL_OCL_COTANGENT || 
+						laplacianScheme == LaplacianScheme::LS_GLOBAL_VCLLSM_COTANGENT || laplacianScheme == LaplacianScheme::LS_GLOBAL_VCLLSMSDF_COTANGENT || LaplacianScheme::LS_LOCAL_JAMASDF_COTANGENT){
 
-						calculateOneRingArea(pMesh, pModel, curOneRingArea);
+						calculateOneRingArea(pMesh, curOneRingArea);
 						pMesh->wL = pMesh->wL * sL;
 
 						if (useSDFBasedLaplacianWeights){
@@ -613,7 +609,7 @@ void lbse::Extractor::computeSkeleton(structure::t3DModel *pModel, int sourcePoi
 						}
 					}
 
-					if (laplacianScheme == LS_GLOBAL_JAMA_POINTCLOUD){
+					if (laplacianScheme == LaplacianScheme::LS_GLOBAL_JAMA_POINTCLOUD){
 						calculateOneRingExtent(pMesh, curOneRingExtent, globalNeighbourhoods);
 							pMesh->wL = pMesh->wL * sL;
 							for (int i = 0; i < pMesh->numOfVertices; i++){
@@ -639,7 +635,7 @@ void lbse::Extractor::computeSkeleton(structure::t3DModel *pModel, int sourcePoi
 					avarageCurOneRingArea /= pMesh->numOfVertices;
 					avarageCurOneRingExtent /= pMesh->numOfVertices;
 
-					if (laplacianScheme == LS_GLOBAL_JAMA_POINTCLOUD){
+					if (laplacianScheme == LaplacianScheme::LS_GLOBAL_JAMA_POINTCLOUD){
 						isOverThreshold = (lastAvarageCurOneRingExtent - avarageCurOneRingExtent) / avarageOrigOneRingExtent >= volumeTreshold;
 					} else {
 						isOverThreshold = avarageCurOneRingArea / avarageOrigOneRingArea >= volumeTreshold;
@@ -657,6 +653,9 @@ void lbse::Extractor::computeSkeleton(structure::t3DModel *pModel, int sourcePoi
 				#endif
 			}
 		}
+
+		delete[] curOneRingArea;
+		delete[] curOneRingExtent;
 
 		/*if (goBack){
 			logg.log(LOG_LEVEL_NOTE, "STEPING BACK THE MESH !!!");
@@ -710,7 +709,7 @@ void lbse::Extractor::computeSkeleton(structure::t3DModel *pModel, int sourcePoi
 	#ifdef _LOG
 		timerlog.addStart("connectivity surgery");
 	#endif
-	applyConnectivitySurgery(node, modelMaxDim);
+	applyConnectivitySurgery(true, node, modelMaxDim);
 	#ifdef _LOG
 		timerlog.addEnd();
 	#endif
@@ -721,13 +720,14 @@ void lbse::Extractor::computeSkeleton(structure::t3DModel *pModel, int sourcePoi
 		timerlog.logExecutionTimes();
 	#endif
 
-	if (sdfSize > 0 && doComputeSDF){
+	if (sdfSize > 0){
+		delete[] sdfHalfVectorsMG;
 		delete[] sdfValuesNormalized;
 		delete[] sdfValues;
 	}
 }
 
-/*void lbse::Extractor::meshgraphVertexPositionsToModel(MeshGraph * pMesh, structure::t3DModel * pModel){
+void lbse::Extractor::meshgraphVertexPositionsToModel(MeshGraph * pMesh, structure::t3DModel * pModel){
 	int offset=0;
 	for (int i = 0; i < pModel->numOfObjects; i++){
 		structure::t3DObject * pObject = &pModel->pObject[i];
@@ -741,29 +741,42 @@ void lbse::Extractor::computeSkeleton(structure::t3DModel *pModel, int sourcePoi
 		}
 		offset+= pObject->numOfVertices;
 	}
-}*/
+}
 
-void lbse::Extractor::applyConnectivitySurgery(SN::SkeletonNode * node, float modelMaxDim)
+void lbse::Extractor::applyConnectivitySurgery(bool applyLBSEPostprocessing, SN::SkeletonNode * node, float modelMaxDim)
 {
 	// connectivity surgery
 	delete pSurgeryGraph;
 	pSurgeryGraph = NULL;
+	pSurgeryGraph = new SurgeryGraph();
 
-	pSurgeryGraph = createSurgeryGraphFromMeshGraph(pMesh);
+	if (applyLBSEPostprocessing){
+		createSurgeryGraphFromMeshGraph(pMesh, pSurgeryGraph);
+	} else {
+		createSurgeryGraphFromMeshGraph(polyMesh, pSurgeryGraph);
+	}
 
 	float threshold = modelMaxDim / (100.0f/groupingTolerance);
-	createSkeletonFromSurgeryGraph(pSurgeryGraph, originalMesh->pVerts, mgDegeneratesMapping, node, &numOfBones, threshold, groupingToleranceSDFMulti,doBranchingSimplification, doDisplacementShifting, groupingWithoutEdge, cyclicSkeleton, sdfHalfVectorsMG, useSDFBasedGroupingDistance);
+	createSkeletonFromSurgeryGraph(applyLBSEPostprocessing, pSurgeryGraph, originalMesh->pVerts, mgDegeneratesMapping, node, &numOfBones, threshold, groupingToleranceSDFMulti, doBranchingSimplification, doDisplacementShifting, groupingWithoutEdge, cyclicSkeleton, sdfHalfVectorsMG, useSDFBasedGroupingDistance);
 
-	//boost::unordered_map<int, std::vector<int> > copypc(pSurgeryGraph->pointClouds);
     currentNumberOfSkeletonBones = generateIdForTree(node, skeletonMeshGraphIndices);
-	//pSurgeryGraph->pointClouds.clear();
-	// set to point cloud for each vertex id of skeleton node instead of vertex created from
-	//for (int i=0; i < numOfBones; i++){
-//		vector<int> newpc = copypc[skeletonMeshGraphIndices[i]];
-		//pSurgeryGraph->pointClouds[i] = newpc;
-	//}
-	
+
 }
+
+/*void lbse::Extractor::mergedMGToSkeleton(SN::SkeletonNode * node, float modelMaxDim){
+
+	// connectivity surgery
+	delete pSurgeryGraph;
+	pSurgeryGraph = NULL;
+	pSurgeryGraph = new SurgeryGraph();
+
+	createSurgeryGraphFromMeshGraph(polyMesh, pSurgeryGraph);
+
+	float threshold2 = modelMaxDim / (100.0f/groupingTolerance);
+	createSkeletonFromSurgeryGraphSDFTest(pSurgeryGraph, originalMesh->pVerts, mgDegeneratesMapping, node, &numOfBones, threshold2, groupingToleranceSDFMulti, doBranchingSimplification, doDisplacementShifting, groupingWithoutEdge, cyclicSkeleton, sdfHalfVectorsMG, useSDFBasedGroupingDistance);
+
+	currentNumberOfSkeletonBones = generateIdForTree(node, skeletonMeshGraphIndices);
+}*/
 
 void lbse::Extractor::calculateSDFForMeshGraph(MeshGraph * pMesh, structure::t3DModel * pModel, float * sdfValuesNormalizedMG, CVector3 ** sdfHalfVectors, CVector3 * sdfHalfVectorsMG){
 
@@ -771,11 +784,11 @@ void lbse::Extractor::calculateSDFForMeshGraph(MeshGraph * pMesh, structure::t3D
 
 	getMGPositionVector(pMesh, pModel, newpos);
 
-	// UNCOMMENT sdfModelController->SetNewPositions(newpos);
+	sdfModelController->SetNewPositions(newpos);
 	int size = 0;
 
-	// UNCOMMENT sdfModelController->ComputeSDF();
-	float * sdf = new float[0];// UNCOMMENT  = sdfModelController->GetSDF(size, true); 
+	sdfModelController->ComputeSDF();
+	float * sdf = sdfModelController->GetSDF(size, true); 
 	float maxSDF = FLT_MIN;
 	float minSDF = FLT_MAX;
 	sdfSize = size;
@@ -797,13 +810,21 @@ void lbse::Extractor::calculateSDFForMeshGraph(MeshGraph * pMesh, structure::t3D
 		sdfValuesNormalized[i] =  (sdf[i] - minSDF) / (maxSDF - minSDF); 
 	}
 
+	vector<CVector3> mgsdfvec;
+
 	recomputeModelValuesToMeshgraph<CVector3>(pMesh, pModel, *sdfHalfVectors, sdfHalfVectorsMG);
 
 	recomputeModelValuesToMeshgraph<float>(pMesh, pModel, sdfValuesNormalized, sdfValuesNormalizedMG);
 
+	for (int i=0; i < pMesh->numOfVertices; i++){
+		mgsdfvec.push_back(sdfHalfVectorsMG[i]);
+	}
+
 	isSDFvaluesComputed = true;
 
 	delete[] sdfValuesNormalized;
+	delete[] sdf;
+	delete[] newpos;
 }
 
 void lbse::Extractor::addRandomNoiseToMeshGraph(MeshGraph * pMesh, structure::t3DModel * pModel, float scale){

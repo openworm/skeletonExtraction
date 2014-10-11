@@ -1,6 +1,6 @@
 #pragma once
 
-#include "s_skeletonNode.h"
+#include <inline/SkeletonNode/s_skeletonNode.h>
 
 namespace SM {
 	/// <summary>

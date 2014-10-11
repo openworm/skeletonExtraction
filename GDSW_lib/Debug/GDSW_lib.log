@@ -1,4 +1,4 @@
-﻿Build started 8/31/2014 1:19:04 PM.
+﻿Build started 10/11/2014 6:30:01 PM.
      1>Project "D:\Projects\OpenWorm\GDSW_lib\GDSW_lib.vcxproj" on node 3 (Rebuild target(s)).
      1>_PrepareForClean:
          Deleting file "Debug\GDSW_lib.lastbuildstate".
@@ -10,7 +10,22 @@
          if not exist "D:\Projects\OpenWorm\include\GDSW_lib\" mkdir "D:\Projects\OpenWorm\include\GDSW_lib\"
          xcopy "D:\Projects\OpenWorm\GDSW_lib\*.h"  "D:\Projects\OpenWorm\include\GDSW_lib\" /y /e
          D:\Projects\OpenWorm\GDSW_lib\gdsw_graphAlgorithms.h
-         1 File(s) copied
+         D:\Projects\OpenWorm\GDSW_lib\include\inline\gl\shaderOptions.h
+         D:\Projects\OpenWorm\GDSW_lib\include\inline\gl\shaderUtils.h
+         D:\Projects\OpenWorm\GDSW_lib\include\inline\logs\log.h
+         D:\Projects\OpenWorm\GDSW_lib\include\inline\logs\timerlog.h
+         D:\Projects\OpenWorm\GDSW_lib\include\inline\meshes\CVectorMesh.h
+         D:\Projects\OpenWorm\GDSW_lib\include\inline\meshes\IndexedFace.h
+         D:\Projects\OpenWorm\GDSW_lib\include\inline\meshes\Mesh+Skin.h
+         D:\Projects\OpenWorm\GDSW_lib\include\inline\meshes\Mesh.h
+         D:\Projects\OpenWorm\GDSW_lib\include\inline\meshes\MeshGraph.h
+         D:\Projects\OpenWorm\GDSW_lib\include\inline\meshes\meshSimplification.h
+         D:\Projects\OpenWorm\GDSW_lib\include\inline\meshes\SerializableMesh+Skin.h
+         D:\Projects\OpenWorm\GDSW_lib\include\inline\meshes\structure.h
+         D:\Projects\OpenWorm\GDSW_lib\include\inline\mmath\mmath.h
+         D:\Projects\OpenWorm\GDSW_lib\include\inline\SkeletonNode\SkeletonNode.h
+         D:\Projects\OpenWorm\GDSW_lib\include\inline\SkeletonNode\s_skeletonNode.h
+         16 File(s) copied
        ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt gdsw_graphAlgorithms.cpp
          gdsw_graphAlgorithms.cpp
@@ -24,4 +39,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:04.47
+Time Elapsed 00:00:04.60

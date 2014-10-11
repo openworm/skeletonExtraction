@@ -1,8 +1,6 @@
+//---------------------------------------------------------------------------
 #include "lbse_skeleton.h"
 
-//---------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------
 
 void assignFathersForSkeletonTree(SN::SkeletonNode * pNode){
 	//pNode->father = new SN::SkeletonNode();
@@ -26,7 +24,7 @@ void assignFathersForSkeletonTree(SN::SkeletonNode * pNode){
 
 void copySkeletonNode(SN::SkeletonNode * src, SN::SkeletonNode * dest){
 	copySkeletonNodeImpl(src, dest);
-	//assignFathersForSkeletonTree(dest);
+	assignFathersForSkeletonTree(dest);
 }
 
 void copySkeletonNodeImpl(SN::SkeletonNode * src, SN::SkeletonNode * dest){
@@ -37,28 +35,12 @@ void copySkeletonNodeImpl(SN::SkeletonNode * src, SN::SkeletonNode * dest){
 	//dest->father = src->father;
 	for (int i = 0; i < src->nodes.size(); i++) {
 		SN::SkeletonNode * p = new SN::SkeletonNode();
+		copySkeletonNode(src->nodes[i], p);
 		p->father = dest;
 		dest->nodes.push_back(p);
-		copySkeletonNode(src->nodes[i], p);
 	}
 
 }
-
-/*void copySkeletonNodeToSQMNode(SN::SkeletonNode * src, bmm::SkeletonNode * dest, float radius){
-	dest->id = src->id;
-	dest->point.x = src->point.x;
-	dest->point.y = src->point.y;
-	dest->point.z = src->point.z;
-	dest->nodes = vector<SN::SkeletonNode*>();
-	dest->radius = radius;
-	dest->cyclic = src->cyclic;
-	//dest->capsule = false;
-	for (int i = 0; i < src->nodes.size(); i++) {
-		bmm::SkeletonNode * p = new bmm::SkeletonNode();
-		copySkeletonNodeToSQMNode(src->nodes[i], p, radius);
-		dest->nodes.push_back(p);
-	}
-}*/
 
 //---------------------------------------------------------------------------
 
@@ -107,22 +89,7 @@ void copyMeshGraph(MeshGraph * in, MeshGraph * out){
 	/*out->neighPCIndex = in->neighPCIndex;
 	out->neighVis = in->neighVis;*/
 }
-//---------------------------------------------------------------------------
-/*CVector3 * createModelVerticesArray(MeshGraph * mesh){
-	#ifdef _LOG
-		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD createModelVerticesArray STARTED");
-	#endif
 
-	CVector3 * arr = new CVector3[mesh->numOfVertices];
-	for (int i = 0; i < mesh->numOfVertices; i++) {
-    	arr[i] = mesh->pVerts[i];
-	}
-	#ifdef _LOG
-		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD createModelVerticesArray ENDED");
-	#endif
-
-	return arr;
-}*/
 //---------------------------------------------------------------------------
 vector<CVector3> findNeighborhood(int ind, vector<CVector3> v, float r){
 	vector<CVector3> n;
@@ -134,62 +101,7 @@ vector<CVector3> findNeighborhood(int ind, vector<CVector3> v, float r){
 
 
 //---------------------------------------------------------------------------
-void calculateOneRingArea(MeshGraph * pMesh, structure::t3DModel *pModel, float * p){
-	#ifdef _LOG
-		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD calculateOneRingArea STARTED");
-	#endif
 
-		for (int i = 0; i < pMesh->numOfVertices; i++) {
-			p[i] = 0.0f;
-		}
-
-		/*if (pMesh->polygonIndices.size() == 0){
-			// ak je toto 0, nesimplifikujeme mesh a ratame z povodnych trojuholnikov
-			int offset = 0;
-			for (int j = 0; j < pModel->numOfObjects; j++){
-				structure::t3DObject *pObject = &pModel->pObject[j];
-				 for (int k = 0; k < pObject->numOfFaces; k++){
-							int ind0 = pMesh->indices[offset + pObject->pFaces[k].vertIndex[0]];
-							int ind1 = pMesh->indices[offset + pObject->pFaces[k].vertIndex[1]];
-							int ind2 = pMesh->indices[offset + pObject->pFaces[k].vertIndex[2]];
-							CVector3 p1 = pMesh->pVerts[ind0];
-							CVector3 p2 = pMesh->pVerts[ind1];
-							CVector3 p3 = pMesh->pVerts[ind2];
-							float a = Magnitude(Cross(p2 - p1, p3 - p1)) / 2.0;
-							if (ind0 > pMesh->numOfVertices-1 || ind1 > pMesh->numOfVertices-1 || ind2 > pMesh->numOfVertices-1){
-								int blbost = 0;
-							}
-							p[ind0] += a;
-							p[ind1] += a;
-							p[ind2] += a;
-					   }
-					   offset += pObject->numOfVerts;
-			}
-		} else {*/
-			for (int j=0; j<pMesh->numOfFaces; j++){
-
-				int ind0 = pMesh->triangleIndices[3 * j];
-				int ind1 = pMesh->triangleIndices[3 * j + 1];
-				int ind2 = pMesh->triangleIndices[3 * j + 2];
-
-				if (ind0 > pMesh->numOfVertices-1 || ind1 > pMesh->numOfVertices-1 || ind2 > pMesh->numOfVertices-1 || ind0 < 0 || ind1 < 0 || ind2 < 0){
-					int blbost = 0;
-				} else {
-					CVector3 p1 = pMesh->pVerts[ind0];
-					CVector3 p2 = pMesh->pVerts[ind1];
-					CVector3 p3 = pMesh->pVerts[ind2];
-					float a = Magnitude(Cross(p2 - p1, p3 - p1)) / 2.0;
-					p[ind0] += a;
-					p[ind1] += a;
-					p[ind2] += a;
-				}
-			}
-		//}
-
-	#ifdef _LOG	
-		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD calculateOneRingArea ENDED");
-	#endif
-}
 //---------------------------------------------------------------------------
 
 void collapseTriangle(MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &mgDegeneratesMapping, int i, int j, int k){
@@ -253,6 +165,7 @@ bool manifoldCheck(MeshGraph * pMesh, int e1, int e2, int i, int j){
 	return (ind == 2);
 }
 
+
 //---------------------------------------------------------------------------
 int generateIdForTree(SN::SkeletonNode * pNode, vector<int> &meshGraphIndices){
 	int idx = 1;
@@ -301,14 +214,7 @@ int generateIdForTree(SN::SkeletonNode * pNode){
 	return idx;
 }
 
-//---------------------------------------------------------------------------
-/*void generateIdDSF(SN::SkeletonNode * pNode, int * p){
-	pNode->id = *p;
-	(*p)++;
-	for (int i = 0; i < pNode->nodes.size(); i++){
-		generateIdDSF(pNode->nodes[i], p);
-	}
-}*/
+
 
 //---------------------------------------------------------------------------
 SN::SkeletonNode * findNodeWithIdInTree(SN::SkeletonNode * node, int id){
@@ -342,7 +248,6 @@ SN::SkeletonNode * findNodeWithId(SN::SkeletonNode * pRoot, int id){
 		}
 	}
 }
-
 
 //---------------------------------------------------------------------------
 // returns the shortest way between 2 points on the mesh graph structure
@@ -408,11 +313,10 @@ SN::SkeletonNode * findNodeWithId(SN::SkeletonNode * pRoot, int id){
 
 //---------------------------------------------------------------------------
 // Connectivity surgery
-SurgeryGraph * createSurgeryGraphFromMeshGraph(MeshGraph * pMesh){
+void createSurgeryGraphFromMeshGraph(MeshGraph * pMesh, SurgeryGraph * pGraph){
 	#ifdef _LOG
 		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD createSurgeryGraphFromMeshGraph STARTED");
 	#endif
-	SurgeryGraph * pGraph = new SurgeryGraph();
 	pGraph->numOfVertices = pMesh->numOfVertices;
 	pGraph->E = Array2D< bool >(pMesh->numOfVertices, pMesh->numOfVertices, false);
 	delete[] pGraph->pVerts;
@@ -425,7 +329,6 @@ SurgeryGraph * createSurgeryGraphFromMeshGraph(MeshGraph * pMesh){
 				pGraph->E[i][j] = pMesh->E[i][j];
 		}
 	}
-	return pGraph;
 	#ifdef _LOG
 		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD createSurgeryGraphFromMeshGraph ENDED");
 	#endif
@@ -482,7 +385,7 @@ void collapseCloseVertices(SurgeryGraph * pGraph, float groupingTolerance, float
 								re = true;
 								break;
 							}
-						halfEdgeCollapse(pGraph, i, good[j], actualNumOfBones, *actualNumOfBones > *wantedNumberOfBones);
+						halfEdgeCollapse(pGraph, i, good[j], actualNumOfBones, false);
 						if (re){
 							i = -1;
 							good.clear();
@@ -498,7 +401,7 @@ void collapseCloseVertices(SurgeryGraph * pGraph, float groupingTolerance, float
 }
 
 //---------------------------------------------------------------------------
-SurgeryGraph * createSkeletonFromSurgeryGraph(SurgeryGraph * pGraph, CVector3 * modelVertices, boost::unordered_map<int, vector<int> > mgDegeneratesMapping ,SN::SkeletonNode * root, int * wantedNumberOfBones, float groupingTolerance, float groupingToleranceSDFMulti, bool doBranchingSimplification,bool doDisplacementShifting, bool groupingWithoutEdge, bool cyclicSkeleton, CVector3 * sdfValues, bool useSDFBasedGroupingDistance){
+void createSkeletonFromSurgeryGraphSDFTest(SurgeryGraph * pGraph, CVector3 * modelVertices, boost::unordered_map<int, vector<int> > mgDegeneratesMapping , SN::SkeletonNode * root, int * wantedNumberOfBones, float groupingTolerance, float groupingToleranceSDFMulti, bool doBranchingSimplification,bool doDisplacementShifting, bool groupingWithoutEdge, bool cyclicSkeleton, CVector3 * sdfValues, bool useSDFBasedGroupingDistance){
 	#ifdef _LOG
 		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD createSkeletonFromSurgeryGraph STARTED");
 	#endif
@@ -515,43 +418,21 @@ SurgeryGraph * createSkeletonFromSurgeryGraph(SurgeryGraph * pGraph, CVector3 * 
 		for (int j = 0; j < pGraph->numOfVertices; j++)
 			originalE[i][j] = pGraph->E[i][j];
 
-	// compute K matrices
-	if (actualNumOfBones > *wantedNumberOfBones) {
-		Array2D<Array2D< float > >KMatrices = Array2D<Array2D< float > >( pGraph->numOfVertices,  pGraph->numOfVertices, Array2D< float >(pGraph->numOfVertices,  pGraph->numOfVertices, 0.0f));
-		for (int i = 0; i < pGraph->numOfVertices; i++)
-				for (int j = 0; j < pGraph->numOfVertices; j++)
-					if (pGraph->E[i][j])
-						KMatrices[i][j] = constructKMatrix(pGraph, i, j);
-		for (int i = 0; i < pGraph->numOfVertices; i++){
-			Array2D< float > Q(4, 4, 0.0f);
-			//for (int m=0; m<4; m++)
-				//for (int n=0; n<4; n++)
-					//Q[m][n] = 0.0f;
-			for (int j = 0; j < pGraph->numOfVertices; j++){
-				if (pGraph->E[i][j]){
-					Array2D< float > E(4, 4, 0.0f);
-					E = KMatrices[i][j].transpose(KMatrices[i][j]) * KMatrices[i][j];
-					Q = Q + E;
-				}
-			}
-			pGraph->QMatrices.push_back(Q);
-		}
-	}
 	#ifdef _LOG
 		logg.log(LOG_LEVEL_C_PARAMS, "actualNumOfBones na zaciatku : ",actualNumOfBones);
 	#endif
 	//collapse very close points
 
-	collapseCloseVertices(pGraph, groupingTolerance, groupingToleranceSDFMulti, &actualNumOfBones, wantedNumberOfBones, groupingWithoutEdge, sdfValues, useSDFBasedGroupingDistance);
+	//collapseCloseVertices(pGraph, groupingTolerance, groupingToleranceSDFMulti, &actualNumOfBones, wantedNumberOfBones, groupingWithoutEdge, sdfValues, useSDFBasedGroupingDistance);
 
-	#ifdef _LOG
-		logg.log(LOG_LEVEL_C_PARAMS, "actualNumOfBones po odstraneni blizkych : ",actualNumOfBones);
-		logg.log(LOG_LEVEL_DUMP, "Matica E po odstraneni blizkych");
-		logg.log(LOG_LEVEL_DUMP, pGraph->E);
-	#endif
+	/*#ifdef _LOG
+		logg.log(0, "actualNumOfBones po odstraneni blizkych : ",actualNumOfBones);
+		logg.log(0, "Matica E po odstraneni blizkych");
+		logg.log(0, pGraph->E);
+	#endif*/
 
 	//iterate and collapse until we got wanted number of bones
-	while(actualNumOfBones > *wantedNumberOfBones) {
+	/*while(actualNumOfBones > *wantedNumberOfBones) {
 		#ifdef _LOG
 			logg.log(LOG_LEVEL_C_PARAMS, "actualNumOfBones : ",actualNumOfBones);
 		#endif
@@ -563,9 +444,9 @@ SurgeryGraph * createSkeletonFromSurgeryGraph(SurgeryGraph * pGraph, CVector3 * 
 			for (int j = i; j < pGraph->numOfVertices; j++)
 				if (pGraph->E[i][j] && i != j) {
 					// calculate shape cost + sampling cost
-					float shapeCT = wA * computeShapeCost(pGraph, i, j);
-					float samplingCT = wB * computeSamplingCost(pGraph, i, j);
-					float cost = shapeCT + samplingCT;
+					//float shapeCT = wA * computeShapeCost(pGraph, i, j);
+					//float samplingCT = wB * computeSamplingCost(pGraph, i, j);
+					float cost = Distance(pGraph->pVerts[i], pGraph->pVerts[j]);
 					// find minimum
 					if (cost < minCost) {
 						minCost = cost;
@@ -574,10 +455,303 @@ SurgeryGraph * createSkeletonFromSurgeryGraph(SurgeryGraph * pGraph, CVector3 * 
 					}
 				}
 
-	   halfEdgeCollapse(pGraph, minIndexI, minIndexJ, &actualNumOfBones, true);
+	   halfEdgeCollapse(pGraph, minIndexI, minIndexJ, &actualNumOfBones, false);
 	   #ifdef _LOG
 			logg.log(LOG_LEVEL_C_PARAMS, "iterativny  halfEdgeCollapse : ",actualNumOfBones);
 	   #endif
+	}*/
+
+
+	// lets create collapsed hash map from point clouds
+	int segInd = 0;
+	#ifdef _LOG
+		logg.log(LOG_LEVEL_C_PARAMS, "pointClouds na konci");
+	#endif
+
+	/*for (int i = 0; i < pGraph->pointClouds.size(); i++){
+		if ( pGraph->pointClouds[i].size() > 0){
+			logg.log(2, "pointClouds pre vrchol : ",i);
+			logg.log(2, "pointClouds velkost : ",(int)pGraph->pointClouds[i].size());
+			for (int j = 0; j < pGraph->pointClouds[i].size(); j++){
+				pGraph->collapsed[pGraph->pointClouds[i][j]] = i;
+				logg.log(2, "clouditem : ",pGraph->pointClouds[i][j]);
+			}
+		}
+	}*/
+
+	*wantedNumberOfBones = actualNumOfBones;
+
+	#ifdef _LOG
+		logg.log(LOG_LEVEL_NOTE, "SKELETON TRIMED");
+		logg.log(LOG_LEVEL_C_PARAMS, "actualNumOfBones : ",actualNumOfBones);
+	#endif
+
+	/*if (doDisplacementShifting)
+		for (int i = 0; i < pGraph->numOfVertices; i++){
+			computeWADisplacement(i, pGraph, modelVertices , originalE, root, mgDegeneratesMapping);
+		}*/
+
+	//collapseCloseVertices(pGraph, groupingTolerance, groupingToleranceSDFMulti, &actualNumOfBones, wantedNumberOfBones, groupingWithoutEdge, sdfValues, useSDFBasedGroupingDistance);
+
+	// find bigests component node
+	int maxComponent = 0;
+	int maxVolume = 0;
+
+	for (int i = 0; i <actualNumOfBones; i++){
+		float vol = computePointCloudVolume(pGraph->pointClouds[i], modelVertices, mgDegeneratesMapping);
+		if (vol > maxVolume) {
+			maxVolume = vol;
+            maxComponent = i;
+		}
+	}
+	pGraph->segmentIndex[segInd++] = maxComponent;
+
+	root->point =  pGraph->pVerts[maxComponent];
+	/*if (doDisplacementShifting) {
+		CVector3 dis = computeWADisplacement(maxComponent, pGraph, modelVertices , originalE ,root,  mgDegeneratesMapping);
+    }*/
+	root->id = maxComponent + 1;
+	//((skl::SkeletonNode *)root)->selected = false;
+
+	// Create tree from graph structure
+
+	vector<SN::SkeletonNode*> queue;
+	SN::SkeletonNode imaginaryCenter;
+	imaginaryCenter.point = CVector3(0,0,0);
+	root->father = &imaginaryCenter;
+	//((skl::SkeletonNode *)root)->bindPoseMatrices.qRotation = CVector4(1,0,0,0);//QuaternionBetweenVectors(CVector3(0,0,-1), root->point);
+	root->cyclic = NULL;
+	//Array2D<float>rotationMatrix = QuaternionToMatrix3x3(((skl::SkeletonNode*)root)->bindPoseMatrices.qRotation);
+	//Array2D<float>invRotationMatrix = rotationMatrix.invert(rotationMatrix);
+	//Array2D<float>trans = CVecToTntVec(root->point);
+	//Array2D<float>invRotatedTrans =  trans * invRotationMatrix;
+	//((skl::SkeletonNode *)root)->bindPoseMatrices.vTranslation = root->point;
+
+	//((skl::SkeletonNode *)root)->bindPoseMatrices.computeAffineTransformation();
+	queue.push_back(root);
+	bool * added = new bool[pGraph->numOfVertices];
+	for (int i = 0; i < pGraph->numOfVertices; i++)
+    	added[i] = false;
+
+	
+	#ifdef _LOG
+		logg.log(LOG_LEVEL_DUMP, "Matica E pred vytvaranim stromu");
+		logg.log(LOG_LEVEL_DUMP, pGraph->E);
+	#endif
+
+	vector<int*> cycleEnclosing;
+
+	while(queue.size() > 0){
+		SN::SkeletonNode * node = queue[queue.size() - 1];
+		queue.pop_back();
+
+		vector<SN::SkeletonNode*> nodes;
+
+		for (int i = 0; i < pGraph->numOfVertices; i++){
+
+			bool isInCycleEnclosing = false;
+			int cycleEnclosingId1 = -1;
+			int cycleEnclosingId2 = -1;
+			for (int c = 0; c < cycleEnclosing.size(); c++){
+				if ((cycleEnclosing[c][0] == i && cycleEnclosing[c][1] == node->id - 1) || (cycleEnclosing[c][1] == i && cycleEnclosing[c][0] == node->id - 1))
+					isInCycleEnclosing = true;
+					cycleEnclosingId1 = cycleEnclosing[c][0] + 1;
+					cycleEnclosingId2 = cycleEnclosing[c][1] + 1;
+			}
+
+			if (added[i] && isInCycleEnclosing){
+				// ((skl::SkeletonNode *)node)->cyclic = ((skl::SkeletonNode *)findNodeWithIdInTree(root, cycleEnclosingId1))
+				SN::SkeletonNode * node1 = (SN::SkeletonNode *)findNodeWithIdInTree(root, cycleEnclosingId1); 
+				if (node1 != NULL)
+					node1->cyclic = findNodeWithIdInTree(root, cycleEnclosingId2);
+				SN::SkeletonNode * node2 = (SN::SkeletonNode *)findNodeWithIdInTree(root, cycleEnclosingId2);
+				if (node2 != NULL)
+					node2->cyclic = findNodeWithIdInTree(root, cycleEnclosingId1);
+			}
+
+			if (pGraph->E[node->id - 1][i] && node->id - 1 != i) {
+				#ifdef _LOG
+					logg.log(LOG_LEVEL_DUMP, "matica E");
+					logg.log(LOG_LEVEL_DUMP, pGraph->E);
+				#endif
+				pGraph->E[node->id - 1][i] = false;
+				pGraph->E[i][node->id - 1] = false;
+
+				if (!added[i] || cyclicSkeleton){
+						// imaginary node 1
+						SN::SkeletonNode *n1 = new SN::SkeletonNode();
+						n1->point = pGraph->pVerts[i];
+						// displacmenet
+						/*if (doDisplacementShifting) {
+							CVector3 dis = computeWADisplacement(i, pGraph, modelVertices , originalE, n1, mgDegeneratesMapping);
+						}*/
+
+						#ifdef _LOG
+							logg.log(LOG_LEVEL_DUMP, "skeleton node isInCycleEnclosing: ", isInCycleEnclosing);
+						#endif
+
+						SN::SkeletonNode * node11 = (SN::SkeletonNode *)findNodeWithIdInTree(root, i + 1);
+						n1->cyclic = node11;
+						if (node11 != NULL){
+							node11->cyclic = n1;
+							int * pair = new int[2];
+							pair[0] = i;
+							pair[1] = node->id - 1;
+							cycleEnclosing.push_back(pair);
+							#ifdef _LOG
+								logg.log(LOG_LEVEL_DUMP, "skeleton node cycle: ", n1->cyclic->id);
+							#endif
+						}
+
+						n1->id = i + 1;
+						pGraph->segmentIndex[segInd++] = i;
+						//((skl::SkeletonNode *)n1)->selected = false;
+						n1->father = node;
+						//BonesMatrices current;
+
+						/*current.qRotation = QuaternionBetweenVectors(node->father->point - node->point ,node->point - n->point );
+
+						Array2D<float>rotationMatrix = QuaternionToMatrix3x3(current.qRotation);
+						Array2D<float>invRotationMatrix = rotationMatrix.invert(rotationMatrix);
+						Array2D<float>trans = CVecToTntVec(n->point - node->point);
+						Array2D<float>invRotatedTrans =  trans * invRotationMatrix;
+					
+						current.vTranslation = TntVecToCVec(invRotatedTrans);*/
+
+						//current.qRotation = CVector4(1,0,0,0);
+						//current.vTranslation = n1->point - node->point;
+
+						//current.computeAffineTransformation();
+						//((skl::SkeletonNode *)n1)->bindPoseMatrices.currentAffine = ((skl::SkeletonNode *)node)->bindPoseMatrices.currentAffine * current.currentAffine;
+
+						nodes.push_back(n1);
+
+						queue.push_back(n1);
+						added[i] = true;
+
+						// imaginary node 2
+
+               }
+			}
+		}
+		node->nodes = nodes;
+		//copyBonesMatrices( &(((skl::SkeletonNode *)node)->bindPoseMatrices), &(((skl::SkeletonNode *)node)->matrices));
+
+		/*if (s_doBranchingSimplification){
+			// simplify branching structure
+			if (node->nodes.size() > 1) {
+				// for every branching node check, if merged with adj. node has better centerdness
+				// if yes, merge them (with minimum centerdness)
+				int bestIndex = -1;
+				float originalCenterdness = computeCenterdness(-1, node->id - 1, pGraph);
+				float bestCenterdness = originalCenterdness;
+				for (int i = 0; i < node->nodes.size(); i++) {
+					float s = computeCenterdness(i, node->id - 1, pGraph);
+					if (s < 0.9 * originalCenterdness) {
+						if (s < bestCenterdness){
+							bestIndex = i;
+							bestCenterdness = s;
+						}
+					}
+				}
+				if (bestIndex != -1) {
+					mergeAdjNodeWithBran(node, bestIndex);
+				}
+			}
+		}*/
+	}
+
+	delete[] added;
+	added = NULL;
+}
+
+//---------------------------------------------------------------------------
+void createSkeletonFromSurgeryGraph(bool applyLBSEPostprocessing, SurgeryGraph * pGraph, CVector3 * modelVertices, boost::unordered_map<int, vector<int> > mgDegeneratesMapping ,SN::SkeletonNode * root, int * wantedNumberOfBones, float groupingTolerance, float groupingToleranceSDFMulti, bool doBranchingSimplification,bool doDisplacementShifting, bool groupingWithoutEdge, bool cyclicSkeleton, CVector3 * sdfValues, bool useSDFBasedGroupingDistance){
+	#ifdef _LOG
+		logg.log(LOG_LEVEL_METHODSTARTEND, "METHOD createSkeletonFromSurgeryGraph STARTED");
+	#endif
+	int actualNumOfBones = pGraph->numOfVertices;
+
+	//logg.log(0, "Matica E PRED");
+	//logg.log(0, pGraph->E);
+
+	for (int i = 0; i < pGraph->numOfVertices; i++)
+		pGraph->pointClouds[i].push_back(i);
+
+	Array2D<bool> originalE = Array2D< bool >( pGraph->numOfVertices,  pGraph->numOfVertices, false);;
+	for (int i = 0; i < pGraph->numOfVertices; i++)
+		for (int j = 0; j < pGraph->numOfVertices; j++)
+			originalE[i][j] = pGraph->E[i][j];
+
+	if (applyLBSEPostprocessing){
+		// compute K matrices
+		if (actualNumOfBones > *wantedNumberOfBones) {
+			Array2D<Array2D< float > >KMatrices = Array2D<Array2D< float > >( pGraph->numOfVertices,  pGraph->numOfVertices, Array2D< float >(3,  4, 0.0f));
+			for (int i = 0; i < pGraph->numOfVertices; i++)
+				for (int j = 0; j < pGraph->numOfVertices; j++)
+					if (pGraph->E[i][j])
+						KMatrices[i][j] = constructKMatrix(pGraph, i, j);
+			for (int i = 0; i < pGraph->numOfVertices; i++){
+				Array2D< float > Q(4, 4, 0.0f);
+				//for (int m=0; m<4; m++)
+				//for (int n=0; n<4; n++)
+				//Q[m][n] = 0.0f;
+				for (int j = 0; j < pGraph->numOfVertices; j++){
+					if (pGraph->E[i][j]){
+						Array2D< float > E(4, 4, 0.0f);
+						E = KMatrices[i][j].transpose(KMatrices[i][j]) * KMatrices[i][j];
+						Q = Q + E;
+					}
+				}
+				pGraph->QMatrices.push_back(Q);
+			}
+		}
+	}
+#ifdef _LOG
+	logg.log(LOG_LEVEL_C_PARAMS, "actualNumOfBones na zaciatku : ",actualNumOfBones);
+#endif
+	//collapse very close points
+
+	if (applyLBSEPostprocessing){
+		collapseCloseVertices(pGraph, groupingTolerance, groupingToleranceSDFMulti, &actualNumOfBones, wantedNumberOfBones, groupingWithoutEdge, sdfValues, useSDFBasedGroupingDistance);
+	}
+
+	#ifdef _LOG
+		logg.log(LOG_LEVEL_C_PARAMS, "actualNumOfBones po odstraneni blizkych : ",actualNumOfBones);
+		logg.log(LOG_LEVEL_DUMP, "Matica E po odstraneni blizkych");
+		logg.log(LOG_LEVEL_DUMP, pGraph->E);
+	#endif
+
+	if (applyLBSEPostprocessing){
+		//iterate and collapse until we got wanted number of bones
+		while(actualNumOfBones > *wantedNumberOfBones) {
+			#ifdef _LOG
+				logg.log(LOG_LEVEL_C_PARAMS, "actualNumOfBones : ",actualNumOfBones);
+			#endif
+			// for every edge
+			int minIndexI = 0;
+			int minIndexJ = 0;
+			float minCost = FLT_MAX;
+			for (int i = 0; i < pGraph->numOfVertices; i++)
+				for (int j = i; j < pGraph->numOfVertices; j++)
+					if (pGraph->E[i][j] && i != j) {
+						// calculate shape cost + sampling cost
+						float shapeCT = wA * computeShapeCost(pGraph, i, j);
+						float samplingCT = wB * computeSamplingCost(pGraph, i, j);
+						float cost = shapeCT + samplingCT;
+						// find minimum
+						if (cost < minCost) {
+							minCost = cost;
+							minIndexI = i;
+							minIndexJ = j;
+						}
+					}
+
+		   halfEdgeCollapse(pGraph, minIndexI, minIndexJ, &actualNumOfBones, true);
+		   #ifdef _LOG
+				logg.log(LOG_LEVEL_C_PARAMS, "iterativny  halfEdgeCollapse : ",actualNumOfBones);
+		   #endif
+		}
 	}
 
 
@@ -605,12 +779,14 @@ SurgeryGraph * createSkeletonFromSurgeryGraph(SurgeryGraph * pGraph, CVector3 * 
 		logg.log(LOG_LEVEL_C_PARAMS, "actualNumOfBones : ",actualNumOfBones);
 	#endif
 
-	if (doDisplacementShifting)
+	if (doDisplacementShifting && applyLBSEPostprocessing)
 		for (int i = 0; i < pGraph->numOfVertices; i++){
 			computeWADisplacement(i, pGraph, modelVertices , originalE, root, mgDegeneratesMapping);
 		}
 
-	collapseCloseVertices(pGraph, groupingTolerance, groupingToleranceSDFMulti, &actualNumOfBones, wantedNumberOfBones, groupingWithoutEdge, sdfValues, useSDFBasedGroupingDistance);
+	if (applyLBSEPostprocessing){
+		collapseCloseVertices(pGraph, groupingTolerance, groupingToleranceSDFMulti, &actualNumOfBones, wantedNumberOfBones, groupingWithoutEdge, sdfValues, useSDFBasedGroupingDistance);
+	}
 
 	// find bigests component node
 	int maxComponent = 0;
@@ -626,7 +802,7 @@ SurgeryGraph * createSkeletonFromSurgeryGraph(SurgeryGraph * pGraph, CVector3 * 
 	pGraph->segmentIndex[segInd++] = maxComponent;
 
 	root->point =  pGraph->pVerts[maxComponent];
-	if (doDisplacementShifting) {
+	if (doDisplacementShifting && applyLBSEPostprocessing) {
 		CVector3 dis = computeWADisplacement(maxComponent, pGraph, modelVertices , originalE ,root,  mgDegeneratesMapping);
     }
 	root->id = maxComponent + 1;
@@ -701,7 +877,7 @@ SurgeryGraph * createSkeletonFromSurgeryGraph(SurgeryGraph * pGraph, CVector3 * 
 						SN::SkeletonNode *n1 = new SN::SkeletonNode();
 						n1->point = pGraph->pVerts[i];
 						// displacmenet
-						if (doDisplacementShifting) {
+						if (doDisplacementShifting && applyLBSEPostprocessing) {
 							CVector3 dis = computeWADisplacement(i, pGraph, modelVertices , originalE, n1, mgDegeneratesMapping);
 						}
 
@@ -755,7 +931,7 @@ SurgeryGraph * createSkeletonFromSurgeryGraph(SurgeryGraph * pGraph, CVector3 * 
 		node->nodes = nodes;
 		//copyBonesMatrices( &(((skl::SkeletonNode *)node)->bindPoseMatrices), &(((skl::SkeletonNode *)node)->matrices));
 
-		if (s_doBranchingSimplification){
+		if (s_doBranchingSimplification && applyLBSEPostprocessing){
 			// simplify branching structure
 			if (node->nodes.size() > 1) {
 				// for every branching node check, if merged with adj. node has better centerdness
@@ -781,9 +957,8 @@ SurgeryGraph * createSkeletonFromSurgeryGraph(SurgeryGraph * pGraph, CVector3 * 
 
 	delete[] added;
 	added = NULL;
-
-	return pGraph;
 }
+
 //---------------------------------------------------------------------------
 float computeCenterdness(int adj, int bran, SurgeryGraph * pGraph){
 	int length = pGraph->pointClouds[bran].size();
@@ -805,8 +980,10 @@ float computeCenterdness(int adj, int bran, SurgeryGraph * pGraph){
 	for (int i = 0; i < length; i++) {
 		nom += pow(distances[i] - mean,2);
 	}
+
 	delete[] distances;
 	distances = NULL;
+
 	return sqrt(nom / (float)length);
 }
 //---------------------------------------------------------------------------
@@ -1006,4 +1183,6 @@ float computeSamplingCost(SurgeryGraph * pGraph, int i, int j){
 	return Distance(pGraph->pVerts[i], pGraph->pVerts[j]) + sum;
 }
 
-#pragma package(smart_init)
+
+
+

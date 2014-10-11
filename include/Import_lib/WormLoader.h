@@ -31,4 +31,8 @@ namespace Import {
 		void ReadWormIteration(meshes::IndexedFace *mesh, int iteration);
 		void ReadWormMesh(meshes::IndexedFace *mesh);
 	};
+
+#pragma region Additions
+	void FixNormals(meshes::IndexedFace *mesh, bool swap = false, bool fixTriangles = true);
+#pragma endregion
 }

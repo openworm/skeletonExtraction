@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{AB34318D-3B62-483B-91CC-596B42F22BA0}</ProjectGuid>
+    <ProjectGuid>{A45DBF7D-5E90-492F-A0A5-0BD463EB8C30}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>SDF_lib</RootNamespace>
   </PropertyGroup>
@@ -34,12 +34,17 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\props\CustomLibs_d.props" />
+    <Import Project="..\props\libs_d.props" />
+    <Import Project="..\props\inlineInclude.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetName>$(ProjectName)_d</TargetName>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>
@@ -74,6 +79,33 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Controllers\Assimp.cpp" />
+    <ClCompile Include="Controllers\Model.cpp" />
+    <ClCompile Include="Controllers\SDFController.cpp" />
+    <ClCompile Include="Helpers\MathHelper.cpp" />
+    <ClCompile Include="sdf_extractor.cpp" />
+    <ClCompile Include="SDF_Library.cpp" />
+    <ClCompile Include="Structures\Mesh\Face.cpp" />
+    <ClCompile Include="Structures\Mesh\Octree.cpp" />
+    <ClCompile Include="Structures\Mesh\Vertex.cpp" />
+    <ClCompile Include="Structures\ShapeDiameterFunction\CSDF.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Controllers\Assimp.h" />
+    <ClInclude Include="Controllers\Model.h" />
+    <ClInclude Include="Controllers\SDFController.h" />
+    <ClInclude Include="Helpers\MathHelper.h" />
+    <ClInclude Include="sdf_extractor.h" />
+    <ClInclude Include="SDF_Library.h" />
+    <ClInclude Include="Structures\Generic\LinkedList.h" />
+    <ClInclude Include="Structures\Math\Mat4.h" />
+    <ClInclude Include="Structures\Math\Vector4.h" />
+    <ClInclude Include="Structures\Mesh\Face.h" />
+    <ClInclude Include="Structures\Mesh\Octree.h" />
+    <ClInclude Include="Structures\Mesh\Vertex.h" />
+    <ClInclude Include="Structures\ShapeDiameterFunction\CSDF.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

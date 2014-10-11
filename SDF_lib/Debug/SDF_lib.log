@@ -1,9 +1,34 @@
-﻿Build started 8/31/2014 1:19:04 PM.
-     1>Project "D:\Projects\OpenWorm\SDF_lib\SDF_lib.vcxproj" on node 4 (Rebuild target(s)).
+﻿Build started 10/11/2014 6:01:10 PM.
+     1>Project "D:\Projects\OpenWorm\SDF_lib\SDF_lib.vcxproj" on node 2 (Rebuild target(s)).
      1>_PrepareForClean:
          Deleting file "Debug\SDF_lib.lastbuildstate".
        InitializeBuildStatus:
          Creating "Debug\SDF_lib.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt Controllers\Assimp.cpp Controllers\Model.cpp Controllers\SDFController.cpp Helpers\MathHelper.cpp sdf_extractor.cpp SDF_Library.cpp Structures\Mesh\Face.cpp Structures\Mesh\Octree.cpp Structures\Mesh\Vertex.cpp Structures\ShapeDiameterFunction\CSDF.cpp
+         CSDF.cpp
+         Vertex.cpp
+         Octree.cpp
+         Face.cpp
+         SDF_Library.cpp
+         sdf_extractor.cpp
+         MathHelper.cpp
+         SDFController.cpp
+         Model.cpp
+         Assimp.cpp
+         Generating Code...
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\Lib.exe /OUT:"D:\Projects\OpenWorm\Debug\SDF_lib_d.lib" /NOLOGO Debug\Assimp.obj
+         Debug\Model.obj
+         Debug\SDFController.obj
+         Debug\MathHelper.obj
+         Debug\sdf_extractor.obj
+         Debug\SDF_Library.obj
+         Debug\Face.obj
+         Debug\Octree.obj
+         Debug\Vertex.obj
+         Debug\CSDF.obj
+         SDF_lib.vcxproj -> D:\Projects\OpenWorm\Debug\SDF_lib_d.lib
        FinalizeBuildStatus:
          Deleting file "Debug\SDF_lib.unsuccessfulbuild".
          Touching "Debug\SDF_lib.lastbuildstate".
@@ -11,4 +36,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:00.06
+Time Elapsed 00:00:08.98

@@ -1,7 +1,9 @@
-﻿Build started 8/31/2014 1:19:59 PM.
-     1>Project "D:\Projects\OpenWorm\LBSE_lib\LBSE_lib.vcxproj" on node 2 (Build target(s)).
-     1>InitializeBuildStatus:
-         Touching "Debug\LBSE_lib.unsuccessfulbuild".
+﻿Build started 10/11/2014 6:30:01 PM.
+     1>Project "D:\Projects\OpenWorm\LBSE_lib\LBSE_lib.vcxproj" on node 2 (Rebuild target(s)).
+     1>_PrepareForClean:
+         Deleting file "Debug\LBSE_lib.lastbuildstate".
+       InitializeBuildStatus:
+         Creating "Debug\LBSE_lib.unsuccessfulbuild" because "AlwaysCreate" was specified.
        PreBuildEvent:
          Description: Generate include files
          if not exist "D:\Projects\OpenWorm\include\" mkdir "D:\Projects\OpenWorm\include\"
@@ -20,7 +22,7 @@
          lbse_iterationSolver.cpp
      1>C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\xutility(2176): warning C4996: 'std::_Copy_impl': Function call with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct. To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. See documentation on how to use Visual C++ 'Checked Iterators'
                  C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\xutility(2157) : see declaration of 'std::_Copy_impl'
-                 lbse_iterationSolver.cpp(2978) : see reference to function template instantiation '_OutIt std::copy<boost::numeric::ublas::vector<T,A>::iterator,boost::numeric::ublas::vector<T,A>::iterator>(_InIt,_InIt,_OutIt)' being compiled
+                 lbse_iterationSolver.cpp(3016) : see reference to function template instantiation '_OutIt std::copy<boost::numeric::ublas::vector<T,A>::iterator,boost::numeric::ublas::vector<T,A>::iterator>(_InIt,_InIt,_OutIt)' being compiled
                  with
                  [
                      _OutIt=boost::numeric::ublas::vector<float,boost::numeric::ublas::unbounded_array<float>>::iterator,
@@ -64,8 +66,8 @@
        FinalizeBuildStatus:
          Deleting file "Debug\LBSE_lib.unsuccessfulbuild".
          Touching "Debug\LBSE_lib.lastbuildstate".
-     1>Done Building Project "D:\Projects\OpenWorm\LBSE_lib\LBSE_lib.vcxproj" (Build target(s)).
+     1>Done Building Project "D:\Projects\OpenWorm\LBSE_lib\LBSE_lib.vcxproj" (Rebuild target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:20.61
+Time Elapsed 00:00:17.65

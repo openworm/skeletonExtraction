@@ -1,5 +1,5 @@
-﻿Build started 8/31/2014 1:19:04 PM.
-     1>Project "D:\Projects\OpenWorm\PCT_lib\PCT_lib.vcxproj" on node 5 (Rebuild target(s)).
+﻿Build started 10/11/2014 6:30:01 PM.
+     1>Project "D:\Projects\OpenWorm\PCT_lib\PCT_lib.vcxproj" on node 4 (Rebuild target(s)).
      1>_PrepareForClean:
          Deleting file "Debug\PCT_lib.lastbuildstate".
        InitializeBuildStatus:
@@ -35,4 +35,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:05.43
+Time Elapsed 00:00:05.74
