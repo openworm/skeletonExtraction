@@ -1,8 +1,6 @@
-﻿Build started 10/11/2014 6:30:01 PM.
-     1>Project "D:\Projects\OpenWorm\PCT_lib\PCT_lib.vcxproj" on node 4 (Rebuild target(s)).
-     1>_PrepareForClean:
-         Deleting file "Debug\PCT_lib.lastbuildstate".
-       InitializeBuildStatus:
+﻿Build started 10/13/2014 12:56:25 PM.
+     1>Project "D:\Projects\OpenWorm\PCT_lib\PCT_lib.vcxproj" on node 6 (Build target(s)).
+     1>InitializeBuildStatus:
          Creating "Debug\PCT_lib.unsuccessfulbuild" because "AlwaysCreate" was specified.
        PreBuildEvent:
          Description: Generate include files
@@ -31,8 +29,8 @@
        FinalizeBuildStatus:
          Deleting file "Debug\PCT_lib.unsuccessfulbuild".
          Touching "Debug\PCT_lib.lastbuildstate".
-     1>Done Building Project "D:\Projects\OpenWorm\PCT_lib\PCT_lib.vcxproj" (Rebuild target(s)).
+     1>Done Building Project "D:\Projects\OpenWorm\PCT_lib\PCT_lib.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:05.74
+Time Elapsed 00:00:06.95

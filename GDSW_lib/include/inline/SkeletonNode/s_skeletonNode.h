@@ -18,6 +18,7 @@ public:
 	CVector3 vTranslation;
 	CVector4 qRotation;
 	Array2D<float> currentAffine;
+	BonesMatrices();
 	void logAffine();
 	void computeAffineTransformation();
 	CVector4 getQuaternionFromAffine();

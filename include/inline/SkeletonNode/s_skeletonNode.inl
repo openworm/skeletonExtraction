@@ -1,6 +1,14 @@
 //---------------------------------------------------------------------------
 #include <inline/SkeletonNode/s_skeletonNode.h>
 
+
+inline BonesMatrices::BonesMatrices(){
+	currentAffine = Array2D< float >(4, 4, 0.0f);
+	for (int i=0; i < 4; i++)
+		currentAffine[i][i] = 1.0f;
+	qRotation = CVector4(1,0,0,0);
+}
+
 //---------------------------------------------------------------------------
 
 inline skl::SkeletonNode * findNodeWithId(skl::SkeletonNode * pRoot, std::string id){

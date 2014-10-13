@@ -2,6 +2,9 @@
 #pragma once
 #include "Vertex.h"
 #include "CSDF.h"
+#include <windows.h>
+#include <stdio.h>
+#include <assert.h>
 
 namespace MeshStructures
 {
@@ -17,7 +20,7 @@ namespace MeshStructures
 
 		void ComputeNormal();
 		void SetColor(int color);
-		void ComputeSDFValue(const std::vector<float> values, const std::vector<float> inverse_Yangles);
+		void ComputeSDFValue(const std::vector<float> &values, const std::vector<float> &inverse_Yangles);
 		LinkedList<Face>* GetSusedia();
 		void ComputeSusedov();
 
@@ -25,7 +28,9 @@ namespace MeshStructures
 		Vector4					normal;
 		Vector4					center;
 		int						farba;						// pre picking
-		CSDF*					diameter;
+		CSDF*					quality;
+		unsigned int			number;						// cislo v zozname
+		bool					checked;					// èi smne skontrolovali pri robeni susedov
 	private:
 		LinkedList<Face>* susedia;
 		//const struct aiFace*	assimp_ref;

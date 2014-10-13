@@ -1,5 +1,6 @@
 // kratky subor s funkciami na matiku
 //#include "stdafx.h"
+
 #include "MathHelper.h"
 
 // get radians from degrees

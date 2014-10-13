@@ -9,6 +9,7 @@
 #include <LBSE_lib/lbse_skeleton.h>
 
 #include <SDF_lib/sdf_extractor.h>
+#include <SDF_lib/Helpers/SDFSettings.h>
 
 #include <Import_lib/WormLoader.h>
 #include <Export_lib/ColladaExporter.h>
@@ -31,9 +32,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	string colladaMeshFile;
 	string colladaMeshAndSkeletonFile;
 	string colladaAnimationFile;
+	string openCLKernelPath;
 
 	string transformationsMatrixFile;
 	string transformationsQuaternionFile;
+
+	Nastavenia->CLKernelPath = openCLKernelPath;
 
 /*******************************************************************************************************************************/
 //                                    BASIC OBJECTS
@@ -67,6 +71,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	oLBSExtractor.wH = 1.0;
 	oLBSExtractor.sL = 3.0;*/
 	oLBSExtractor.wantedNumOfBones = 24;
+
+	Nastavenia->SDF_Mode = SDF_CPU; // or SDF_GPU
 
 /*******************************************************************************************************************************/
 	// [1] Read the worm particles w/wo triangulation and transform it into meshgraph stucture (using importer)

@@ -53,7 +53,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(IncludePath)</IncludePath>
+    <IncludePath>$(IncludePath);$(SolutionDir)\include\;$(SolutionDir)\Lib\include\;$(SolutionDir)\include\inline;$(SolutionDir)\include\SDF_lib\Controllers;$(SolutionDir)\include\SDF_lib\Helpers;$(SolutionDir)\include\SDF_lib\Structures;$(SolutionDir)\include\SDF_lib\Structures\Generic;$(SolutionDir)\include\SDF_lib\Structures\Math;$(SolutionDir)\include\SDF_lib\Structures\Mesh;$(SolutionDir)\include\SDF_lib\Structures\ShapeDiameterFunction</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>

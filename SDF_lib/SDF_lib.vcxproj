@@ -44,6 +44,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>$(ProjectName)_d</TargetName>
+    <IncludePath>$(IncludePath);$(SolutionDir)\include\;$(SolutionDir)\include\SDF_lib\Controllers;$(SolutionDir)\include\SDF_lib\Helpers;$(SolutionDir)\include\SDF_lib\Structures;$(SolutionDir)\include\SDF_lib\Structures\Generic;$(SolutionDir)\include\SDF_lib\Structures\Math;$(SolutionDir)\include\SDF_lib\Structures\Mesh;$(SolutionDir)\include\SDF_lib\Structures\ShapeDiameterFunction;$(SolutionDir)\include\SDF_lib\</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -58,6 +59,14 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PreBuildEvent>
+      <Command>if not exist "$(SolutionDir)include\" mkdir "$(SolutionDir)include\"
+if not exist "$(SolutionDir)include\$(ProjectName)\" mkdir "$(SolutionDir)include\$(ProjectName)\"
+xcopy "$(ProjectDir)*.h"  "$(SolutionDir)include\$(ProjectName)\" /y /e</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Generate include files</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -85,10 +94,18 @@
     <ClCompile Include="Controllers\Model.cpp" />
     <ClCompile Include="Controllers\SDFController.cpp" />
     <ClCompile Include="Helpers\MathHelper.cpp" />
+    <ClCompile Include="Helpers\mtrand.cpp" />
+    <ClCompile Include="Helpers\SDFSettings.cpp" />
+    <ClCompile Include="Helpers\StringHelper.cpp" />
+    <ClCompile Include="OpenCLDebug.cpp" />
+    <ClCompile Include="SDFOpenCL.cpp" />
     <ClCompile Include="sdf_extractor.cpp" />
     <ClCompile Include="SDF_Library.cpp" />
     <ClCompile Include="Structures\Mesh\Face.cpp" />
+    <ClCompile Include="Structures\Mesh\Grid.cpp" />
     <ClCompile Include="Structures\Mesh\Octree.cpp" />
+    <ClCompile Include="Structures\Mesh\PPoint.cpp" />
+    <ClCompile Include="Structures\Mesh\ROctree.cpp" />
     <ClCompile Include="Structures\Mesh\Vertex.cpp" />
     <ClCompile Include="Structures\ShapeDiameterFunction\CSDF.cpp" />
   </ItemGroup>
@@ -97,15 +114,29 @@
     <ClInclude Include="Controllers\Model.h" />
     <ClInclude Include="Controllers\SDFController.h" />
     <ClInclude Include="Helpers\MathHelper.h" />
+    <ClInclude Include="Helpers\mtrand.h" />
+    <ClInclude Include="Helpers\SDFSettings.h" />
+    <ClInclude Include="Helpers\StringHelper.h" />
+    <ClInclude Include="OpenCLDebug.h" />
+    <ClInclude Include="SDFOpenCL.h" />
     <ClInclude Include="sdf_extractor.h" />
     <ClInclude Include="SDF_Library.h" />
     <ClInclude Include="Structures\Generic\LinkedList.h" />
     <ClInclude Include="Structures\Math\Mat4.h" />
     <ClInclude Include="Structures\Math\Vector4.h" />
     <ClInclude Include="Structures\Mesh\Face.h" />
+    <ClInclude Include="Structures\Mesh\Grid.h" />
     <ClInclude Include="Structures\Mesh\Octree.h" />
+    <ClInclude Include="Structures\Mesh\PPoint.h" />
+    <ClInclude Include="Structures\Mesh\ROctree.h" />
     <ClInclude Include="Structures\Mesh\Vertex.h" />
     <ClInclude Include="Structures\ShapeDiameterFunction\CSDF.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="OpenCLKernels\proces.cl" />
+    <None Include="OpenCLKernels\sdf.cl" />
+    <None Include="OpenCLKernels\sdf2.cl" />
+    <None Include="OpenCLKernels\smooth.cl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

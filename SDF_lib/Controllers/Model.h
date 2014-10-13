@@ -12,6 +12,7 @@ namespace ModelController
 {
 	using namespace std;
 	using namespace AssimpFileHandler;
+	//using namespace VCGFileHandler;
 	using namespace SDFController;
 
 	const int color_step = 4;
@@ -26,46 +27,62 @@ namespace ModelController
 		void logDebug(string logString);
 
 		void LoadFile(string Filename);
+		void LoadFileVCG(string Filename);
+		void SaveModel(string Filename);
 		void LoadAssimp(aiScene* scene);
 		//float GetSDF(const struct aiFace* face, bool smoothed);
-		void Triangulate();
 		float* GetSDF(int& size, bool smoothed);
 		float* GetNormals(int& size);
-		void SetNewPositions(float* pos);
+		void CopySDF_Vertices_to_Faces();
+		void CopySDF_Faces_to_Vertices();
 		void ResetSettings();
+		void AssignNumber();
 		void ComputeBoundary();
 		void CreateOctree();
 		void SetColors();
+		void RecomputeNormals();
 		void ComputeSusedov();
 		void GetBoundary(float &siz, float &x, float &y, float &z);
-		void DrawModel();
-		void ColorToRGB(int color, unsigned char &R, unsigned char &G, unsigned char &B);
-		void HLSToRGB(float SDF_value, unsigned char &R, unsigned char &G, unsigned char &B);
-		void setDrawMode(int mode);
-		int getDrawMode();
-		int GetTriangleCount();
-		void ProcessPick(int x, int y);
+		//void DrawModel();
+		//void ColorToRGB(int color, GLubyte &R, GLubyte &G, GLubyte &B);
+		//void HLSToRGB(float SDF_value, GLubyte &R, GLubyte &G, GLubyte &B);
+		//void ProcessPick(int x, int y);
 		void ComputeSDF();
+		void TriangulatePoints();
+		void ReloadOctreeData();
+		void SetNewPositions(float* pos);
 		void DeleteIdenticalVertices();
-		void RecomputeNormals();
+		void EraseIdenticalVertices();
+		void BuildArrays();
+		void ComputeSoftNormals();
+		void MergeResults(LinkedList<Face>* triangles_backup, LinkedList<Vertex>* points_backup);
+		void RecomputeSmoothing();
+		void NormalizeTextureCoords();
+		unsigned char*** GetTexture();
+		void SmoothTexture();
 
 		bool loaded;
 		bool show_octree;
 		bool show_normals;
 		Face* selected;
-
+		//GLfloat Look_X, Look_Y, Look_Z;
 	private:
 		CAssimp* Assimp;
+		//CVCG* VCGlib;
 		CSDFController* SDF_control;
 		LinkedList<Face>* triangles;
 		LinkedList<Vertex>* points;
 		Octree* m_root;
-		int draw_mode;						// 0 picking (default), 1 selected triangle, 2 SDF, 3 wireframe
 
 		// rozmery modelu
-		Vector4		b_stred;				// center of minN - maxN
-		float		b_size;					// size for octree
-		float		b_sf;					// scale factor
-		float		b_max;					// diagonala v octree
+		Vector4				b_stred;		// center of minN - maxN
+		float				b_size;			// size for octree
+		float				b_sf;			// scale factor
+		float				b_max;			// diagonala v octree
+		Vector4				o_min;
+		Vector4				o_max;
+		unsigned int		nodeCount;
+		unsigned int		leafCount;
+		unsigned int		triangleCount;
 	};
 }

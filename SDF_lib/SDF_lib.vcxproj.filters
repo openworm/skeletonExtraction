@@ -49,6 +49,9 @@
     <Filter Include="Header Files\Structures\SDF">
       <UniqueIdentifier>{bcfec9e6-ada4-4f99-bb96-b8ee91435411}</UniqueIdentifier>
     </Filter>
+    <Filter Include="OpenCLKernels">
+      <UniqueIdentifier>{1225e73d-d63b-434e-8486-5f612cd0a5e4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -83,6 +86,30 @@
     </ClCompile>
     <ClCompile Include="Structures\ShapeDiameterFunction\CSDF.cpp">
       <Filter>Source Files\Structures\SDF</Filter>
+    </ClCompile>
+    <ClCompile Include="Helpers\StringHelper.cpp">
+      <Filter>Source Files\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="Helpers\SDFSettings.cpp">
+      <Filter>Source Files\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="Structures\Mesh\ROctree.cpp">
+      <Filter>Source Files\Structures\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Structures\Mesh\PPoint.cpp">
+      <Filter>Source Files\Structures\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Structures\Mesh\Grid.cpp">
+      <Filter>Source Files\Structures\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="SDFOpenCL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenCLDebug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Helpers\mtrand.cpp">
+      <Filter>Source Files\Helpers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -125,5 +152,43 @@
     <ClInclude Include="Structures\ShapeDiameterFunction\CSDF.h">
       <Filter>Header Files\Structures\SDF</Filter>
     </ClInclude>
+    <ClInclude Include="Helpers\StringHelper.h">
+      <Filter>Header Files\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\SDFSettings.h">
+      <Filter>Header Files\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Structures\Mesh\ROctree.h">
+      <Filter>Header Files\Structures\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Structures\Mesh\PPoint.h">
+      <Filter>Header Files\Structures\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Structures\Mesh\Grid.h">
+      <Filter>Header Files\Structures\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="SDFOpenCL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenCLDebug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\mtrand.h">
+      <Filter>Header Files\Helpers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="OpenCLKernels\smooth.cl">
+      <Filter>OpenCLKernels</Filter>
+    </None>
+    <None Include="OpenCLKernels\sdf2.cl">
+      <Filter>OpenCLKernels</Filter>
+    </None>
+    <None Include="OpenCLKernels\sdf.cl">
+      <Filter>OpenCLKernels</Filter>
+    </None>
+    <None Include="OpenCLKernels\proces.cl">
+      <Filter>OpenCLKernels</Filter>
+    </None>
   </ItemGroup>
 </Project>

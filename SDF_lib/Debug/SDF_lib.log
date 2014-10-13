@@ -1,19 +1,65 @@
-﻿Build started 10/11/2014 6:01:10 PM.
-     1>Project "D:\Projects\OpenWorm\SDF_lib\SDF_lib.vcxproj" on node 2 (Rebuild target(s)).
-     1>_PrepareForClean:
-         Deleting file "Debug\SDF_lib.lastbuildstate".
-       InitializeBuildStatus:
+﻿Build started 10/13/2014 12:56:25 PM.
+     1>Project "D:\Projects\OpenWorm\SDF_lib\SDF_lib.vcxproj" on node 7 (Build target(s)).
+     1>InitializeBuildStatus:
          Creating "Debug\SDF_lib.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       PreBuildEvent:
+         Description: Generate include files
+         if not exist "D:\Projects\OpenWorm\include\" mkdir "D:\Projects\OpenWorm\include\"
+         if not exist "D:\Projects\OpenWorm\include\SDF_lib\" mkdir "D:\Projects\OpenWorm\include\SDF_lib\"
+         xcopy "D:\Projects\OpenWorm\SDF_lib\*.h"  "D:\Projects\OpenWorm\include\SDF_lib\" /y /e
+         D:\Projects\OpenWorm\SDF_lib\OpenCLDebug.h
+         D:\Projects\OpenWorm\SDF_lib\SDFOpenCL.h
+         D:\Projects\OpenWorm\SDF_lib\sdf_extractor.h
+         D:\Projects\OpenWorm\SDF_lib\SDF_Library.h
+         D:\Projects\OpenWorm\SDF_lib\Controllers\Assimp.h
+         D:\Projects\OpenWorm\SDF_lib\Controllers\Model.h
+         D:\Projects\OpenWorm\SDF_lib\Controllers\OpenGL.h
+         D:\Projects\OpenWorm\SDF_lib\Controllers\SDFController.h
+         D:\Projects\OpenWorm\SDF_lib\Controllers\VCG_lib.h
+         D:\Projects\OpenWorm\SDF_lib\Helpers\MathHelper.h
+         D:\Projects\OpenWorm\SDF_lib\Helpers\mtrand.h
+         D:\Projects\OpenWorm\SDF_lib\Helpers\SDFSettings.h
+         D:\Projects\OpenWorm\SDF_lib\Helpers\StringHelper.h
+         D:\Projects\OpenWorm\SDF_lib\Shaders\BlurObject.h
+         D:\Projects\OpenWorm\SDF_lib\Shaders\FrameBufferObject.h
+         D:\Projects\OpenWorm\SDF_lib\Shaders\ShaderObject.h
+         D:\Projects\OpenWorm\SDF_lib\Shaders\TextureDataObject.h
+         D:\Projects\OpenWorm\SDF_lib\Shaders\TextureObject.h
+         D:\Projects\OpenWorm\SDF_lib\Structures\Generic\HashTable.h
+         D:\Projects\OpenWorm\SDF_lib\Structures\Generic\LinkedList.h
+         D:\Projects\OpenWorm\SDF_lib\Structures\Math\Mat4.h
+         D:\Projects\OpenWorm\SDF_lib\Structures\Math\Vector4.h
+         D:\Projects\OpenWorm\SDF_lib\Structures\Mesh\Face.h
+         D:\Projects\OpenWorm\SDF_lib\Structures\Mesh\Grid.h
+         D:\Projects\OpenWorm\SDF_lib\Structures\Mesh\Octree.h
+         D:\Projects\OpenWorm\SDF_lib\Structures\Mesh\PPoint.h
+         D:\Projects\OpenWorm\SDF_lib\Structures\Mesh\ROctree.h
+         D:\Projects\OpenWorm\SDF_lib\Structures\Mesh\Vertex.h
+         D:\Projects\OpenWorm\SDF_lib\Structures\ShapeDiameterFunction\CSDF.h
+         29 File(s) copied
        ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt Controllers\Assimp.cpp Controllers\Model.cpp Controllers\SDFController.cpp Helpers\MathHelper.cpp sdf_extractor.cpp SDF_Library.cpp Structures\Mesh\Face.cpp Structures\Mesh\Octree.cpp Structures\Mesh\Vertex.cpp Structures\ShapeDiameterFunction\CSDF.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt Controllers\Assimp.cpp Controllers\Model.cpp Controllers\SDFController.cpp Helpers\MathHelper.cpp Helpers\mtrand.cpp Helpers\SDFSettings.cpp Helpers\StringHelper.cpp OpenCLDebug.cpp SDFOpenCL.cpp sdf_extractor.cpp SDF_Library.cpp Structures\Mesh\Face.cpp Structures\Mesh\Grid.cpp Structures\Mesh\Octree.cpp Structures\Mesh\PPoint.cpp Structures\Mesh\ROctree.cpp Structures\Mesh\Vertex.cpp Structures\ShapeDiameterFunction\CSDF.cpp
          CSDF.cpp
          Vertex.cpp
+         ROctree.cpp
+         PPoint.cpp
          Octree.cpp
+         Grid.cpp
          Face.cpp
          SDF_Library.cpp
          sdf_extractor.cpp
+         SDFOpenCL.cpp
+         OpenCLDebug.cpp
+         StringHelper.cpp
+         SDFSettings.cpp
+         mtrand.cpp
          MathHelper.cpp
          SDFController.cpp
+     1>d:\projects\openworm\sdf_lib\controllers\sdfcontroller.cpp(2956): warning C4018: '<=' : signed/unsigned mismatch
+     1>d:\projects\openworm\sdf_lib\controllers\sdfcontroller.cpp(3041): warning C4018: '<' : signed/unsigned mismatch
+     1>d:\projects\openworm\sdf_lib\controllers\sdfcontroller.cpp(3043): warning C4018: '<' : signed/unsigned mismatch
+     1>d:\projects\openworm\sdf_lib\controllers\sdfcontroller.cpp(3045): warning C4018: '<' : signed/unsigned mismatch
+     1>d:\projects\openworm\sdf_lib\controllers\sdfcontroller.cpp(3050): warning C4018: '>' : signed/unsigned mismatch
          Model.cpp
          Assimp.cpp
          Generating Code...
@@ -22,18 +68,26 @@
          Debug\Model.obj
          Debug\SDFController.obj
          Debug\MathHelper.obj
+         Debug\mtrand.obj
+         Debug\SDFSettings.obj
+         Debug\StringHelper.obj
+         Debug\OpenCLDebug.obj
+         Debug\SDFOpenCL.obj
          Debug\sdf_extractor.obj
          Debug\SDF_Library.obj
          Debug\Face.obj
+         Debug\Grid.obj
          Debug\Octree.obj
+         Debug\PPoint.obj
+         Debug\ROctree.obj
          Debug\Vertex.obj
          Debug\CSDF.obj
          SDF_lib.vcxproj -> D:\Projects\OpenWorm\Debug\SDF_lib_d.lib
        FinalizeBuildStatus:
          Deleting file "Debug\SDF_lib.unsuccessfulbuild".
          Touching "Debug\SDF_lib.lastbuildstate".
-     1>Done Building Project "D:\Projects\OpenWorm\SDF_lib\SDF_lib.vcxproj" (Rebuild target(s)).
+     1>Done Building Project "D:\Projects\OpenWorm\SDF_lib\SDF_lib.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:08.98
+Time Elapsed 00:00:17.94
