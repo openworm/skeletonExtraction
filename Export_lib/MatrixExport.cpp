@@ -34,6 +34,11 @@ namespace Export {
 			output << node->matrices.qRotation.s << " " << node->matrices.qRotation.i << " " << node->matrices.qRotation.j << " " << node->matrices.qRotation.k << std::endl;
 		}
 
+		void ExportAxisAngle(skl::SkeletonNode *node, std::ofstream &output) {
+			CVector4 axisAngle = QuaternionToAxisAngle(node->matrices.qRotation);
+			output << axisAngle.s * (180.0 / PI) << " " << axisAngle.i << " " << axisAngle.j << " " << axisAngle.k << std::endl;
+		}
+
 		void ExportAffineMatrix(skl::SkeletonNode *node, std::ofstream &output) {
 			for (int i = 0; i < 4; i++) {
 				for (int j = 0; j < 4; j++) {
@@ -66,6 +71,10 @@ namespace Export {
 
 	void SaveQuaternionsToFile(skl::SkeletonNode *skeleton, std::string fileName) {
 		SaveToFile(skeleton, fileName, ExportQRotation);
+	}
+
+	void SaveAxisAngleToFile(skl::SkeletonNode *skeleton, std::string fileName){
+		SaveToFile(skeleton, fileName, ExportAxisAngle);
 	}
 
 	void SaveMatricesToFile(skl::SkeletonNode *skeleton, std::string fileName) {

@@ -519,7 +519,7 @@ void createSkeletonFromSurgeryGraphSDFTest(SurgeryGraph * pGraph, CVector3 * mod
 	SN::SkeletonNode imaginaryCenter;
 	imaginaryCenter.point = CVector3(0,0,0);
 	root->father = &imaginaryCenter;
-	//((skl::SkeletonNode *)root)->bindPoseMatrices.qRotation = CVector4(0,1,0,0);//QuaternionBetweenVectors(CVector3(0,0,-1), root->point);
+	//((skl::SkeletonNode *)root)->bindPoseMatrices.qRotation = CVector4(1,0,0,0);//QuaternionBetweenVectors(CVector3(0,0,-1), root->point);
 	root->cyclic = NULL;
 	//Array2D<float>rotationMatrix = QuaternionToMatrix3x3(((skl::SkeletonNode*)root)->bindPoseMatrices.qRotation);
 	//Array2D<float>invRotationMatrix = rotationMatrix.invert(rotationMatrix);
@@ -618,7 +618,7 @@ void createSkeletonFromSurgeryGraphSDFTest(SurgeryGraph * pGraph, CVector3 * mod
 					
 						current.vTranslation = TntVecToCVec(invRotatedTrans);*/
 
-						//current.qRotation = CVector4(0,1,0,0);
+						//current.qRotation = CVector4(1,0,0,0);
 						//current.vTranslation = n1->point - node->point;
 
 						//current.computeAffineTransformation();
@@ -814,7 +814,7 @@ void createSkeletonFromSurgeryGraph(bool applyLBSEPostprocessing, SurgeryGraph *
 	SN::SkeletonNode imaginaryCenter;
 	imaginaryCenter.point = CVector3(0,0,0);
 	root->father = &imaginaryCenter;
-	//((skl::SkeletonNode *)root)->bindPoseMatrices.qRotation = CVector4(0,1,0,0);//QuaternionBetweenVectors(CVector3(0,0,-1), root->point);
+	//((skl::SkeletonNode *)root)->bindPoseMatrices.qRotation = CVector4(1,0,0,0);//QuaternionBetweenVectors(CVector3(0,0,-1), root->point);
 	root->cyclic = NULL;
 	//Array2D<float>rotationMatrix = QuaternionToMatrix3x3(((skl::SkeletonNode*)root)->bindPoseMatrices.qRotation);
 	//Array2D<float>invRotationMatrix = rotationMatrix.invert(rotationMatrix);
@@ -913,7 +913,7 @@ void createSkeletonFromSurgeryGraph(bool applyLBSEPostprocessing, SurgeryGraph *
 					
 						current.vTranslation = TntVecToCVec(invRotatedTrans);*/
 
-						//current.qRotation = CVector4(0,1,0,0);
+						//current.qRotation = CVector4(1,0,0,0);
 						//current.vTranslation = n1->point - node->point;
 
 						//current.computeAffineTransformation();

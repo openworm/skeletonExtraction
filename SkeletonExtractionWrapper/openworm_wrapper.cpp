@@ -195,6 +195,7 @@ void Openworm_Wrapper::calculateAndExportSkeletonTransformationsForTimestep(int 
 
 	// send new skeleton rotations to shader
 	Export::SaveQuaternionsToFile(pSkeletonRootForTimestep, filePath + "animation\\quaternion_" + std::to_string(oLBSExtractor.currentNumberOfSkeletonBones - 1) + "S_" + std::to_string(timeStep) + ".qua" );
+	Export::SaveAxisAngleToFile(pSkeletonRootForTimestep, filePath + "animation\\quaternion_" + std::to_string(oLBSExtractor.currentNumberOfSkeletonBones - 1) + "S_" + std::to_string(timeStep) + ".exa" );
 	Export::SaveMatricesToFile(pSkeletonRootForTimestep, filePath + "animation\\matrix_" + std::to_string(oLBSExtractor.currentNumberOfSkeletonBones - 1) + "S_" + std::to_string(timeStep) + ".mat");
 
 	exporter->Export(meshImport, pSkeletonRootForTimestep, filePath + "animation\\model_" + std::to_string(oLBSExtractor.currentNumberOfSkeletonBones - 1) + "S_" + std::to_string(timeStep) + ".dae");

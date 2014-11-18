@@ -6,7 +6,7 @@ inline BonesMatrices::BonesMatrices(){
 	currentAffine = Array2D< float >(4, 4, 0.0f);
 	for (int i=0; i < 4; i++)
 		currentAffine[i][i] = 1.0f;
-	qRotation = CVector4(0,1,0,0);
+	qRotation = CVector4(1,0,0,0);
 }
 
 //---------------------------------------------------------------------------
@@ -76,13 +76,13 @@ inline void copySNSkeletonNodeToSklImpl(SN::SkeletonNode * src, skl::SkeletonNod
 
 	BonesMatrices bindPoseMatrices;
 
-	bindPoseMatrices.qRotation = CVector4(0,1,0,0);
+	bindPoseMatrices.qRotation = CVector4(1,0,0,0);
 	bindPoseMatrices.vTranslation = src->point;
 	bindPoseMatrices.computeAffineTransformation();
 
 	BonesMatrices matrices;
 
-	matrices.qRotation = CVector4(0,1,0,0);
+	matrices.qRotation = CVector4(1,0,0,0);
 	matrices.vTranslation = src->point;
 	matrices.computeAffineTransformation();
 

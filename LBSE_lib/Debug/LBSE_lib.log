@@ -1,5 +1,5 @@
-﻿Build started 11/18/2014 2:30:02 PM.
-     1>Project "D:\Projects\OpenWorm\LBSE_lib\LBSE_lib.vcxproj" on node 2 (Rebuild target(s)).
+﻿Build started 11/18/2014 5:17:06 PM.
+     1>Project "D:\Projects\OpenWorm\LBSE_lib\LBSE_lib.vcxproj" on node 4 (Rebuild target(s)).
      1>_PrepareForClean:
          Deleting file "Debug\LBSE_lib.lastbuildstate".
        InitializeBuildStatus:
@@ -70,4 +70,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:18.02
+Time Elapsed 00:00:19.66
