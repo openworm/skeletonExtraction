@@ -24,9 +24,6 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Wrapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\inline\meshes\CVectorMesh.h">
       <Filter>inline libs</Filter>
     </ClInclude>
@@ -57,12 +54,15 @@
     <ClInclude Include="..\include\inline\SkeletonNode\SkeletonNode.h">
       <Filter>inline libs</Filter>
     </ClInclude>
+    <ClInclude Include="openworm_wrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SkeletonExtractionWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Wrapper.cpp">
+    <ClCompile Include="openworm_wrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

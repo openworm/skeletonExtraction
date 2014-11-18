@@ -38,14 +38,14 @@ inline void Timerlog::logExecutionTimes(){
 		char t[255];
 
 		if (secDiff >= 1.0){
-			sprintf ( t, "Timer(%s) :: %s :: %i sec and %02i milisec", 
+			sprintf_s ( t, 255, "Timer(%s) :: %s :: %i sec and %02i milisec", 
 				timerName,
 				start.name,
 				(int)secDiff,
 				milisecDiff
 				);
 		} else {
-			sprintf ( t, "Timer(%s) :: %s :: %02i milisec", 
+			sprintf_s ( t, 255, "Timer(%s) :: %s :: %02i milisec", 
 				timerName,
 				start.name,
 				milisecDiff

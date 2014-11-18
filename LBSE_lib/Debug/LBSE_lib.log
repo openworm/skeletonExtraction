@@ -1,6 +1,8 @@
-﻿Build started 10/13/2014 12:56:25 PM.
-     1>Project "D:\Projects\OpenWorm\LBSE_lib\LBSE_lib.vcxproj" on node 2 (Build target(s)).
-     1>InitializeBuildStatus:
+﻿Build started 11/18/2014 2:30:02 PM.
+     1>Project "D:\Projects\OpenWorm\LBSE_lib\LBSE_lib.vcxproj" on node 2 (Rebuild target(s)).
+     1>_PrepareForClean:
+         Deleting file "Debug\LBSE_lib.lastbuildstate".
+       InitializeBuildStatus:
          Creating "Debug\LBSE_lib.unsuccessfulbuild" because "AlwaysCreate" was specified.
        PreBuildEvent:
          Description: Generate include files
@@ -64,8 +66,8 @@
        FinalizeBuildStatus:
          Deleting file "Debug\LBSE_lib.unsuccessfulbuild".
          Touching "Debug\LBSE_lib.lastbuildstate".
-     1>Done Building Project "D:\Projects\OpenWorm\LBSE_lib\LBSE_lib.vcxproj" (Build target(s)).
+     1>Done Building Project "D:\Projects\OpenWorm\LBSE_lib\LBSE_lib.vcxproj" (Rebuild target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:22.00
+Time Elapsed 00:00:18.02

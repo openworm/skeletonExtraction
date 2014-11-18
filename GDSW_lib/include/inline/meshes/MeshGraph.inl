@@ -559,7 +559,10 @@ inline void createMeshGraph(meshes::IndexedFace *mesh, MeshGraph * pMesh, float 
 		pMesh->triangleIndices = NULL;
 	
 		pMesh->triangleIndices = new int[mesh->indices.size()];
-		pMesh->triangleIndices = &(mesh->indices[0]);
+
+		for (int i=0; i < mesh->vertices.size() / 3; i++){
+			pMesh->triangleIndices[i] = mesh->indices[i];
+		}
 
 		pMesh->numOfFaces = mesh->indices.size() / 3;
 	}
@@ -570,6 +573,8 @@ inline void createMeshGraph(meshes::IndexedFace *mesh, MeshGraph * pMesh, float 
 		pMesh->indices[i] = i;
 	}
 
+	delete[] pMesh->origOneRingArea;
+	pMesh->origOneRingArea = NULL;
 	pMesh->origOneRingArea = new float[pMesh->numOfVertices];
 
 	pMesh->E = Array2D<bool>(pMesh->numOfVertices,pMesh->numOfVertices, false);

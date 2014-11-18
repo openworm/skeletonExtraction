@@ -9,7 +9,9 @@
 
 #include <SDF_lib/SDF_Library.h>
 
-//#include <GLDebugger/gldebugger.h>
+#ifdef _GLD
+	#include <GLD_lib/gldebugger.h>
+#endif
 
 using namespace mmath;
 using namespace meshes;

@@ -85,6 +85,9 @@ struct MeshGraph {
 		gMeshgraphLinesVB = -1;
 		gMeshgraphColorsVB = -1;
 		triangleIndices = new int[0];
+		numOfFaces = 0;
+		numOfVBOlines = 0;
+		numOfVertices = 0;
 	}
 	~MeshGraph(){
 		delete[] pVerts;

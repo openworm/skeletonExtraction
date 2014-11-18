@@ -124,7 +124,11 @@ inline void Log::log(int level, TNT::Array2D< float > matrix){
 	for (int i = 0; i < matrix.dim1(); i++) {
 		std::string row;
 		for (int j = 0; j < matrix.dim2(); j++) {
-			std::string s = std::to_string(matrix[i][j]);
+			std::string s;
+			if (matrix[i][j] < FLT_MAX)
+				s = std::to_string(matrix[i][j]);
+			else
+				s = "X";
 			int l = floatlength;
 			if (s.length() < floatlength)
 				l = s.length();

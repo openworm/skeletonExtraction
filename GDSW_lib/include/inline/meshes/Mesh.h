@@ -37,5 +37,6 @@ namespace meshes {
 		std::vector<int> materialIndices;
 
 		Mesh() : IndexedFace() {};
+		~Mesh() {};
 	};
 }

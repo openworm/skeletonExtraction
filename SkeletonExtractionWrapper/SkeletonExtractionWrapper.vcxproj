@@ -20,7 +20,8 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v110</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
+    <CLRSupport>true</CLRSupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -77,22 +78,41 @@ xcopy "D:\Projects\_shared\include\inline\mmath\*.*"  "D:\Projects\OpenWorm\GDSW
 xcopy "D:\Projects\_shared\include\inline\SkeletonNode\*.*"  "D:\Projects\OpenWorm\GDSW_lib\include\inline\SkeletonNode\" /y /e
 
 xcopy "D:\Projects\_shared\GDSW_lib\*.h"  "D:\Projects\OpenWorm\GDSW_lib\" /y /e
+xcopy "D:\Projects\_shared\GDSW_lib\*.h"  "D:\Projects\OpenWorm\include\GDSW_lib\" /y /e
 xcopy "D:\Projects\_shared\GDSW_lib\*.cpp"  "D:\Projects\OpenWorm\GDSW_lib\" /y /e
+xcopy "D:\Projects\_shared\GDSW_lib\*.cpp"  "D:\Projects\OpenWorm\include\GDSW_lib\" /y /e
+
+xcopy "D:\Projects\_shared\LBSE_lib\*.h"  "D:\Projects\OpenWorm\LBSE_lib\" /y /e
+xcopy "D:\Projects\_shared\LBSE_lib\*.h"  "D:\Projects\OpenWorm\include\LBSE_lib\" /y /e
+xcopy "D:\Projects\_shared\LBSE_lib\*.cpp"  "D:\Projects\OpenWorm\LBSE_lib\" /y /e
+xcopy "D:\Projects\_shared\LBSE_lib\*.cpp"  "D:\Projects\OpenWorm\include\LBSE_lib\" /y /e
 
 xcopy "D:\Projects\_shared\PCT_lib\*.h"  "D:\Projects\OpenWorm\PCT_lib\" /y /e
+xcopy "D:\Projects\_shared\PCT_lib\*.h"  "D:\Projects\OpenWorm\include\PCT_lib\" /y /e
 xcopy "D:\Projects\_shared\PCT_lib\*.cpp"  "D:\Projects\OpenWorm\PCT_lib\" /y /e
+xcopy "D:\Projects\_shared\PCT_lib\*.cpp"  "D:\Projects\OpenWorm\include\PCT_lib\" /y /e
 
 xcopy "D:\Projects\_shared\SDF_lib\*.h"  "D:\Projects\OpenWorm\SDF_lib\" /y /e
+xcopy "D:\Projects\_shared\SDF_lib\*.h"  "D:\Projects\OpenWorm\include\SDF_lib\" /y /e
 xcopy "D:\Projects\_shared\SDF_lib\*.cpp"  "D:\Projects\OpenWorm\SDF_lib\" /y /e
+xcopy "D:\Projects\_shared\SDF_lib\*.cpp"  "D:\Projects\OpenWorm\include\SDF_lib\" /y /e
 
 xcopy "D:\Projects\_shared\SM_lib\*.h"  "D:\Projects\OpenWorm\SM_lib\" /y /e
+xcopy "D:\Projects\_shared\SM_lib\*.h"  "D:\Projects\OpenWorm\include\SM_lib\" /y /e
 xcopy "D:\Projects\_shared\SM_lib\*.cpp"  "D:\Projects\OpenWorm\SM_lib\" /y /e
+xcopy "D:\Projects\_shared\SM_lib\*.cpp"  "D:\Projects\OpenWorm\include\SM_lib\" /y /e
 
 xcopy "D:\Projects\_shared\Import_lib\*.h"  "D:\Projects\OpenWorm\Import_lib\" /y /e
+xcopy "D:\Projects\_shared\Import_lib\*.h"  "D:\Projects\OpenWorm\include\Import_lib\" /y /e
 xcopy "D:\Projects\_shared\Import_lib\*.cpp"  "D:\Projects\OpenWorm\Import_lib\" /y /e
+xcopy "D:\Projects\_shared\Import_lib\*.cpp"  "D:\Projects\OpenWorm\include\Import_lib\" /y /e
 
 xcopy "D:\Projects\_shared\Export_lib\*.h"  "D:\Projects\OpenWorm\Export_lib\" /y /e
+xcopy "D:\Projects\_shared\Export_lib\*.h"  "D:\Projects\OpenWorm\include\Export_lib\" /y /e
 xcopy "D:\Projects\_shared\Export_lib\*.cpp"  "D:\Projects\OpenWorm\Export_lib\" /y /e
+xcopy "D:\Projects\_shared\Export_lib\*.cpp"  "D:\Projects\OpenWorm\include\Export_lib\" /y /e
+
+xcopy "D:\Projects\_shared\Skeletor\Wrappers\openworm_wrapper.*"  "D:\Projects\OpenWorm\SkeletonExtractionWrapper\" /y /e
 
 </Command>
     </PreBuildEvent>
@@ -132,12 +152,12 @@ xcopy "D:\Projects\_shared\Export_lib\*.cpp"  "D:\Projects\OpenWorm\Export_lib\"
     <ClInclude Include="..\include\inline\meshes\structure.h" />
     <ClInclude Include="..\include\inline\mmath\mmath.h" />
     <ClInclude Include="..\include\inline\SkeletonNode\SkeletonNode.h" />
+    <ClInclude Include="openworm_wrapper.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="Wrapper.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="openworm_wrapper.cpp" />
     <ClCompile Include="SkeletonExtractionWrapper.cpp" />
-    <ClCompile Include="Wrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\include\inline\meshes\MeshGraph.inl" />

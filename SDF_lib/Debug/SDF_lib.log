@@ -1,6 +1,8 @@
-﻿Build started 10/13/2014 12:56:25 PM.
-     1>Project "D:\Projects\OpenWorm\SDF_lib\SDF_lib.vcxproj" on node 7 (Build target(s)).
-     1>InitializeBuildStatus:
+﻿Build started 11/18/2014 2:30:02 PM.
+     1>Project "D:\Projects\OpenWorm\SDF_lib\SDF_lib.vcxproj" on node 4 (Rebuild target(s)).
+     1>_PrepareForClean:
+         Deleting file "Debug\SDF_lib.lastbuildstate".
+       InitializeBuildStatus:
          Creating "Debug\SDF_lib.unsuccessfulbuild" because "AlwaysCreate" was specified.
        PreBuildEvent:
          Description: Generate include files
@@ -37,32 +39,36 @@
          D:\Projects\OpenWorm\SDF_lib\Structures\Mesh\Vertex.h
          D:\Projects\OpenWorm\SDF_lib\Structures\ShapeDiameterFunction\CSDF.h
          29 File(s) copied
+       GenerateTargetFrameworkMonikerAttribute:
+       Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
        ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt Controllers\Assimp.cpp Controllers\Model.cpp Controllers\SDFController.cpp Helpers\MathHelper.cpp Helpers\mtrand.cpp Helpers\SDFSettings.cpp Helpers\StringHelper.cpp OpenCLDebug.cpp SDFOpenCL.cpp sdf_extractor.cpp SDF_Library.cpp Structures\Mesh\Face.cpp Structures\Mesh\Grid.cpp Structures\Mesh\Octree.cpp Structures\Mesh\PPoint.cpp Structures\Mesh\ROctree.cpp Structures\Mesh\Vertex.cpp Structures\ShapeDiameterFunction\CSDF.cpp
-         CSDF.cpp
-         Vertex.cpp
-         ROctree.cpp
-         PPoint.cpp
-         Octree.cpp
-         Grid.cpp
-         Face.cpp
-         SDF_Library.cpp
-         sdf_extractor.cpp
-         SDFOpenCL.cpp
-         OpenCLDebug.cpp
-         StringHelper.cpp
-         SDFSettings.cpp
-         mtrand.cpp
-         MathHelper.cpp
-         SDFController.cpp
-     1>d:\projects\openworm\sdf_lib\controllers\sdfcontroller.cpp(2956): warning C4018: '<=' : signed/unsigned mismatch
-     1>d:\projects\openworm\sdf_lib\controllers\sdfcontroller.cpp(3041): warning C4018: '<' : signed/unsigned mismatch
-     1>d:\projects\openworm\sdf_lib\controllers\sdfcontroller.cpp(3043): warning C4018: '<' : signed/unsigned mismatch
-     1>d:\projects\openworm\sdf_lib\controllers\sdfcontroller.cpp(3045): warning C4018: '<' : signed/unsigned mismatch
-     1>d:\projects\openworm\sdf_lib\controllers\sdfcontroller.cpp(3050): warning C4018: '>' : signed/unsigned mismatch
-         Model.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /AI"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0" /AI"C:\Program Files (x86)\Windows Kits\8.0\References\CommonConfiguration\Neutral" /Zi /clr /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _UNICODE /D UNICODE /EHa /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /TP /analyze- /errorReport:prompt /clr:nostdlib Controllers\Assimp.cpp Controllers\Model.cpp Controllers\SDFController.cpp Helpers\MathHelper.cpp Helpers\mtrand.cpp Helpers\SDFSettings.cpp Helpers\StringHelper.cpp OpenCLDebug.cpp SDFOpenCL.cpp sdf_extractor.cpp SDF_Library.cpp Structures\Mesh\Face.cpp Structures\Mesh\Grid.cpp Structures\Mesh\Octree.cpp Structures\Mesh\PPoint.cpp Structures\Mesh\ROctree.cpp Structures\Mesh\Vertex.cpp Structures\ShapeDiameterFunction\CSDF.cpp
          Assimp.cpp
+         Model.cpp
+         SDFController.cpp
+     1>Controllers\SDFController.cpp(2956): warning C4018: '<=' : signed/unsigned mismatch
+     1>Controllers\SDFController.cpp(3041): warning C4018: '<' : signed/unsigned mismatch
+     1>Controllers\SDFController.cpp(3043): warning C4018: '<' : signed/unsigned mismatch
+     1>Controllers\SDFController.cpp(3045): warning C4018: '<' : signed/unsigned mismatch
+     1>Controllers\SDFController.cpp(3050): warning C4018: '>' : signed/unsigned mismatch
+         MathHelper.cpp
+         mtrand.cpp
+         SDFSettings.cpp
+         StringHelper.cpp
+         OpenCLDebug.cpp
+         SDFOpenCL.cpp
+         sdf_extractor.cpp
+         SDF_Library.cpp
+         Face.cpp
+         Grid.cpp
+         Octree.cpp
+         PPoint.cpp
+         ROctree.cpp
+         Vertex.cpp
+         CSDF.cpp
          Generating Code...
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /Zi /clr /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _UNICODE /D UNICODE /EHa /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /TP /analyze- /errorReport:prompt "C:\Users\mado\AppData\Local\Temp\.NETFramework,Version=v4.0.AssemblyAttributes.cpp"
+         .NETFramework,Version=v4.0.AssemblyAttributes.cpp
        Lib:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\Lib.exe /OUT:"D:\Projects\OpenWorm\Debug\SDF_lib_d.lib" /NOLOGO Debug\Assimp.obj
          Debug\Model.obj
@@ -82,12 +88,14 @@
          Debug\ROctree.obj
          Debug\Vertex.obj
          Debug\CSDF.obj
+         "Debug\.NETFramework,Version=v4.0.AssemblyAttributes.obj"
+     1>.NETFramework,Version=v4.0.AssemblyAttributes.obj : warning LNK4221: This object file does not define any previously undefined public symbols, so it will not be used by any link operation that consumes this library
          SDF_lib.vcxproj -> D:\Projects\OpenWorm\Debug\SDF_lib_d.lib
        FinalizeBuildStatus:
          Deleting file "Debug\SDF_lib.unsuccessfulbuild".
          Touching "Debug\SDF_lib.lastbuildstate".
-     1>Done Building Project "D:\Projects\OpenWorm\SDF_lib\SDF_lib.vcxproj" (Build target(s)).
+     1>Done Building Project "D:\Projects\OpenWorm\SDF_lib\SDF_lib.vcxproj" (Rebuild target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:17.94
+Time Elapsed 00:00:15.90

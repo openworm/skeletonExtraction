@@ -204,3 +204,4 @@ UpgradeLog*.htm
 FakesAssemblies/
 
 CustomLibs/JMSP/JMSP.sdf
+*.log

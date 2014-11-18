@@ -99,6 +99,9 @@ namespace skl {
 }
 
 skl::SkeletonNode * findNodeWithId(skl::SkeletonNode * pRoot, std::string id);
+void copySNSkeletonNodeToSkl(SN::SkeletonNode * src, skl::SkeletonNode * dest);
+void copySNSkeletonNodeToSklImpl(SN::SkeletonNode * src, skl::SkeletonNode * dest);
+void copyBonesMatrices(BonesMatrices * in, BonesMatrices * out);
 
 BOOST_CLASS_VERSION(skl::SkeletonNode, 0);
 

@@ -677,7 +677,7 @@ namespace mmath {
 		float d = Dot(v0, v1);
 		// If dot == 1, vectors are the same
 		if (d >= 1.0f) {
-			return Quaternion(1,0,0,0);
+			return Quaternion(0,1,0,0);
 		}
 		if (d < (1e-6f - 1.0f)) {
 			return QuaternionFromAngleAxis(M_PI, axis);

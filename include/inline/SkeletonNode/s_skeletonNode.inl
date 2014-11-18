@@ -6,7 +6,7 @@ inline BonesMatrices::BonesMatrices(){
 	currentAffine = Array2D< float >(4, 4, 0.0f);
 	for (int i=0; i < 4; i++)
 		currentAffine[i][i] = 1.0f;
-	qRotation = CVector4(1,0,0,0);
+	qRotation = CVector4(0,1,0,0);
 }
 
 //---------------------------------------------------------------------------
@@ -57,4 +57,50 @@ inline CVector4 BonesMatrices::getQuaternionFromAffine(){
 inline CVector3 BonesMatrices::getTranslationFromAffine(){
 	return CVector3(currentAffine[0][3], currentAffine[1][3], currentAffine[2][3]);
 }
+
+inline void copySNSkeletonNodeToSkl(SN::SkeletonNode * src, skl::SkeletonNode * dest){
+	copySNSkeletonNodeToSklImpl(src, dest);
+	//assignFathersForSkeletonTree(dest);
+
+}
+
+inline void copySNSkeletonNodeToSklImpl(SN::SkeletonNode * src, skl::SkeletonNode * dest){
+
+	dest->id = src->id;
+	//dest->sId = src->sId;
+	dest->selected = false;
+	dest->point = src->point;
+	dest->nodes = std::vector<SN::SkeletonNode*>();
+	//dest->father = src->father;
+	dest->cyclic = src->cyclic;
+
+	BonesMatrices bindPoseMatrices;
+
+	bindPoseMatrices.qRotation = CVector4(0,1,0,0);
+	bindPoseMatrices.vTranslation = src->point;
+	bindPoseMatrices.computeAffineTransformation();
+
+	BonesMatrices matrices;
+
+	matrices.qRotation = CVector4(0,1,0,0);
+	matrices.vTranslation = src->point;
+	matrices.computeAffineTransformation();
+
+	copyBonesMatrices(&bindPoseMatrices, &dest->bindPoseMatrices);
+	copyBonesMatrices(&matrices, &dest->matrices);
+	for (int i = 0; i < src->nodes.size(); i++) {
+		skl::SkeletonNode * p = new skl::SkeletonNode();
+		p->father = dest;
+		dest->nodes.push_back(p);
+		copySNSkeletonNodeToSkl((skl::SkeletonNode *)src->nodes[i], p);
+	}
+
+}
+
+inline void copyBonesMatrices(BonesMatrices * in, BonesMatrices * out){
+	out->qRotation = in->qRotation;
+	out->vTranslation = in->vTranslation;
+	out->currentAffine = in->currentAffine.copy();
+}
+
 #pragma package(smart_init)

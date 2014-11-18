@@ -13,6 +13,8 @@ namespace Import {
 	{
 		std::string wormFile;
 		std::string wormMeshFile;
+		std::string wormMuscleFile;
+
 		std::ifstream fileStream;
 		int particlesPerIteration;
 
@@ -23,6 +25,8 @@ namespace Import {
 		WormLoader(std::string wormFile, std::string wormMeshFile);
 		~WormLoader(void);
 		
+		// worm cuticle only
+
 		bool SetupWormFile(std::string file);
 		void SetWormFile(std::string file);
 		void SetWormMeshFile(std::string file);
@@ -30,9 +34,13 @@ namespace Import {
 		void ReadNextWormIteration(meshes::IndexedFace *mesh);
 		void ReadWormIteration(meshes::IndexedFace *mesh, int iteration);
 		void ReadWormMesh(meshes::IndexedFace *mesh);
+
+		// also with worm muscles
+		void ReadWormMuscleWithIndex(meshes::IndexedFace * wholeMesh, std::vector<meshes::IndexedFace> &muscleMeshes, std::string muscleIndexFile);
 	};
 
 #pragma region Additions
 	void FixNormals(meshes::IndexedFace *mesh, bool swap = false, bool fixTriangles = true);
+	void CalculatePerVertexNormals(meshes::IndexedFace *mesh);
 #pragma endregion
 }

@@ -34,6 +34,14 @@ namespace Export {
 		tinyxml2::XMLDocument *document;
 		tinyxml2::XMLElement *root;
 
+		tinyxml2::XMLElement *library_geometries;
+		tinyxml2::XMLElement *library_controllers;
+		tinyxml2::XMLElement *library_visual_scenes;
+		tinyxml2::XMLElement *visual_scene;
+
+		int meshCount;
+		int skeletonCount;
+
 		template< typename T > tinyxml2::XMLElement* ExportVectorToSource(std::vector<T> &data, Parameters &params);
 		void ExportVertices(meshes::IndexedFace *mesh, tinyxml2::XMLElement *meshElement);
 		void ExportNormals(meshes::IndexedFace *mesh, tinyxml2::XMLElement *meshElement);
@@ -52,6 +60,10 @@ namespace Export {
 		void ExportSkin(meshes::MeshSkin *mesh, SN::SkeletonNode *skeleton);
 		void ExportSkeleton(SN::SkeletonNode *skeleton);
 		void FinishMeshExport();
+		void BindMeshWithSkeleton();
+		void BindMeshesWithSkeletons(std::vector<int> &meshSkeletonMap);
+		void CreateMeshInstanceNode(int index);
+		void CreateSkinedMeshInstanceNode(int meshIndex, int skeletonIndex);
 		bool SaveToFile(std::string fileName);
 	public:
 		ColladaExporter(void);
@@ -63,5 +75,8 @@ namespace Export {
 
 		bool Export(meshes::IndexedFace *mesh, std::string fileName);
 		bool Export(meshes::MeshSkin *mesh, SN::SkeletonNode *skeleton, std::string fileName);
+		bool Export(std::vector<meshes::IndexedFace*> &meshes, std::string fileName);
+		bool Export(meshes::IndexedFace *mesh, SN::SkeletonNode *skeleton, std::string fileName);
+		bool Export(std::vector<meshes::MeshSkin*> &meshes, std::vector<SN::SkeletonNode*> &skeletons, std::vector<int> &meshSkeletonMap, std::string fileName);
 	};
 }
