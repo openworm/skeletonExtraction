@@ -1,4 +1,4 @@
-﻿Build started 11/18/2014 5:17:06 PM.
+﻿Build started 12/23/2014 1:54:57 PM.
      1>Project "D:\Projects\OpenWorm\SDF_lib\SDF_lib.vcxproj" on node 7 (Rebuild target(s)).
      1>_PrepareForClean:
          Deleting file "Debug\SDF_lib.lastbuildstate".
@@ -39,10 +39,9 @@
          D:\Projects\OpenWorm\SDF_lib\Structures\Mesh\Vertex.h
          D:\Projects\OpenWorm\SDF_lib\Structures\ShapeDiameterFunction\CSDF.h
          29 File(s) copied
-       GenerateTargetFrameworkMonikerAttribute:
-       Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
        ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /AI"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0" /AI"C:\Program Files (x86)\Windows Kits\8.0\References\CommonConfiguration\Neutral" /Zi /clr /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _UNICODE /D UNICODE /EHa /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /TP /analyze- /errorReport:prompt /clr:nostdlib Controllers\Assimp.cpp Controllers\Model.cpp Controllers\SDFController.cpp Helpers\MathHelper.cpp Helpers\mtrand.cpp Helpers\SDFSettings.cpp Helpers\StringHelper.cpp OpenCLDebug.cpp SDFOpenCL.cpp sdf_extractor.cpp SDF_Library.cpp Structures\Mesh\Face.cpp Structures\Mesh\Grid.cpp Structures\Mesh\Octree.cpp Structures\Mesh\PPoint.cpp Structures\Mesh\ROctree.cpp Structures\Mesh\Vertex.cpp Structures\ShapeDiameterFunction\CSDF.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /Z7 /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt Controllers\Assimp.cpp Controllers\Model.cpp Controllers\SDFController.cpp Helpers\MathHelper.cpp Helpers\mtrand.cpp Helpers\SDFSettings.cpp Helpers\StringHelper.cpp OpenCLDebug.cpp SDFOpenCL.cpp sdf_extractor.cpp SDF_Library.cpp Structures\Mesh\Face.cpp Structures\Mesh\Grid.cpp Structures\Mesh\Octree.cpp Structures\Mesh\PPoint.cpp Structures\Mesh\ROctree.cpp Structures\Mesh\Vertex.cpp Structures\ShapeDiameterFunction\CSDF.cpp
+     1>cl : Command line warning D9007: '/Gm' requires '/Zi or /ZI'; option ignored
          Assimp.cpp
          Model.cpp
          SDFController.cpp
@@ -67,8 +66,6 @@
          Vertex.cpp
          CSDF.cpp
          Generating Code...
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /Zi /clr /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _UNICODE /D UNICODE /EHa /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /TP /analyze- /errorReport:prompt "C:\Users\mado\AppData\Local\Temp\.NETFramework,Version=v4.0.AssemblyAttributes.cpp"
-         .NETFramework,Version=v4.0.AssemblyAttributes.cpp
        Lib:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\Lib.exe /OUT:"D:\Projects\OpenWorm\Debug\SDF_lib_d.lib" /NOLOGO Debug\Assimp.obj
          Debug\Model.obj
@@ -88,8 +85,6 @@
          Debug\ROctree.obj
          Debug\Vertex.obj
          Debug\CSDF.obj
-         "Debug\.NETFramework,Version=v4.0.AssemblyAttributes.obj"
-     1>.NETFramework,Version=v4.0.AssemblyAttributes.obj : warning LNK4221: This object file does not define any previously undefined public symbols, so it will not be used by any link operation that consumes this library
          SDF_lib.vcxproj -> D:\Projects\OpenWorm\Debug\SDF_lib_d.lib
        FinalizeBuildStatus:
          Deleting file "Debug\SDF_lib.unsuccessfulbuild".
@@ -98,4 +93,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:17.33
+Time Elapsed 00:00:13.01

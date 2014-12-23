@@ -173,10 +173,14 @@ void GraphAlgorithms::computeClosestSegmentVertices(MeshGraph * pMesh, SN::Skele
 		for (int i=0; i < closestSegments.size(); i++){
 			SN::SkeletonNode* seg = closestSegments[i];
 
+			int test2 = closestToSkeletonNode[seg->id - 1].size();
+
 			closestsIndices.insert(closestsIndices.end(),  closestToSkeletonNode[seg->id - 1].begin(),  closestToSkeletonNode[seg->id - 1].end());
 		}
 
 		closestSegmentsVertexIndices[n->id - 1] = closestsIndices;
+
+		int test = closestSegmentsVertexIndices[n->id - 1].size();
 
 		// go for next segments
 
@@ -190,21 +194,25 @@ void GraphAlgorithms::computeClosestSegmentVertices(MeshGraph * pMesh, SN::Skele
 
 //---------------------------------------------------------------------------
 // returns the shortest way between 2 points on the mesh graph structure
-float GraphAlgorithms::GeodesicDistance(MeshGraph * pMesh,  Array2D<float> distanceMatrix, CVector3 p1, int vertexIndex, bool firstSkeletonPoint){
-	int idx1 = findClosestPointIndex(pMesh, p1);
-	int idx2 = vertexIndex;
-	if (idx1 == -1 || idx2 == -1)
-		return FLT_MAX;
-	if (distanceMatrix[idx1][idx2] < FLT_MAX){
-		if (idx1 == idx2)
+float GraphAlgorithms::GeodesicDistance(MeshGraph * pMesh,  Array2D<float> distanceMatrix, CVector3 p1, int vertexIndex, bool firstSkeletonPoint, vector<int> closestVertexOneRing){
+	float minDistance = FLT_MAX;
+	for (int i=0; i < closestVertexOneRing.size(); i++){
+		int idx1 = closestVertexOneRing[i];//findClosestPointIndex(pMesh, p1); // find whole one ring vertices, than distance is minumum distance -> predpocitat najblzisich
+		int idx2 = vertexIndex;
+		if (idx1 == -1 || idx2 == -1){
+			continue;
+		}
+		if (idx1 == idx2){
 			return Distance(p1, pMesh->pVerts[idx2]);
+		}
 		//if (firstSkeletonPoint)
 		//	return distanceMatrix[idx1][idx2] + Distance(p1, pMesh->pVerts[idx1]);
 		float d = distanceMatrix[idx1][idx2] + Distance(p1, pMesh->pVerts[idx1]);
-		return d;
-	} else {
-		return FLT_MAX;
+		if (d < minDistance){
+			minDistance = d;
+		}
 	}
+	return minDistance;
 }
 
 int  GraphAlgorithms::findClosestPointIndex(MeshGraph *pMesh, CVector3 sourcePoint){
@@ -223,7 +231,7 @@ int  GraphAlgorithms::findClosestPointIndex(MeshGraph *pMesh, CVector3 sourcePoi
 
 //---------------------------------------------------------------------------
 // method finds x closest bones from skeleton subtree to the point
-void GraphAlgorithms::findXMinInTree(MeshGraph * pMesh, Array2D<float> distanceMatrix, int x, SN::SkeletonNode *pRoot, SN::SkeletonNode * mins, int vertexIndex){
+void GraphAlgorithms::findXMinInTree(MeshGraph * pMesh, Array2D<float> distanceMatrix, int x, SN::SkeletonNode *pRoot, SN::SkeletonNode * mins, int vertexIndex, boost::unordered_map<int, vector<int> > &closestVertexOneRing){
 
 	//if (node->father == NULL){
 		pRoot->father = new SN::SkeletonNode();
@@ -279,7 +287,7 @@ void GraphAlgorithms::findXMinInTree(MeshGraph * pMesh, Array2D<float> distanceM
 				queue.push_back(n->nodes[i]);
 			}
 
-			float dist = GeodesicDistance(pMesh, distanceMatrix, (n->point + n->father->point) / 2.0, vertexIndex, true); //
+			float dist = GeodesicDistance(pMesh, distanceMatrix, (n->point + n->father->point) / 2.0, vertexIndex, true, closestVertexOneRing[n->id - 1]); //
 
 			bool isNotInMins = true;
 
@@ -299,9 +307,83 @@ void GraphAlgorithms::findXMinInTree(MeshGraph * pMesh, Array2D<float> distanceM
 		mins[j] = *minNode;
 	}
 
+	#ifdef _LOG
+		logg.log(0, "closest segments for vertex:", vertexIndex);
+		logg.log(0, "1", mins[0].id);
+		logg.log(0, "2", mins[1].id);
+	#endif
+
 }
 
-void GraphAlgorithms::computeObjectSkeletonShaderData(SN::SkeletonNode* currentSkeletonRoot, MeshGraph * pMesh, structure::t3DObject *pObject, ObjectSkeletonShaderData * data, int length, int indexOffset, bool isMeshGraphComputed, Array2D<float> distanceMatrix, int numOfControlBones, int maxBones){
+void GraphAlgorithms::calculateClosestOneRingIndices(SN::SkeletonNode* sklRoot, MeshGraph * pMesh, boost::unordered_map<int, vector<int> > &closestVertexOneRing){
+	vector<SN::SkeletonNode*> queue;
+	queue.push_back(sklRoot->nodes[0]);
+
+	while (queue.size() > 0){
+		SN::SkeletonNode* pNode = (SN::SkeletonNode*)queue[queue.size() - 1];
+		queue.pop_back();
+
+		CVector3 point = (pNode->point + pNode->father->point) / 2.0;
+
+		vector<float> distances;
+		vector<int> indices;
+
+		// calculate distances
+
+		for (int i=0; i < pMesh->numOfVertices; i++){
+			float d = Magnitude(pMesh->pVerts[i] - point);
+			distances.push_back(d);
+			indices.push_back(i);
+		}
+
+		for (int j=0; j < pMesh->numOfVertices; j++){
+
+			int minIndex = j;
+			float swapDistance = 0;
+			int swapIndex = 0;
+
+			for (int i=j; i < pMesh->numOfVertices; i++){
+				if (distances[i] < distances[minIndex]){
+					minIndex = i;
+				}
+			}
+
+			swapIndex = indices[j];
+			indices[j] = indices[minIndex];
+			indices[minIndex] = swapIndex;
+
+			swapDistance = distances[j];
+			distances[j] = distances[minIndex];
+			distances[minIndex] = swapDistance;
+		}
+
+		// sort distances, the the closests with minsort
+
+		vector<int> closestVertexOneRingVec;
+
+		float delta = abs(distances[0] - distances[1]) + 0.1f;
+
+		closestVertexOneRingVec.push_back(indices[0]);
+
+		for (int i=1; i < pMesh->numOfVertices; i++){
+			if (abs(distances[i] - distances[i - 1]) > delta){
+				break;
+			} else {
+				closestVertexOneRingVec.push_back(indices[i]);
+				delta = distances[i] - distances[i - 1] + 0.1f;
+			}
+		}
+
+		closestVertexOneRing[pNode->id - 1] = closestVertexOneRingVec;
+
+		for (int i=0; i < pNode->nodes.size(); i++){
+			SN::SkeletonNode* pSon = (SN::SkeletonNode*)pNode->nodes[i];
+			queue.push_back(pSon);
+		}
+	}
+}
+
+void GraphAlgorithms::computeObjectSkeletonShaderData(SN::SkeletonNode* currentSkeletonRoot, MeshGraph * pMesh, structure::t3DObject *pObject, ObjectSkeletonShaderData * data, int length, int indexOffset, bool isMeshGraphComputed, Array2D<float> distanceMatrix, int numOfControlBones, int maxBones, boost::unordered_map<int, vector<int> > &closestVertexOneRing){
 
 	SN::SkeletonNode* sklRoot = new SN::SkeletonNode();
 
@@ -325,9 +407,9 @@ void GraphAlgorithms::computeObjectSkeletonShaderData(SN::SkeletonNode* currentS
 	float* indices = new float[pObject->numOfVerts * numOfControlBones];
 
 	SN::SkeletonNode * base = new SN::SkeletonNode[numOfControlBones];
-	float * dist = new float[numOfControlBones];
+	float * invDist = new float[numOfControlBones];
 
-	vector<SN::SkeletonNode*> queue;
+	/*vector<SN::SkeletonNode*> queue;
 	queue.push_back((SN::SkeletonNode*)sklRoot);
 
 
@@ -341,7 +423,7 @@ void GraphAlgorithms::computeObjectSkeletonShaderData(SN::SkeletonNode* currentS
 			SN::SkeletonNode* pSon = (SN::SkeletonNode*)pNode->nodes[i];
 			queue.push_back(pSon);
 		}
-	}
+	}*/
 
 	for (int i = 0; i < pObject->numOfVerts; i++) {
 		copySkeletonNode(currentSkeletonRoot, sklRoot);
@@ -350,10 +432,10 @@ void GraphAlgorithms::computeObjectSkeletonShaderData(SN::SkeletonNode* currentS
 			//pObject->skinning = false;	
 
 		// find x control bones which have influence on vertex
-		findXMinInTree(pMesh, distanceMatrix, numOfControlBones, sklRoot, base, pMesh->indices[indexOffset + i]);
+		findXMinInTree(pMesh, distanceMatrix, numOfControlBones, sklRoot, base, pMesh->indices[indexOffset + i], closestVertexOneRing);
 
-		// if there is less than NUM_OF_CTRL_BONES(4) control points, multiply the best one
-		vector<int> empty;
+		// if there is less than NUM_OF_CTRL_BONE control points, multiply the best one
+		/*vector<int> empty;
 		int bestIndex = -1;
 		float minDis = FLT_MAX;
 		for (int k = 0; k < numOfControlBones; k++) {
@@ -369,52 +451,56 @@ void GraphAlgorithms::computeObjectSkeletonShaderData(SN::SkeletonNode* currentS
 		}
 		if (bestIndex > -1)
 			for (int k=0; k<empty.size(); k++)
-				base[empty[k]] = base[bestIndex];
+				base[empty[k]] = base[bestIndex];*/
 
-		float distSum = 0.0f;
+		float invDistSum = 0.0f;
 		for (int k = 0; k < numOfControlBones; k++) {
 			indices[i * numOfControlBones + k] = (float)base[k].id - 1;
-			float f = Distance(pObject->pVerts[i], (base[k].point + base[k].father->point) / 2.0 );
+
+			float f = GeodesicDistance(pMesh, distanceMatrix, (base[k].point + base[k].father->point) / 2.0, pMesh->indices[indexOffset + i], true, closestVertexOneRing[base[k].id - 1]);
+
+			//float f = Distance(pObject->pVerts[i], (base[k].point + base[k].father->point) / 2.0 );
 			// toto este nemozem pouzit, lebo ratanie vzdialenosti mi funguje iba jednosmerne top-bottom stromovo, nie oboma smermi ak v grafe
 			// je tam problem ked najde najblizsie body k raidiacemu vrcholu a bodu meshu ten isty vrchol grafu
 			//float f = GeodesicDistance(pLBSExtractor.pMesh, distanceMatrix, base[k].point, pLBSExtractor.pMesh->indices[indexOffset + i], true);
+
 			if (f == 0)
-				dist[k] = FLT_MAX;
+				invDist[k] = FLT_MAX;
 			else
-				dist[k] = 1.0 / f;
-			distSum += dist[k];
+				invDist[k] = 1.0 / f;
+
+			invDistSum += invDist[k];
 
 			#ifdef _LOG
-				logg.log(LOG_LEVEL_DUMP, "indexy pre vertex : " ,i);
-				logg.log(LOG_LEVEL_DUMP, "index", indices[i * numOfControlBones + k]);
+				logg.log(0, "indexy pre vertex : " ,i);
+				logg.log(0, "index", indices[i * numOfControlBones + k]);
 			#endif
 		}
 
-		if (distSum > FLT_MAX)
-			distSum = FLT_MAX;
+		if (invDistSum > FLT_MAX)
+			invDistSum = FLT_MAX;
 
 		for (int k = 0; k < numOfControlBones; k++) {
-			float invDist;
-			if (distSum != 0)
-				weights[i*numOfControlBones + k] = (dist[k] / distSum);
+			if (invDistSum != 0)
+				weights[i*numOfControlBones + k] = (invDist[k] / invDistSum);
 			else
 				weights[i*numOfControlBones + k] = 1.0f;
 
 			#ifdef _LOG
-				logg.log(LOG_LEVEL_DUMP, "vahy pre vertex : " , i);
-				logg.log(LOG_LEVEL_DUMP, "vaha ", weights[i * numOfControlBones + k]);
+				logg.log(0, "vahy pre vertex : " , i);
+				logg.log(0, "vaha ", weights[i * numOfControlBones + k]);
 			#endif
 		}
 	}
 
-	queue.clear();
+	/*queue.clear();
 	queue.push_back((SN::SkeletonNode*)sklRoot);
 
 	while (queue.size() > 0){
 		SN::SkeletonNode* pNode = (SN::SkeletonNode*)queue[queue.size() - 1];
 		queue.pop_back();
 
-		/*if (useBindPoseMatrices){
+		if (useBindPoseMatrices){
 			pNode->point = pNode->bindPoseMatrices.getTranslationFromAffine();
 		} else {
 			pNode->point = pNode->matrices.getTranslationFromAffine();
@@ -423,8 +509,8 @@ void GraphAlgorithms::computeObjectSkeletonShaderData(SN::SkeletonNode* currentS
 		for (int i=0; i < pNode->nodes.size(); i++){
 			SN::SkeletonNode* pSon = (SN::SkeletonNode*)pNode->nodes[i];
 			queue.push_back(pSon);
-		}*/
-	}
+		}
+	}*/
 
 
 	if (length != pObject->numOfVerts) {
@@ -448,8 +534,8 @@ void GraphAlgorithms::computeObjectSkeletonShaderData(SN::SkeletonNode* currentS
 
 	//delete[] base;
 	//base = NULL;
-	delete[] dist;
-	dist = NULL;
+	delete[] invDist;
+	invDist = NULL;
 	delete[] indices;
 	indices = NULL;
 	delete[] weights;
@@ -462,7 +548,7 @@ void GraphAlgorithms::computeObjectSkeletonShaderData(SN::SkeletonNode* currentS
 	#endif
 }
 
-void GraphAlgorithms::computeMeshGraphSkinningData(SN::SkeletonNode* currentSkeletonRoot, MeshGraph * pMesh, ObjectSkeletonShaderData * data, bool isMeshGraphComputed, Array2D<float> distanceMatrix, int numOfControlBones, int maxBones){
+void GraphAlgorithms::computeMeshGraphSkinningData(SN::SkeletonNode* currentSkeletonRoot, MeshGraph * pMesh, ObjectSkeletonShaderData * data, bool isMeshGraphComputed, Array2D<float> distanceMatrix, int numOfControlBones, int maxBones, boost::unordered_map<int, vector<int> > &closestVertexOneRing){
 
 	SN::SkeletonNode* sklRoot = new SN::SkeletonNode();
 
@@ -504,7 +590,7 @@ void GraphAlgorithms::computeMeshGraphSkinningData(SN::SkeletonNode* currentSkel
 			//pObject->skinning = false;	
 
 		// find x control bones which have influence on vertex
-		findXMinInTree(pMesh, distanceMatrix, numOfControlBones, sklRoot, base, i);
+		findXMinInTree(pMesh, distanceMatrix, numOfControlBones, sklRoot, base, i, closestVertexOneRing);
 
 		//SN::SkeletonNode b1 = base[0];
 		//SN::SkeletonNode b2 = base[1];

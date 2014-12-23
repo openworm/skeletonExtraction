@@ -761,7 +761,9 @@ void lbse::Extractor::applyConnectivitySurgery(bool applyLBSEPostprocessing, SN:
 	float threshold = modelMaxDim / (100.0f/groupingTolerance);
 	createSkeletonFromSurgeryGraph(applyLBSEPostprocessing, pSurgeryGraph, originalMesh->pVerts, mgDegeneratesMapping, node, &numOfBones, threshold, groupingToleranceSDFMulti, doBranchingSimplification, doDisplacementShifting, groupingWithoutEdge, cyclicSkeleton, sdfHalfVectorsMG, useSDFBasedGroupingDistance);
 
-    currentNumberOfSkeletonBones = generateIdForTree(node, skeletonMeshGraphIndices);
+	if (applyLBSEPostprocessing){
+		currentNumberOfSkeletonBones = generateIdForTree(node, skeletonMeshGraphIndices);
+	}
 
 }
 
