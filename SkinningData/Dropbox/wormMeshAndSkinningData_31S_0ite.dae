@@ -85,7 +85,7 @@
     </library_controllers>
     <library_visual_scenes>
         <visual_scene id="VisualSceneNode" name="bind">
-            <node id="skeleton_root_0" name="joint1" sid="joint1" type="JOINT">
+		            <node id="skeleton_root_0" name="joint1" sid="joint1" type="JOINT">
                 <translate sid="translate">50.099991 182.779083 -20.039553</translate>
                 <node name="joint2" sid="joint2" type="JOINT">
                     <translate sid="translate">-0.000095 10.729858 -0.000235</translate>
@@ -179,9 +179,7 @@
                 </node>
             </node>
             <node id="worm_0" name="worm_0" type="NODE">
-                <instance_controller url="#worm-skin_0">
-                    <skeleton>#skeleton_root_0</skeleton>
-                </instance_controller>
+				<instance_geometry url="#worm-mesh_0"/>
             </node>
         </visual_scene>
     </library_visual_scenes>
