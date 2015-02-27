@@ -1,13 +1,6 @@
 #pragma once
 
-#define OW_NUM_OF_CTRL_BONES 4
-#define OW_MAX_BONE_MAT 24
-#define OW_SKINNING_NUM_BONES 31
-
-#define OW_MAX_WORM_ITERATIONS 4000
-#define OW_BINDPOSE_TIMESTEP 3000
-#define OW_SINPLIFY_TRIANGLECOUNT 3000
-#define OW_ITE_TO_LOAD 200
+#include <inline/openworm_constants.h>
 
 #include <tchar.h>
 
@@ -17,6 +10,7 @@
 
 #include <SM_lib/QuaternionsBetweenWormSkeletons.h>
 
+#include <meshes/MeshErrorMeasures.h>
 #include <meshes/structure.h>
 #include <meshes/SerializableMesh+Skin.h>
 #include <SkeletonNode/SkeletonNode.h>
@@ -38,6 +32,8 @@
 #include <glm\gtc\type_ptr.hpp>
 #include <glm\gtc\matrix_transform.hpp>
 
+#include "../Wrappers/export_wrapper.h"
+
 #ifdef _GLD
 	#include <GLW_Lib/GLW_lib.h>
 	#include "../WeightsVisualisation.h"
@@ -57,6 +53,8 @@ struct Openworm_Wrapper {
 	vector<glm::quat> skinningQuatVec;
 	vector<glm::quat> skinningQuatVecNew;
 	vector<glm::quat> skinningQuatVecSimplified;
+
+	vector<float> perSegmentSDFVec;
 
 	skl::SkeletonNode bindPoseSkeletonNode;
 
@@ -168,6 +166,8 @@ struct Openworm_Wrapper {
 
 	int  findClosesCuticleVertexToPoint(CVector3 point);
 
+	void multiplyPerSegmentSDF(sdf::Extractor * pSDFExtractor);
+
 	void loadAndPrepareSkinningData(meshes::SerializableMeshSkin * serMesh, ObjectSkeletonShaderData * skeletonData);
 	void calculateSkinningDataForMuscles();
 
@@ -179,7 +179,7 @@ struct Openworm_Wrapper {
 	void loadCuticleModelIntoBuffer(meshes::MeshSkin * model);
 	void loadMuscleModelIntoBuffer(meshes::MeshSkin * model);
 
-	void skeletonExtractionSDF(int timeStep, string filePath, Export::ColladaExporter * exporter, skl::SkeletonNode * skeletonOutput, meshes::Mesh  * meshImport);
+	void skeletonExtractionSDF(int timeStep, string filePath, Export_Wrapper * exportWrapper, skl::SkeletonNode * skeletonOutput, meshes::Mesh  * meshImport);
 	void skeletonExtractionSDF_calculateSDF(meshes::Mesh * mesh, lbse::Extractor * pLBSExtractor);
 	void skeletonExtractionSDF_extractSkeleton(SN::SkeletonNode * pSkeletonRoot, lbse::Extractor * pLBSExtractor, sdf::Extractor * pSDFExtractor);
 	void loadModelToStructures(lbse::Extractor * pLBSExtractor, structure::t3DModel * pModel, int * adaptVMdmax, int joiningTolerance);
@@ -190,7 +190,7 @@ struct Openworm_Wrapper {
 	// main thread calls
 
 	#ifdef _GLD
-		void prepareBindPoseSkeletonAndVisualization(string filePath, Visualisation * vis);
+		void prepareBindPoseSkeletonAndVisualization(string filePath, Visualisation * vis,  Export_Wrapper * exportWrapper);
 		void prepareGLDDataForSkinningPreview(string projectPath);
 	#endif
 
@@ -203,8 +203,8 @@ struct Openworm_Wrapper {
 	void pauseSimulationAndSkinningPreview();
 	void updateSimulationModelFromMainThread();
 	void updateSimulationMuscleModelFromMainThread();
-	void calculateAndExportSkeletonTransformations(string filePath, Export::ColladaExporter * exporter);
-	void calculateAndExportSkeletonTransformationsForTimestep(int timeStep, string filePath, Export::ColladaExporter * exporter, skl::SkeletonNode * skeletonOutput);
+	void calculateAndExportSkeletonTransformations(string filePath, Export_Wrapper * exportWrapperer);
+	void calculateAndExportSkeletonTransformationsForTimestep(int timeStep, string filePath, Export_Wrapper * exportWrapperer, skl::SkeletonNode * skeletonOutput);
 	void calculateModelMaxDim(MeshGraph * pMesh, float * adaptVMdmax);
 
 	void updateSkeletonToGLDFromMainThread();
@@ -218,15 +218,23 @@ struct Openworm_Wrapper {
 
 	// animation thread calls
 
-	void nextTimeStepSkinningPreview();
+	void nextTimeStepSkinningPreview(Export_Wrapper * exportWrapper);
 	void nextTimeStepSimulationPreview();
 	void nextTimeStepMuscleSimulationPreview();
 	void addSimulationModel(meshes::IndexedFace * mesh);
 	void addSimulationMuscleModel(meshes::IndexedFace * mesh);
-	void nextTimeStepSimulationAndSkinningPreview(bool * finished, bool force);
+	void nextTimeStepSimulationAndSkinningPreview(bool * finished, bool force, Export_Wrapper * exportWrapper);
 
 	void performTransformationsInSkeletonTree(skl::SkeletonNode * skeletonNode, vector<glm::mat4> * pSkinningMatrixVec);
 	void performTransformationsInSkeletonTree(skl::SkeletonNode * skeletonNode, vector<glm::quat> * pSkinningQuatVec, vector<glm::mat4> * pSkinningMatrixVec);
+	void performTimeConstantTransformationsInSkeletonTree(skl::SkeletonNode * skeletonNode, vector<glm::quat> * pSkinningQuatVec, vector<glm::mat4> * pSkinningMatrixVec);
+	void performGravitationBasedTransformationsInSkeletonTree(skl::SkeletonNode * skeletonNode, vector<glm::quat> * pSkinningQuatVec, vector<glm::mat4> * pSkinningMatrixVec, float gravitation_magnitude);
+	void performSDFBasedTransformationsInSkeletonTree(skl::SkeletonNode * skeletonNode, vector<glm::quat> * pSkinningQuatVec, vector<glm::mat4> * pSkinningMatrixVec, vector<float> &sdf, float gravitation_magnitude, const glm::vec3 &gravitationAxis);
+
+	void loadSDFFromFile(string fileName, vector<float> &sdf);
+	void fixFedUpSDF(vector<float> &sdf_old, vector<float> &sdf_new);
+	void calculateHeuristicSkinningWeights(string projDir);
+	void calculateMuscleMesh(string fileDir, meshes::IndexedFace *muscleMesh);
 
 	// skeleton extraction for muscles
 
@@ -234,3 +242,13 @@ struct Openworm_Wrapper {
 
 	void calculateAndExportMuscleTransformations(string filePath, Export::ColladaExporter * exporter);
 };
+
+#pragma region Additions
+
+namespace OpenWorm {
+	float TotalSkeletonCurvature(vector<glm::quat> &quats);
+	float ScaleFactorFromCurvature(float curvature);
+	float ScaleSDFByGravity(float sdf, float gravitationMagnitude);
+}
+
+#pragma endregion

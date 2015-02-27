@@ -16,7 +16,7 @@ namespace sdf {
 
 		int skeletonTesselationFactor;
 
-		void applyMedianMerge(MeshGraph * polyMesh, MeshGraph * pMesh, float threshold);
+		void applyMedianMerge(MeshGraph * polyMesh, MeshGraph * pMesh, float threshold, vector<float> * pPerSegmentSDFVec, CVector3 * sdfVecMG);
 		void subdivideSkeletonByCrossSectionMedians(SN::SkeletonNode* pRoot, MeshGraph * pMesh, int segmentSubdivision);
 		void subdivideSkeletonMeshGraphByCrossSectionMedians(MeshGraph * polyMesh, MeshGraph * pMesh, int segmentSubdivision);
 	};

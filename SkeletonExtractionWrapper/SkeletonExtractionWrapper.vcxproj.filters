@@ -16,6 +16,12 @@
     <Filter Include="inline libs">
       <UniqueIdentifier>{d7d76580-db8a-49a1-8908-ec4707f7d030}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Wrappers">
+      <UniqueIdentifier>{3d71b512-e266-4453-a95b-9f568dbabd94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Wrapper">
+      <UniqueIdentifier>{b34b1f27-033b-4964-a503-50377b6e92b3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -54,22 +60,31 @@
     <ClInclude Include="..\include\inline\SkeletonNode\SkeletonNode.h">
       <Filter>inline libs</Filter>
     </ClInclude>
-    <ClInclude Include="openworm_wrapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="wrapper.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Wrappers\export_wrapper.h">
+      <Filter>Header Files\Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Wrappers\openworm_wrapper.h">
+      <Filter>Header Files\Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inline\openworm_constants.h">
+      <Filter>Header Files\Wrapper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SkeletonExtractionWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="openworm_wrapper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="wrapper.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Wrappers\openworm_wrapper.cpp">
+      <Filter>Source Files\Wrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Wrappers\export_wrapper.cpp">
+      <Filter>Source Files\Wrappers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

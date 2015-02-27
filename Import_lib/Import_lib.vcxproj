@@ -90,12 +90,14 @@ xcopy "$(ProjectDir)*.h"  "$(SolutionDir)include\$(ProjectName)\" /y /e</Command
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\include\Import_lib\SphericalDelaunay.cpp" />
     <ClCompile Include="m_3dsLoader.cpp" />
     <ClCompile Include="m_assimpLoader.cpp" />
     <ClCompile Include="m_colladaLoader.cpp" />
     <ClCompile Include="WormLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\Import_lib\SphericalDelaunay.h" />
     <ClInclude Include="m_3dsLoader.h" />
     <ClInclude Include="m_assimpLoader.h" />
     <ClInclude Include="m_colladaLoader.h" />

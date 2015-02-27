@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 #include "sdf_extractor.h"
 
-void sdf::Extractor::applyMedianMerge(MeshGraph * polyMesh, MeshGraph * pMesh, float threshold){
+void sdf::Extractor::applyMedianMerge(MeshGraph * polyMesh, MeshGraph * pMesh, float threshold, vector<float> * pPerSegmentSDFVec, CVector3 * sdfVecMG){
 
 	MeshGraph * medianMesh = new MeshGraph();
 	copyMeshGraph(pMesh, medianMesh);
@@ -68,6 +68,19 @@ void sdf::Extractor::applyMedianMerge(MeshGraph * polyMesh, MeshGraph * pMesh, f
 			polyMeshVerts.push_back(medianMesh->pVerts[i]);
 			polyMeshIndices[polyMeshVerts.size() - 1].insert(i);
 		}
+	}
+
+	//when acreating new polymesh vertex, calculate also its avarage SDF
+	for (int i=0; i < polyMeshVerts.size(); i++){
+		float avarageSDF = 0;
+		set<int> indices = polyMeshIndices[i];
+		std::set<int>::iterator it;
+		for (it = indices.begin(); it != indices.end(); it++)
+		{
+			avarageSDF += Magnitude(sdfVecMG[*it]);
+		}
+		avarageSDF = avarageSDF / (float)(polyMeshIndices[i].size());
+		(*pPerSegmentSDFVec).push_back(avarageSDF);
 	}
 
 	polyMesh->numOfVertices = polyMeshVerts.size();

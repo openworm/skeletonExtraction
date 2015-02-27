@@ -1,5 +1,5 @@
-﻿Build started 12/23/2014 1:54:57 PM.
-     1>Project "D:\Projects\OpenWorm\GDSW_lib\GDSW_lib.vcxproj" on node 6 (Rebuild target(s)).
+﻿Build started 2/22/2015 12:54:40 PM.
+     1>Project "D:\Projects\OpenWorm\GDSW_lib\GDSW_lib.vcxproj" on node 2 (Rebuild target(s)).
      1>_PrepareForClean:
          Deleting file "Debug\GDSW_lib.lastbuildstate".
        InitializeBuildStatus:
@@ -18,6 +18,7 @@
          D:\Projects\OpenWorm\GDSW_lib\include\inline\meshes\IndexedFace.h
          D:\Projects\OpenWorm\GDSW_lib\include\inline\meshes\Mesh+Skin.h
          D:\Projects\OpenWorm\GDSW_lib\include\inline\meshes\Mesh.h
+         D:\Projects\OpenWorm\GDSW_lib\include\inline\meshes\MeshErrorMeasures.h
          D:\Projects\OpenWorm\GDSW_lib\include\inline\meshes\MeshGraph.h
          D:\Projects\OpenWorm\GDSW_lib\include\inline\meshes\meshSimplification.h
          D:\Projects\OpenWorm\GDSW_lib\include\inline\meshes\SerializableMesh+Skin.h
@@ -29,7 +30,7 @@
          D:\Projects\OpenWorm\GDSW_lib\include\inline\SkeletonNode\SkeletonPointNode.h
          D:\Projects\OpenWorm\GDSW_lib\include\inline\SkeletonNode\SkeletonSheetNode.h
          D:\Projects\OpenWorm\GDSW_lib\include\inline\SkeletonNode\s_skeletonNode.h
-         20 File(s) copied
+         21 File(s) copied
        ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt gdsw_graphAlgorithms.cpp
          gdsw_graphAlgorithms.cpp
@@ -43,4 +44,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:05.32
+Time Elapsed 00:00:05.87

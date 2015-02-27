@@ -137,6 +137,7 @@ xcopy "$(ProjectDir)*.h"  "$(SolutionDir)include\$(ProjectName)\" /y /e</Command
     <ClInclude Include="Structures\ShapeDiameterFunction\CSDF.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\ClientSide\examples\webgl_loader_collada_openworm.html" />
     <None Include="OpenCLKernels\proces.cl" />
     <None Include="OpenCLKernels\sdf.cl" />
     <None Include="OpenCLKernels\sdf2.cl" />

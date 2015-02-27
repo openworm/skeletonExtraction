@@ -1,27 +1,27 @@
-Info,  T8232: this is my info-call
-Info,  T8232: App started!
-Info,  T8232: Load D:\Projects\_shared\Skeletor\Models\OpenWorm\Export\collada\wormCollada_0.dae
-Debug, T8232: Assimp 3.0.1262 x86 msvc shared singlethreaded
-Info,  T8232: Found a matching importer for this file format
-Info,  T8232: Import root directory is 'D:\Projects\_shared\Skeletor\Models\OpenWorm\Export\collada\'
-Debug, T8232: Collada schema version is 1.4.n
-Warn,  T8232: Collada: No material specified for subgroup "" in geometry "worm-mesh_0".
-Debug, T8232: ValidateDataStructureProcess begin
-Debug, T8232: ValidateDataStructureProcess end
-Debug, T8232: ScenePreprocessor: Adding default material 'DefaultMaterial'
-Info,  T8232: Entering post processing pipeline
-Debug, T8232: FindDegeneratesProcess begin
-Debug, T8232: FindDegeneratesProcess finished
-Debug, T8232: TriangulateProcess begin
-Debug, T8232: TriangulateProcess finished. There was nothing to be done.
-Debug, T8232: FindInvalidDataProcess begin
-Debug, T8232: FindInvalidDataProcess finished. Everything seems to be OK.
-Debug, T8232: SplitLargeMeshesProcess_Triangle begin
-Debug, T8232: SplitLargeMeshesProcess_Triangle finished. There was nothing to do
-Debug, T8232: Generate spatially-sorted vertex cache
-Debug, T8232: JoinVerticesProcess begin
-Debug, T8232: Mesh 0 (unnamed) | Verts in: 34158 out: 5695 | ~83.3275%
-Info,  T8232: JoinVerticesProcess finished | Verts in: 34158 out: 5695 | ~83.3%
-Debug, T8232: SplitLargeMeshesProcess_Vertex begin
-Debug, T8232: SplitLargeMeshesProcess_Vertex finished. There was nothing to do
-Info,  T8232: Leaving post processing pipeline
+Info,  T13728: this is my info-call
+Info,  T13728: App started!
+Info,  T13728: Load D:\Projects\_shared\Skeletor\Models\OpenWorm\Export\export_2\collada\wormCollada_00000.dae
+Debug, T13728: Assimp 3.0.1262 x86 msvc shared singlethreaded
+Info,  T13728: Found a matching importer for this file format
+Info,  T13728: Import root directory is 'D:\Projects\_shared\Skeletor\Models\OpenWorm\Export\export_2\collada\'
+Debug, T13728: Collada schema version is 1.4.n
+Warn,  T13728: Collada: No material specified for subgroup "" in geometry "worm-mesh_0".
+Debug, T13728: ValidateDataStructureProcess begin
+Debug, T13728: ValidateDataStructureProcess end
+Debug, T13728: ScenePreprocessor: Adding default material 'DefaultMaterial'
+Info,  T13728: Entering post processing pipeline
+Debug, T13728: FindDegeneratesProcess begin
+Debug, T13728: FindDegeneratesProcess finished
+Debug, T13728: TriangulateProcess begin
+Debug, T13728: TriangulateProcess finished. There was nothing to be done.
+Debug, T13728: FindInvalidDataProcess begin
+Debug, T13728: FindInvalidDataProcess finished. Everything seems to be OK.
+Debug, T13728: SplitLargeMeshesProcess_Triangle begin
+Debug, T13728: SplitLargeMeshesProcess_Triangle finished. There was nothing to do
+Debug, T13728: Generate spatially-sorted vertex cache
+Debug, T13728: JoinVerticesProcess begin
+Debug, T13728: Mesh 0 (unnamed) | Verts in: 34158 out: 5695 | ~83.3275%
+Info,  T13728: JoinVerticesProcess finished | Verts in: 34158 out: 5695 | ~83.3%
+Debug, T13728: SplitLargeMeshesProcess_Vertex begin
+Debug, T13728: SplitLargeMeshesProcess_Vertex finished. There was nothing to do
+Info,  T13728: Leaving post processing pipeline

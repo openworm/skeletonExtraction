@@ -15,6 +15,6 @@
 
 #include <SM_lib/QuaternionsBetweenWormSkeletons.h>
 
-#include "openworm_wrapper.h"
+#include "../Wrappers/openworm_wrapper.h"
 
 void coreFunc(int timeStep);

@@ -27,6 +27,7 @@
 #include "WormLoader.h"
 #include <sstream>
 #include <queue>
+#include "SphericalDelaunay.h"
 
 namespace Import {
 	typedef std::pair<int, mmath::CVector3> TrianglePair;
@@ -203,6 +204,28 @@ namespace Import {
 		//maybe clear mesh if not loaded correctly?
 	}
 
+	void WormLoader::ReadWormIteration(std::vector<meshes::IndexedFace> &meshes, int iteration) {
+		std::ifstream fs(wormFile, std::ifstream::in | std::ifstream::binary);
+		//read header
+		float iterations = 0, elasticParticles = 0, liqudParticles = 0;
+		fs.seekg(6*sizeof(float));
+		fs.read((char*)(&iterations), sizeof(float));
+		fs.read((char*)(&elasticParticles), sizeof(float));
+		fs.read((char*)(&liqudParticles), sizeof(float));
+		int particlesPerIteration = elasticParticles + liqudParticles;
+		if (iteration > iterations) return;
+		fs.seekg(iteration*particlesPerIteration*4*sizeof(float), std::ifstream::cur);
+		//read data
+		//mesh->vertices.clear();
+		//mesh->vertices.reserve(particlesPerIteration*3);
+		int i = 0;
+		while (fs.good() && i < particlesPerIteration) {
+			//ReadNextWormParticle(fs, mesh);
+			i++;
+		}
+		fs.close();
+	}
+
 	void WormLoader::ReadWormMuscleWithIndex(meshes::IndexedFace * wholeMesh, std::vector<meshes::IndexedFace> &muscleMeshes, std::string muscleIndexFile) {
 		std::ifstream inputStream(muscleIndexFile);
 
@@ -237,11 +260,57 @@ namespace Import {
 		}
 
 		for (int i=0; i < numOfPar; i++){
-				muscleMeshes[particleIndices[i] - minIdx].vertices.push_back(wholeMesh->vertices[i * 3]);
-				muscleMeshes[particleIndices[i] - minIdx].vertices.push_back(wholeMesh->vertices[i * 3 + 1]);
-				muscleMeshes[particleIndices[i] - minIdx].vertices.push_back(wholeMesh->vertices[i * 3 + 2]);
+			muscleMeshes[particleIndices[i] - minIdx].vertices.push_back(wholeMesh->vertices[i * 3]);
+			muscleMeshes[particleIndices[i] - minIdx].vertices.push_back(wholeMesh->vertices[i * 3 + 1]);
+			muscleMeshes[particleIndices[i] - minIdx].vertices.push_back(wholeMesh->vertices[i * 3 + 2]);
+		}
+	}
+
+	void WormLoader::ReadWormMuscleWithIndex(meshes::IndexedFace * wholeMesh, std::vector<meshes::IndexedFace> &muscleMeshes, std::vector<std::vector<int> > &muscleIdMap, std::string muscleIndexFile) {
+		std::ifstream inputStream(muscleIndexFile);
+
+		int numOfPar = wholeMesh->vertices.size() / 3;
+
+		std::vector<int> particleIndices;
+		particleIndices.reserve(numOfPar);
+
+		int minIdx = INT_MAX;
+		int maxIdx = -1;
+
+		if (inputStream.is_open()) {
+			while (inputStream.good()) {
+				int muscleIndex;
+				inputStream >> muscleIndex;
+
+				particleIndices.push_back(muscleIndex);
+
+				if (muscleIndex > maxIdx){
+					maxIdx = muscleIndex;
+				}
+				if (muscleIndex < minIdx){
+					minIdx = muscleIndex;
+				}
+			}
+			inputStream.close();
 		}
 
+		muscleIdMap.clear();
+		for (int i=minIdx; i <= maxIdx; i++){
+			meshes::IndexedFace muscle;
+			muscleMeshes.push_back(muscle);
+			std::vector<int> v;
+			muscleIdMap.push_back(v);
+		}
+
+		for (int i=0; i < numOfPar; i++){
+			int muscleId = particleIndices[i] - minIdx;
+			//add particle to muscle
+			muscleMeshes[muscleId].vertices.push_back(wholeMesh->vertices[i * 3]);
+			muscleMeshes[muscleId].vertices.push_back(wholeMesh->vertices[i * 3 + 1]);
+			muscleMeshes[muscleId].vertices.push_back(wholeMesh->vertices[i * 3 + 2]);
+			//add particle id to array
+			muscleIdMap[muscleId].push_back(i);
+		}
 	}
 
 	void WormLoader::ReadWormMesh(meshes::IndexedFace *mesh) {
@@ -343,6 +412,47 @@ namespace Import {
 			mesh->normals.push_back(normal.x);
 			mesh->normals.push_back(normal.y);
 			mesh->normals.push_back(normal.z);
+		}
+	}
+
+	void CreateMeshForMuscle(meshes::IndexedFace *muscle) {
+		int numOfVerts = muscle->vertices.size() / 3;
+		std::vector<glm::vec3> vertices;
+		std::vector<glm::ivec3> triangles;
+		//find center of mass of the muscle
+		glm::vec3 center(0, 0, 0);
+		for (int i = 0; i < numOfVerts; i++) {
+			mmath::CVector3 P = muscle->GetVertex(i);
+			center += glm::vec3(P.x, P.y, P.z);
+		}
+		center = center / (float)numOfVerts;
+		//push vertices
+		vertices.reserve(numOfVerts);
+		for (int i = 0; i < numOfVerts; i++) {
+			mmath::CVector3 P = muscle->GetVertex(i);
+			vertices.push_back(glm::vec3(P.x, P.y, P.z) - center);
+		}
+		//execute triangulation
+		Delaunay_on_sphere(vertices, triangles);
+		//copy triangles to mesh
+		muscle->indices.clear();
+		muscle->indices.reserve(triangles.size()*3);
+		for (int i = 0; i < triangles.size(); i++) {
+			muscle->indices.push_back(triangles[i][0]);
+			muscle->indices.push_back(triangles[i][1]);
+			muscle->indices.push_back(triangles[i][2]);
+		}
+	}
+
+	void CreateMeshForMuscle(meshes::IndexedFace *muscle, mmath::CVector3 start, mmath::CVector3 end) {
+		//TODO find capsule coordinates of each muscle vertex and perform triangulation in capsule domain
+	}
+
+	void TransferMeshFromMuscles(meshes::IndexedFace *muscle, std::vector<meshes::IndexedFace*> &muscles, std::vector<std::vector<int> > &muscleIdMap) {
+		for (int i = 0; i < muscles.size(); i++) {
+			for (int j = 0; j < muscles[i]->indices.size(); j++) {
+				muscle->indices.push_back(muscleIdMap[i][muscles[i]->indices[j]]);
+			}
 		}
 	}
 

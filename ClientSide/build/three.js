@@ -17845,6 +17845,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 		hemi: { length: 0, skyColors: [], groundColors: [], positions: [] }
 
 	};
+	
+	var timestep;
+	var currentMatrix = new Array();
+	
+	this.setTimestep = function setTimestep(ts) {
+		timestep = ts;
+	}
+	
+	this.setCurrentMatrix = function setCurrentMatrix(m) {
+		currentMatrix = m;
+	}
 
 	// initialize
 
@@ -22169,8 +22180,55 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else if ( object.skeleton && object.skeleton.boneMatrices ) {
 
 				if ( p_uniforms.boneGlobalMatrices !== null ) {
+				
+					var modelMatrix = new Array();
+					
+					for (var n = 0; n < 16; n++){
+						modelMatrix[n] = object.skeleton.boneMatrices[n];
+					}
+				
+					var newMatrix = new Array();
+					
+					if (currentMatrix.length == 0){
+						newMatrix = modelMatrix;
+					} else {
+						var mModel = new THREE.Matrix4();
+						mModel.set(modelMatrix[0], modelMatrix[4], modelMatrix[8], modelMatrix[12],
+								   modelMatrix[1], modelMatrix[5], modelMatrix[9], modelMatrix[13],
+								   modelMatrix[2], modelMatrix[6], modelMatrix[10], modelMatrix[14],
+								   modelMatrix[3], modelMatrix[7], modelMatrix[11], modelMatrix[15]);
+						for (var m = 0; m < OW_NUM_NODES; m++){
+							var mCurrent = new THREE.Matrix4();
+							mCurrent.set(currentMatrix[m * 16 + 0], currentMatrix[m * 16 + 4], currentMatrix[m * 16 + 8], currentMatrix[m * 16 + 12],
+							   		     currentMatrix[m * 16 + 1], currentMatrix[m * 16 + 5], currentMatrix[m * 16 + 9], currentMatrix[m * 16 + 13],
+									     currentMatrix[m * 16 + 2], currentMatrix[m * 16 + 6], currentMatrix[m * 16 + 10], currentMatrix[m * 16 + 14],
+									     currentMatrix[m * 16 + 3], currentMatrix[m * 16 + 7], currentMatrix[m * 16 + 11], currentMatrix[m * 16 + 15]);
+													   
+							var mNew = new THREE.Matrix4();	
 
-					_gl.uniformMatrix4fv( p_uniforms.boneGlobalMatrices, false, object.skeleton.boneMatrices );
+							mNew.multiplyMatrices(mModel, mCurrent);
+							for (var n = 0; n < 16; n++){
+								newMatrix.push(mNew.elements[n]);
+							}
+						}
+					}
+					
+					/*
+					
+					var scalingf = 2 * (timestep / 1000);
+					
+					for (var m = 0; m < 31; m++){
+						for (var n = 0; n < 4; n++){
+							for (var k = 0; k < 4; k++){
+								newMatrix[m * 16 + n * 4 + k] = modelMatrix[n * 4 + k];
+								if (n == k && n < 3)
+									newMatrix[m * 16 + n * 4 + k] = newMatrix[m * 16 + n * 4 + k] * scalingf;	
+							}
+						}
+					}*/
+					
+					_gl.uniformMatrix4fv( p_uniforms.boneGlobalMatrices, false, newMatrix );
+					//_gl.uniformMatrix4fv( p_uniforms.boneGlobalMatrices, false, object.skeleton.boneMatrices );					
 
 				}
 

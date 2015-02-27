@@ -22,6 +22,8 @@ SDF_lib/Release/*
 SkeletonExtractionWrapper_lib/Debug/*
 SkeletonExtractionWrapper_lib/Release/*
 
+SkinningData/*
+
 # User-specific files
 *.suo
 *.user

@@ -64,7 +64,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_OW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <ExceptionHandling>Async</ExceptionHandling>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
@@ -153,13 +153,16 @@ xcopy "D:\Projects\_shared\Skeletor\Wrappers\openworm_wrapper.*"  "D:\Projects\O
     <ClInclude Include="..\include\inline\meshes\SerializableMesh+Skin.h" />
     <ClInclude Include="..\include\inline\meshes\structure.h" />
     <ClInclude Include="..\include\inline\mmath\mmath.h" />
+    <ClInclude Include="..\include\inline\openworm_constants.h" />
     <ClInclude Include="..\include\inline\SkeletonNode\SkeletonNode.h" />
-    <ClInclude Include="openworm_wrapper.h" />
+    <ClInclude Include="..\Wrappers\export_wrapper.h" />
+    <ClInclude Include="..\Wrappers\openworm_wrapper.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="wrapper.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="openworm_wrapper.cpp" />
+    <ClCompile Include="..\Wrappers\export_wrapper.cpp" />
+    <ClCompile Include="..\Wrappers\openworm_wrapper.cpp" />
     <ClCompile Include="SkeletonExtractionWrapper.cpp" />
     <ClCompile Include="wrapper.cpp" />
   </ItemGroup>

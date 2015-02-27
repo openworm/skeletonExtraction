@@ -2,11 +2,11 @@
 
 void coreFunc(int timeStep){
 	try {
-		string filePath = string("D:\\Projects\\_shared\\Skeletor\\Models\\OpenWorm\\Export\\");
-		Export::ColladaExporter exporter;
+		string filePath = string("D:\\Projects\\_shared\\Skeletor\\Models\\OpenWorm\\Export\\export_") + OW_DATA_VERSION + "\\";
+		Export_Wrapper ew;
 		Openworm_Wrapper ow;
 
-		ow.oSDFExtractor.skeletonTesselationFactor = 1;
+		ow.oSDFExtractor.skeletonTesselationFactor = (OW_SKINNING_NUM_BONES  -1) / (OW_NUMNODES_BEFORETES - 1);
 
 		ow.oLBSExtractor.sdfHalfVectors = new CVector3[0];
 		ow.oLBSExtractor.sdfHalfVectorsMG = new CVector3[0];
@@ -17,12 +17,12 @@ void coreFunc(int timeStep){
 		skl::SkeletonNode * bindPoseSkeleton = new skl::SkeletonNode();
 
 		meshes::Mesh  * meshBindPose = new meshes::Mesh();
-		ow.skeletonExtractionSDF(0, filePath, &ow.exporter, bindPoseSkeleton, meshBindPose);
+		ow.skeletonExtractionSDF(OW_BINDPOSE_TIMESTEP, filePath, &ew, bindPoseSkeleton, meshBindPose);
 		ow.pSkeletonRootBindPose = bindPoseSkeleton;
 		ow.bindPoseSegmentLengths = ow.calculateSkeletonSegmentLengths(bindPoseSkeleton);
 		delete meshBindPose;
 
-		ow.calculateAndExportSkeletonTransformationsForTimestep(timeStep, filePath, &exporter, NULL);
+		ow.calculateAndExportSkeletonTransformationsForTimestep(timeStep, filePath, &ew, NULL);
 
 		delete bindPoseSkeleton;
 
@@ -31,5 +31,5 @@ void coreFunc(int timeStep){
 	} catch (...){
 		std::ofstream outfile ("leaks.txt");
 		outfile << timeStep;
-	    }
+	}
 }

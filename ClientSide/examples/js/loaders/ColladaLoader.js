@@ -58,6 +58,8 @@ THREE.ColladaLoader = function () {
 
 	function load ( url, readyCallback, progressCallback ) {
 
+		console.log('Colladaloader: '+url);
+	
 		var length = 0;
 
 		if ( document.implementation && document.implementation.createDocument ) {

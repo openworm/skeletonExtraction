@@ -16,6 +16,10 @@ namespace glm {
 	quat QuatBetweenVectors(vec3 start, vec3 dest, vec3 fallbackAxis = glm::vec3(0));
 
 	quat QuatBetweenVectorsWithAxis(vec3 start, vec3 dest, vec3 axis);
+
+	float AngleFromQuaternion(const quat &q);
+
+	glm::vec2 CubicBezierInterpolate(const glm::vec2 &P0, const glm::vec2 &P1, const glm::vec2 &P2, const glm::vec2 &P3, float t);
 }
 
 #include "aditions.inl"

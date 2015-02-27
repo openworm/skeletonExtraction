@@ -1,15 +1,17 @@
 #include "openworm_wrapper.h"
+#include <glm\custom\aditions.h>
 
 #define NUM_OF_CTRL_BONES 2
 #define MAX_BONE_MAT 24
 
 #define MAX_WORM_ITERATIONS 4000
 
+#define WORM_GRAVITATION_CONSTANT 0.012
+
 // main thread calls
 
 Openworm_Wrapper::Openworm_Wrapper(){
-	//wantedNumOfSkeletonNodes = 16;
-	wantedNumOfSkeletonNodes = 11;
+	wantedNumOfSkeletonNodes = OW_NUMNODES_BEFORETES;
 	initSkinning = false;
 	skinningGPU = true;
 
@@ -259,20 +261,21 @@ void Openworm_Wrapper::prepareGLDDataForSkinningPreview(string projectPath){
 
 #ifdef _GLD
 
-void Openworm_Wrapper::prepareBindPoseSkeletonAndVisualization(string filePath, Visualisation * vis){
+void Openworm_Wrapper::prepareBindPoseSkeletonAndVisualization(string filePath, Visualisation * vis, Export_Wrapper * exportWrapper){
 
 	skinningFilePath = filePath;
 
 	visualization = vis;
-	//visualization->Skeleton = new SN::SkeletonNode();
+	visualization->Skeleton = new SN::SkeletonNode();
 
-		// load skeleton for animtimestep
+	// load skeleton for animtimestep
 
 	if (filePath.size() > 0){
 		skinningFilePath = filePath;
 	}
 
-	string file = skinningFilePath + "animation_" + std::to_string(OW_SKINNING_NUM_BONES) + "\\skeleton_" + std::to_string(OW_SKINNING_NUM_BONES) + "S_" + std::to_string(0) + ".skl";
+	// load bind pose, strreighten worm
+	string file = skinningFilePath + "animation_" + std::to_string(OW_SKINNING_NUM_BONES)+ "\\skeleton_" + std::to_string(OW_SKINNING_NUM_BONES) + "S_" + exportWrapper->PadNumber(0, OW_PADDING) + ".skl";
 
 	ifstream ifs(file);
 	assert(ifs.good());
@@ -285,7 +288,7 @@ void Openworm_Wrapper::prepareBindPoseSkeletonAndVisualization(string filePath, 
 	ia >> BOOST_SERIALIZATION_NVP(bindPoseSkeletonNode);
 	assignFathersForSkeletonTree(&bindPoseSkeletonNode);
 
-	//copySkeletonNode(&bindPoseSkeletonNode, visualization->Skeleton);
+	copySkeletonNode(&bindPoseSkeletonNode, visualization->Skeleton);
 
 }
 
@@ -313,17 +316,17 @@ void  Openworm_Wrapper::calculateSkinningDataForMuscles(){
 	vector<int> muscleIndices;
 
 	for (int m=0; m < muscleMeshesVector.size(); m++){
-		CVector3 muscleCenter;
-		meshes::IndexedFace * oneMuscleMesh = &(muscleMeshesVector[m]);
-		for  (int i = 0; i < oneMuscleMesh->vertices.size() / 3; i++){
-			muscleCenter = muscleCenter + CVector3(oneMuscleMesh->vertices[i * 3], oneMuscleMesh->vertices[i * 3 + 1], oneMuscleMesh->vertices[i * 3 + 2]);
-			// 1 as an inicialization
-			muscleIndices.push_back(-1);
-			muscleIndices.push_back(-1);
-		}
-		muscleCenter = muscleCenter / (oneMuscleMesh->vertices.size() / 3);
+	CVector3 muscleCenter;
+	meshes::IndexedFace * oneMuscleMesh = &(muscleMeshesVector[m]);
+	for  (int i = 0; i < oneMuscleMesh->vertices.size() / 3; i++){
+	muscleCenter = muscleCenter + CVector3(oneMuscleMesh->vertices[i * 3], oneMuscleMesh->vertices[i * 3 + 1], oneMuscleMesh->vertices[i * 3 + 2]);
+	// 1 as an inicialization
+	muscleIndices.push_back(-1);
+	muscleIndices.push_back(-1);
+	}
+	muscleCenter = muscleCenter / (oneMuscleMesh->vertices.size() / 3);
 
-		muscleCenters.push_back(muscleCenter);
+	muscleCenters.push_back(muscleCenter);
 
 	}
 
@@ -332,60 +335,60 @@ void  Openworm_Wrapper::calculateSkinningDataForMuscles(){
 	queue.push_back(bindPoseSkeletonNode.nodes[0]);
 
 	while (queue.size() > 0){
-		SN::SkeletonNode* pNode = queue[queue.size() - 1];
-		queue.pop_back();
+	SN::SkeletonNode* pNode = queue[queue.size() - 1];
+	queue.pop_back();
 
-		boneCenters.push_back((pNode->point + pNode->father->point) / 2.0);
+	boneCenters.push_back((pNode->point + pNode->father->point) / 2.0);
 
-		for (int i=0; i < pNode->nodes.size(); i++){
-			SN::SkeletonNode* pSon = pNode->nodes[i];
-			queue.push_back(pSon);
-		}
+	for (int i=0; i < pNode->nodes.size(); i++){
+	SN::SkeletonNode* pSon = pNode->nodes[i];
+	queue.push_back(pSon);
+	}
 	}
 
 	// find closest bones to each muscle vertex
 	for (int c=0; c < serMuscleMeshForSkinning->vertices.size() / 3; c++){
-		for (int b=0; b < boneCenters.size(); b++){
-			float dist2nd = FLT_MAX;
-			float ind2nd = -1;
-			float dist = Magnitude(boneCenters[b] - CVector3(serMuscleMeshForSkinning->vertices[c * 3], serMuscleMeshForSkinning->vertices[c * 3 + 1], serMuscleMeshForSkinning->vertices[c * 3 + 2]));
-			// get actual distances and find if the bone is closer
-			float dist1 = FLT_MAX;
-			if (muscleIndices[c * 2] > -1){
-				dist1 = Magnitude(boneCenters[muscleIndices[c * 2]] - serMuscleMeshForSkinning->GetVertex(c));
-			}
-			float dist2 = FLT_MAX;
-			if (muscleIndices[c * 2 + 1] > -1){
-				dist2 = Magnitude(boneCenters[muscleIndices[c * 2 + 1]] - serMuscleMeshForSkinning->GetVertex(c));
-			}
+	for (int b=0; b < boneCenters.size(); b++){
+	float dist2nd = FLT_MAX;
+	float ind2nd = -1;
+	float dist = Magnitude(boneCenters[b] - CVector3(serMuscleMeshForSkinning->vertices[c * 3], serMuscleMeshForSkinning->vertices[c * 3 + 1], serMuscleMeshForSkinning->vertices[c * 3 + 2]));
+	// get actual distances and find if the bone is closer
+	float dist1 = FLT_MAX;
+	if (muscleIndices[c * 2] > -1){
+	dist1 = Magnitude(boneCenters[muscleIndices[c * 2]] - serMuscleMeshForSkinning->GetVertex(c));
+	}
+	float dist2 = FLT_MAX;
+	if (muscleIndices[c * 2 + 1] > -1){
+	dist2 = Magnitude(boneCenters[muscleIndices[c * 2 + 1]] - serMuscleMeshForSkinning->GetVertex(c));
+	}
 
-			if (dist < dist1){
-				// the most closest bone
-				if (muscleIndices[c * 2] != -1){
-					muscleIndices[c * 2 + 1] = muscleIndices[c * 2];
-				}
-				muscleIndices[c * 2] = b;
-			} else {
-				if (dist < dist2nd && dist != muscleIndices[c * 2]){
-					ind2nd = b;
-					dist2nd = dist;
-				}
-			}
+	if (dist < dist1){
+	// the most closest bone
+	if (muscleIndices[c * 2] != -1){
+	muscleIndices[c * 2 + 1] = muscleIndices[c * 2];
+	}
+	muscleIndices[c * 2] = b;
+	} else {
+	if (dist < dist2nd && dist != muscleIndices[c * 2]){
+	ind2nd = b;
+	dist2nd = dist;
+	}
+	}
 
-			// if 2nd closest bone is closer than our msecond index, change them
-			if (muscleIndices[c * 2 + 1] == -1){
-				muscleIndices[c * 2 + 1] = ind2nd;
-			} else {
-				if (dist < dist2){
-					muscleIndices[c * 2] = b;
-				}
-			}
-			if (muscleIndices[c * 2 + 1] != -1 && ind2nd != -1){
-				if (Magnitude(boneCenters[ind2nd] - CVector3(serMuscleMeshForSkinning->vertices[c * 3], serMuscleMeshForSkinning->vertices[c * 3 + 1], serMuscleMeshForSkinning->vertices[c * 3 + 2])) < Magnitude(boneCenters[muscleIndices[c * 2 + 1]] - CVector3(serMuscleMeshForSkinning->vertices[c * 3], serMuscleMeshForSkinning->vertices[c * 3 + 1], serMuscleMeshForSkinning->vertices[c * 3 + 2]))){
-					muscleIndices[c * 2 + 1] = ind2nd;
-				}
-			}
-		}
+	// if 2nd closest bone is closer than our msecond index, change them
+	if (muscleIndices[c * 2 + 1] == -1){
+	muscleIndices[c * 2 + 1] = ind2nd;
+	} else {
+	if (dist < dist2){
+	muscleIndices[c * 2] = b;
+	}
+	}
+	if (muscleIndices[c * 2 + 1] != -1 && ind2nd != -1){
+	if (Magnitude(boneCenters[ind2nd] - CVector3(serMuscleMeshForSkinning->vertices[c * 3], serMuscleMeshForSkinning->vertices[c * 3 + 1], serMuscleMeshForSkinning->vertices[c * 3 + 2])) < Magnitude(boneCenters[muscleIndices[c * 2 + 1]] - CVector3(serMuscleMeshForSkinning->vertices[c * 3], serMuscleMeshForSkinning->vertices[c * 3 + 1], serMuscleMeshForSkinning->vertices[c * 3 + 2]))){
+	muscleIndices[c * 2 + 1] = ind2nd;
+	}
+	}
+	}
 	}*/
 
 	serMuscleMeshForSkinning->jointIDs.clear();
@@ -395,36 +398,36 @@ void  Openworm_Wrapper::calculateSkinningDataForMuscles(){
 
 	//int idx = 0;
 	//for (int m=0; m < muscleMeshesVector.size(); m++){
-		//CVector3 muscleCenter;
-		//meshes::IndexedFace * oneMuscleMesh = &(muscleMeshesVector[m]);
-		//for  (int i = 0; i < oneMuscleMesh->vertices.size() / 3; i++){
-		for  (int i = 0; i < serMuscleMeshForSkinning->vertices.size() / 3; i++){
-			serMuscleMeshForSkinning->influences.push_back(2);
+	//CVector3 muscleCenter;
+	//meshes::IndexedFace * oneMuscleMesh = &(muscleMeshesVector[m]);
+	//for  (int i = 0; i < oneMuscleMesh->vertices.size() / 3; i++){
+	for  (int i = 0; i < serMuscleMeshForSkinning->vertices.size() / 3; i++){
+		serMuscleMeshForSkinning->influences.push_back(2);
 
-			//int inf1 = muscleIndices[idx * 2];
-			//int inf2 = muscleIndices[idx * 2 + 1];
+		//int inf1 = muscleIndices[idx * 2];
+		//int inf2 = muscleIndices[idx * 2 + 1];
 
-			//float dist1 = Magnitude(CVector3(oneMuscleMesh->vertices[i * 3], oneMuscleMesh->vertices[i * 3 + 1], oneMuscleMesh->vertices[i * 3 + 2]) - boneCenters[inf1]);
-			//float dist2 = Magnitude(CVector3(oneMuscleMesh->vertices[i * 3], oneMuscleMesh->vertices[i * 3 + 1], oneMuscleMesh->vertices[i * 3 + 2]) - boneCenters[inf2]);
+		//float dist1 = Magnitude(CVector3(oneMuscleMesh->vertices[i * 3], oneMuscleMesh->vertices[i * 3 + 1], oneMuscleMesh->vertices[i * 3 + 2]) - boneCenters[inf1]);
+		//float dist2 = Magnitude(CVector3(oneMuscleMesh->vertices[i * 3], oneMuscleMesh->vertices[i * 3 + 1], oneMuscleMesh->vertices[i * 3 + 2]) - boneCenters[inf2]);
 
-			//float weight1 = dist1 / (dist1 + dist2);
-			//float weight2 = dist2 / (dist1 + dist2);
+		//float weight1 = dist1 / (dist1 + dist2);
+		//float weight2 = dist2 / (dist1 + dist2);
 
-			int idOfClosest = findClosesCuticleVertexToPoint(CVector3(serMuscleMeshForSkinning->vertices[i * 3], serMuscleMeshForSkinning->vertices[i * 3 + 1], serMuscleMeshForSkinning->vertices[i * 3 + 2]));
-			float weight1 = serMeshForSkinning->skinWeights[idOfClosest * 2];
-			float weight2 = serMeshForSkinning->skinWeights[idOfClosest * 2 + 1];
+		int idOfClosest = findClosesCuticleVertexToPoint(CVector3(serMuscleMeshForSkinning->vertices[i * 3], serMuscleMeshForSkinning->vertices[i * 3 + 1], serMuscleMeshForSkinning->vertices[i * 3 + 2]));
+		float weight1 = serMeshForSkinning->skinWeights[idOfClosest * 2];
+		float weight2 = serMeshForSkinning->skinWeights[idOfClosest * 2 + 1];
 
-			int inf1 = serMeshForSkinning->jointIDs[idOfClosest * 2];
-			int inf2 = serMeshForSkinning->jointIDs[idOfClosest * 2 + 1];
+		int inf1 = serMeshForSkinning->jointIDs[idOfClosest * 2];
+		int inf2 = serMeshForSkinning->jointIDs[idOfClosest * 2 + 1];
 
-			serMuscleMeshForSkinning->jointIDs.push_back(inf1);
-			serMuscleMeshForSkinning->jointIDs.push_back(inf2);
+		serMuscleMeshForSkinning->jointIDs.push_back(inf1);
+		serMuscleMeshForSkinning->jointIDs.push_back(inf2);
 
-			serMuscleMeshForSkinning->skinWeights.push_back(weight1);
-			serMuscleMeshForSkinning->skinWeights.push_back(weight2);
+		serMuscleMeshForSkinning->skinWeights.push_back(weight1);
+		serMuscleMeshForSkinning->skinWeights.push_back(weight2);
 
-			//idx++;
-		}
+		//idx++;
+	}
 	//}
 
 }
@@ -442,7 +445,7 @@ void Openworm_Wrapper::readWormFileAndLoadMesh(string positionsFile, string memb
 
 void Openworm_Wrapper::prepareGLDDataForSimulationPreview(string positionsFile, string membraneFile){
 
-	readWormFileAndLoadMesh(positionsFile, membraneFile, 0);
+	readWormFileAndLoadMesh(positionsFile, membraneFile, OW_BINDPOSE_TIMESTEP);
 
 #ifdef _GLD
 
@@ -492,41 +495,41 @@ void Openworm_Wrapper::readWormFileAndLoadMuscleMesh(string positionsFile, strin
 
 	// creation of edges in muscle cloud
 	//if (false){
-		muscleMeshesVector.clear();
-		muscleLoader.ReadWormMuscleWithIndex(muscleMesh, muscleMeshesVector, indicesFile);
+	muscleMeshesVector.clear();
+	muscleLoader.ReadWormMuscleWithIndex(muscleMesh, muscleMeshesVector, indicesFile);
 
-		//copy indices from all the muscles into global mesh
-		/*
-		vector<float> newVertices;
-		vector<int> newIndices;
+	//copy indices from all the muscles into global mesh
+	/*
+	vector<float> newVertices;
+	vector<int> newIndices;
 
-		int muscleOffset = 0;
+	int muscleOffset = 0;
 
-		for (int m=0; m < muscleMeshesVector.size(); m++){
+	for (int m=0; m < muscleMeshesVector.size(); m++){
 
-			meshes::IndexedFace * oneMuscleMesh = &(muscleMeshesVector[m]);
+	meshes::IndexedFace * oneMuscleMesh = &(muscleMeshesVector[m]);
 
-			for  (int i = 0; i < oneMuscleMesh->vertices.size() / 3; i++){
+	for  (int i = 0; i < oneMuscleMesh->vertices.size() / 3; i++){
 
-				newVertices.push_back(oneMuscleMesh->vertices[i * 3]);
-				newVertices.push_back(oneMuscleMesh->vertices[i * 3 + 1]);
-				newVertices.push_back(oneMuscleMesh->vertices[i * 3 + 2]);
+	newVertices.push_back(oneMuscleMesh->vertices[i * 3]);
+	newVertices.push_back(oneMuscleMesh->vertices[i * 3 + 1]);
+	newVertices.push_back(oneMuscleMesh->vertices[i * 3 + 2]);
 
-				/*for  (int j = 0; j < oneMuscleMesh->vertices.size() / 3; j++){
-					if (i != j){
-						newIndices.push_back(muscleOffset + i);
-						newIndices.push_back(muscleOffset + j);
-						newIndices.push_back(muscleOffset + i);
-					}
-				}*/
-			/*}
+	/*for  (int j = 0; j < oneMuscleMesh->vertices.size() / 3; j++){
+	if (i != j){
+	newIndices.push_back(muscleOffset + i);
+	newIndices.push_back(muscleOffset + j);
+	newIndices.push_back(muscleOffset + i);
+	}
+	}*/
+	/*}
 
-			muscleOffset = muscleOffset + oneMuscleMesh->vertices.size() / 3;
-		}
+	muscleOffset = muscleOffset + oneMuscleMesh->vertices.size() / 3;
+	}
 
-		// add triangulation from per partes local muscle cells
-		muscleMesh->vertices = newVertices;
-		muscleMesh->indices = newIndices;
+	// add triangulation from per partes local muscle cells
+	muscleMesh->vertices = newVertices;
+	muscleMesh->indices = newIndices;
 	}*/
 }
 
@@ -581,14 +584,14 @@ void Openworm_Wrapper::pauseSimulationAndSkinningPreview(){
 }
 
 void Openworm_Wrapper::updateSimulationModelFromMainThread(){
-	#ifdef _GLD
-		int NumOfV = meshToAdd.vertices.size()/3;
-		if (NumOfV>0)
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, meshToAddGLDVerticesId);
-			glBufferData(GL_ARRAY_BUFFER, NumOfV * 3 * sizeof(float), &meshToAdd.vertices[0], GL_STATIC_DRAW);
-		}
-	#endif
+#ifdef _GLD
+	int NumOfV = meshToAdd.vertices.size()/3;
+	if (NumOfV>0)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, meshToAddGLDVerticesId);
+		glBufferData(GL_ARRAY_BUFFER, NumOfV * 3 * sizeof(float), &meshToAdd.vertices[0], GL_STATIC_DRAW);
+	}
+#endif
 }
 
 void Openworm_Wrapper::updateSimulationMuscleModelFromMainThread(){
@@ -644,7 +647,7 @@ void Openworm_Wrapper::addSkeletonToGLD(string filePath){
 
 
 #ifdef _GLD
-	//visualization->Skeleton2 = &bindPoseSkeletonNode;
+	visualization->Skeleton2 = &bindPoseSkeletonNode;
 #endif
 
 	b_addSkinningSkeleton = true;
@@ -652,8 +655,8 @@ void Openworm_Wrapper::addSkeletonToGLD(string filePath){
 	b_addSkinningSkeleton = false;
 
 #ifdef _GLD
-	//visualization->makeSkeleton(visualization->Skeleton);
-	//visualization->makeSkinnedSkeleton(visualization->Skeleton2);
+	visualization->makeSkeleton(visualization->Skeleton);
+	visualization->makeSkinnedSkeleton(visualization->Skeleton2);
 	if (skinningGPU){
 		gldAddModelShaderProgram("Skinning skeleton", skinningProgram->program);
 	} else {
@@ -701,18 +704,19 @@ void Openworm_Wrapper::updateSkeletonToGLDFromMainThread(){
 
 #ifdef _GLD
 
-		//visualization->updateSkeleton(visualization->Skeleton);
+		visualization->updateSkeleton(visualization->Skeleton);
 
 #endif
 
 		//delete visualization->Skeleton;
+		//visualization->Skeleton = new SN::SkeletonNode();
 
 	}
 }
 
 // animation thread calls
 
-void Openworm_Wrapper::calculateAndExportSkeletonTransformations(string filePath, Export::ColladaExporter * exporter){
+void Openworm_Wrapper::calculateAndExportSkeletonTransformations(string filePath, Export_Wrapper * exportWrapper){
 
 	// go through all timesteps, compute skeletons and export transformations
 
@@ -724,11 +728,11 @@ void Openworm_Wrapper::calculateAndExportSkeletonTransformations(string filePath
 
 	pSkeletonRootBindPose = new skl::SkeletonNode();
 
-	calculateAndExportSkeletonTransformationsForTimestep(bindPoseTimeStep, filePath, exporter, pSkeletonRootBindPose);
+	calculateAndExportSkeletonTransformationsForTimestep(bindPoseTimeStep, filePath, exportWrapper, pSkeletonRootBindPose);
 
 	while (timeStep < MAX_WORM_ITERATIONS){
 
-		calculateAndExportSkeletonTransformationsForTimestep(timeStep, filePath, exporter, NULL);
+		calculateAndExportSkeletonTransformationsForTimestep(timeStep, filePath, exportWrapper, NULL);
 
 		//timeStep = timeStep + 100;
 		timeStep++;
@@ -745,7 +749,7 @@ void Openworm_Wrapper::calculateAndExportMuscleTransformations(string filePath, 
 	timeStep = 0;
 
 	// load muscles in bind pose
-	readWormFileAndLoadMuscleMesh(filePath + "muscle_position_buffer.bin", filePath + "muscleParticlesIndexes.txt", bindPoseTimeStep);
+	readWormFileAndLoadMuscleMesh(filePath + MUSCLE_POSITION_BUFFER, filePath + MUSCLE_PARTICLE_INDICES, bindPoseTimeStep);
 
 	// calculate skeletons for each muscle in bindpose
 	for (int i=0; i < muscleMeshesVector.size(); i++){
@@ -756,7 +760,7 @@ void Openworm_Wrapper::calculateAndExportMuscleTransformations(string filePath, 
 
 	while (timeStep < MAX_WORM_ITERATIONS){
 		// load muscles in actual pose
-		readWormFileAndLoadMuscleMesh(filePath + "muscle_position_buffer.bin", filePath + "muscleParticlesIndexes.txt", timeStep);
+		readWormFileAndLoadMuscleMesh(filePath + MUSCLE_POSITION_BUFFER, filePath + MUSCLE_PARTICLE_INDICES, timeStep);
 
 		// 3. apply inverse skinning
 		// 4. extract skeleton
@@ -767,13 +771,13 @@ void Openworm_Wrapper::calculateAndExportMuscleTransformations(string filePath, 
 
 }
 
-void Openworm_Wrapper::skeletonExtractionSDF(int timeStep, string filePath, Export::ColladaExporter * exporter, skl::SkeletonNode * skeletonOutput, meshes::Mesh  * meshImport){
+void Openworm_Wrapper::skeletonExtractionSDF(int timeStep, string filePath, Export_Wrapper * exportWrapper, skl::SkeletonNode * skeletonOutput, meshes::Mesh  * meshImport){
 
 	oLBSExtractor.sdfModelController = new ModelController::CModel();
 	oLBSExtractor.pMesh = new MeshGraph();
 	skl::SkeletonNode * loadSkelet = new skl::SkeletonNode();
 
-	std::string pFile = std::string(filePath + "collada\\wormCollada_" + std::to_string(timeStep) + ".dae");
+	std::string pFile = std::string(filePath + "collada\\wormCollada_" + exportWrapper->PadNumber(timeStep, OW_PADDING) + ".dae");
 
 	ImportModel(meshImport, NULL, (char*)pFile.c_str(), oLBSExtractor.sdfModelController, loadSkelet);
 
@@ -818,12 +822,12 @@ void Openworm_Wrapper::skeletonExtractionSDF(int timeStep, string filePath, Expo
 	loadSkelet = NULL;
 }
 
-void Openworm_Wrapper::calculateAndExportSkeletonTransformationsForTimestep(int timeStep, string filePath, Export::ColladaExporter * exporter, skl::SkeletonNode * skeletonOutput){
+void Openworm_Wrapper::calculateAndExportSkeletonTransformationsForTimestep(int timeStep, string filePath, Export_Wrapper * exportWrapper, skl::SkeletonNode * skeletonOutput){
 
 	meshes::Mesh  * meshImport = new meshes::Mesh();
 	pSkeletonRootForTimestep = new skl::SkeletonNode();
 
-	skeletonExtractionSDF(timeStep, filePath, exporter, pSkeletonRootForTimestep, meshImport);
+	skeletonExtractionSDF(timeStep, filePath, exportWrapper, pSkeletonRootForTimestep, meshImport);
 
 	if (skeletonOutput != NULL){
 		copySNSkeletonNodeToSkl(pSkeletonRootForTimestep, skeletonOutput);
@@ -831,22 +835,31 @@ void Openworm_Wrapper::calculateAndExportSkeletonTransformationsForTimestep(int 
 
 	// export model
 
-	exporter->Export(meshImport, pSkeletonRootForTimestep, filePath + "animation_"+std::to_string(OW_SKINNING_NUM_BONES)+"\\model_" + std::to_string(oLBSExtractor.currentNumberOfSkeletonBones - 1) + "S_" + std::to_string(timeStep) + ".dae");
+	exportWrapper->exporter.Export(meshImport, pSkeletonRootForTimestep, filePath + "animation_"+std::to_string(OW_SKINNING_NUM_BONES)+"\\model_" + std::to_string(oLBSExtractor.currentNumberOfSkeletonBones - 1) + "S_" + exportWrapper->PadNumber(timeStep, OW_PADDING) + ".dae");
 
 	// serialize skeleton nodes
 
-	ofstream ofs(filePath + "animation_" + std::to_string(OW_SKINNING_NUM_BONES) + "\\skeleton_" + std::to_string(oLBSExtractor.currentNumberOfSkeletonBones - 1) + "S_" + std::to_string(timeStep) + ".skl");
+	ofstream ofs(filePath + "animation_" + std::to_string(OW_SKINNING_NUM_BONES) + "\\skeleton_" + std::to_string(oLBSExtractor.currentNumberOfSkeletonBones - 1) + "S_" + exportWrapper->PadNumber(timeStep, OW_PADDING) + ".skl");
 	assert(ofs.good());
 	boost::archive::xml_oarchive oa(ofs);
 	oa << BOOST_SERIALIZATION_NVP(pSkeletonRootForTimestep);
 
-	// compare differences with bind pose - timeStep 0
+	// serialize per segment SDF values
+
+	ofstream ofs2(filePath + "animation_" + std::to_string(OW_SKINNING_NUM_BONES) + "\\SDF_" + std::to_string(oLBSExtractor.currentNumberOfSkeletonBones - 1) + "S_" + exportWrapper->PadNumber(timeStep, OW_PADDING) + ".sdf", std::ofstream::out);
+	assert(ofs2.good());
+	for (int i=0; i < perSegmentSDFVec.size(); i++){
+		ofs2 << perSegmentSDFVec[i] << std::endl;
+	}
+	ofs2.close();
+
+	// compare differences with bind pose - timeStep 
 	SM::CalculateWormTransformationMatrices(pSkeletonRootBindPose, pSkeletonRootForTimestep);
 
 	// send new skeleton rotations to shader
-	Export::SaveQuaternionsToFile(pSkeletonRootForTimestep, filePath + "animation_" + std::to_string(OW_SKINNING_NUM_BONES) + "\\quaternion_" + std::to_string(oLBSExtractor.currentNumberOfSkeletonBones - 1) + "S_" + std::to_string(timeStep) + ".qua" );
-	Export::SaveAxisAngleToFile(pSkeletonRootForTimestep, filePath + "animation_" + std::to_string(OW_SKINNING_NUM_BONES) +"\\quaternion_" + std::to_string(oLBSExtractor.currentNumberOfSkeletonBones - 1) + "S_" + std::to_string(timeStep) + ".axa" );
-	Export::SaveMatricesToFile(pSkeletonRootForTimestep, filePath + "animation_" + std::to_string(OW_SKINNING_NUM_BONES) + "\\matrix_" + std::to_string(oLBSExtractor.currentNumberOfSkeletonBones - 1) + "S_" + std::to_string(timeStep) + ".mat");
+	Export::SaveQuaternionsToFile(pSkeletonRootForTimestep, filePath + "animation_" + std::to_string(OW_SKINNING_NUM_BONES) +"_bindpose"+ std::to_string(OW_BINDPOSE_TIMESTEP) + "\\quaternion_" + std::to_string(oLBSExtractor.currentNumberOfSkeletonBones - 1) + "S_" + exportWrapper->PadNumber(timeStep, OW_PADDING) + ".qua");
+	Export::SaveAxisAngleToFile(pSkeletonRootForTimestep, filePath + "animation_" + std::to_string(OW_SKINNING_NUM_BONES) +"_bindpose"+ std::to_string(OW_BINDPOSE_TIMESTEP) +"\\quaternion_" + std::to_string(oLBSExtractor.currentNumberOfSkeletonBones - 1) + "S_" + exportWrapper->PadNumber(timeStep, OW_PADDING) + ".axa");
+	Export::SaveMatricesToFile(pSkeletonRootForTimestep, filePath + "animation_" + std::to_string(OW_SKINNING_NUM_BONES) +"_bindpose"+ std::to_string(OW_BINDPOSE_TIMESTEP) + "\\matrix_" + std::to_string(oLBSExtractor.currentNumberOfSkeletonBones - 1) + "S_" + exportWrapper->PadNumber(timeStep, OW_PADDING) + ".mat");
 
 	delete pSkeletonRootForTimestep;
 	pSkeletonRootForTimestep = NULL;
@@ -875,46 +888,86 @@ vector<float> Openworm_Wrapper::calculateSkeletonSegmentLengths(SN::SkeletonNode
 }
 
 /*void Openworm_Wrapper::performTransformationsInSkeletonTree(skl::SkeletonNode * skeletonNode, vector<glm::mat4> * pSkinningMatrixVec){
+vector<skl::SkeletonNode*> queue;
+queue.push_back(skeletonNode);
+
+glm::mat4 fathersAffine(1);
+
+while (queue.size() > 0){
+skl::SkeletonNode* pNode = queue[queue.size() - 1];
+queue.pop_back();
+
+int nodeId = pNode->id;
+
+if (nodeId >= 0 && nodeId < (*pSkinningMatrixVec).size()){
+glm::mat4 nodeMatrix = (*pSkinningMatrixVec)[nodeId];
+
+glm::mat4 translateToOriginMatrix(1);
+translateToOriginMatrix = glm::translate(translateToOriginMatrix, glm::vec3(-pNode->point.x, -pNode->point.y, -pNode->point.z));
+
+glm::mat4 translateFromOriginMatrix(1);
+translateFromOriginMatrix = glm::translate(translateFromOriginMatrix, glm::vec3(pNode->point.x, pNode->point.y, pNode->point.z));
+
+// apply transformation of father to this childs matrix
+nodeMatrix = translateToOriginMatrix * nodeMatrix * translateFromOriginMatrix;
+
+nodeMatrix = fathersAffine * nodeMatrix;
+
+// setn new matrix
+(*pSkinningMatrixVec)[nodeId] = nodeMatrix;
+
+// set father for calculation of child nodes
+fathersAffine = nodeMatrix;
+}
+
+for (int i=0; i < pNode->nodes.size(); i++){
+skl::SkeletonNode* pSon = (skl::SkeletonNode*)pNode->nodes[i];
+queue.push_back(pSon);
+}
+}
+}*/
+
+void Openworm_Wrapper::performTransformationsInSkeletonTree(skl::SkeletonNode * skeletonNode, vector<glm::quat> * pSkinningQuatVec, vector<glm::mat4> * pSkinningMatrixVec){
+	(*pSkinningMatrixVec).resize((*pSkinningQuatVec).size());
+
 	vector<skl::SkeletonNode*> queue;
-	queue.push_back(skeletonNode);
+	queue.push_back((skl::SkeletonNode*)skeletonNode->nodes[0]);
 
 	glm::mat4 fathersAffine(1);
 
+	int nodeId = 0;
+	(*pSkinningMatrixVec)[0] = glm::mat4(1);
+
 	while (queue.size() > 0){
-		skl::SkeletonNode* pNode = queue[queue.size() - 1];
+		nodeId++;
+		skl::SkeletonNode* pNode = queue.back();
 		queue.pop_back();
 
-		int nodeId = pNode->id;
+		glm::quat nodeQuat = (*pSkinningQuatVec)[nodeId];
 
-		if (nodeId >= 0 && nodeId < (*pSkinningMatrixVec).size()){
-			glm::mat4 nodeMatrix = (*pSkinningMatrixVec)[nodeId];
+		glm::mat4 translateToOriginMatrix = glm::translate(glm::mat4(1), glm::vec3(-pNode->father->point.x, -pNode->father->point.y, -pNode->father->point.z));
+		glm::mat4 rotate = glm::mat4_cast(nodeQuat);
+		glm::mat4 translateFromOriginMatrix = glm::translate(glm::mat4(1), glm::vec3(pNode->father->point.x, pNode->father->point.y, pNode->father->point.z));
 
-			glm::mat4 translateToOriginMatrix(1);
-			translateToOriginMatrix = glm::translate(translateToOriginMatrix, glm::vec3(-pNode->point.x, -pNode->point.y, -pNode->point.z));
+		// apply transformation of father to this childs matrix
+		glm::mat4 nodeMatrix = translateFromOriginMatrix * rotate * translateToOriginMatrix; /// glm::inverse if inverse skinning
 
-			glm::mat4 translateFromOriginMatrix(1);
-			translateFromOriginMatrix = glm::translate(translateFromOriginMatrix, glm::vec3(pNode->point.x, pNode->point.y, pNode->point.z));
+		nodeMatrix = fathersAffine * nodeMatrix;
 
-			// apply transformation of father to this childs matrix
-			nodeMatrix = translateToOriginMatrix * nodeMatrix * translateFromOriginMatrix;
+		// setn new matrix
+		(*pSkinningMatrixVec)[nodeId] = nodeMatrix;
 
-			nodeMatrix = fathersAffine * nodeMatrix;
-
-			// setn new matrix
-			(*pSkinningMatrixVec)[nodeId] = nodeMatrix;
-
-			// set father for calculation of child nodes
-			fathersAffine = nodeMatrix;
-		}
+		// set father for calculation of child nodes
+		fathersAffine = nodeMatrix;
 
 		for (int i=0; i < pNode->nodes.size(); i++){
 			skl::SkeletonNode* pSon = (skl::SkeletonNode*)pNode->nodes[i];
 			queue.push_back(pSon);
 		}
 	}
-}*/
+}
 
-void Openworm_Wrapper::performTransformationsInSkeletonTree(skl::SkeletonNode * skeletonNode, vector<glm::quat> * pSkinningQuatVec, vector<glm::mat4> * pSkinningMatrixVec){
+void Openworm_Wrapper::performTimeConstantTransformationsInSkeletonTree(skl::SkeletonNode * skeletonNode, vector<glm::quat> * pSkinningQuatVec, vector<glm::mat4> * pSkinningMatrixVec){
 	(*pSkinningMatrixVec).resize((*pSkinningQuatVec).size());
 
 	vector<skl::SkeletonNode*> queue;
@@ -943,9 +996,8 @@ void Openworm_Wrapper::performTransformationsInSkeletonTree(skl::SkeletonNode * 
 
 		glm::mat4 translateToOriginMatrix = glm::translate(glm::mat4(1), glm::vec3(-pNode->father->point.x, -pNode->father->point.y, -pNode->father->point.z));
 		glm::mat4 rotate = glm::mat4_cast(nodeQuat);
-		glm::mat4 scale = glm::mat4(1.0);//glm::scale(glm::mat4(1.0), glm::vec3(ss, 1.0, ss));
+		glm::mat4 scale = glm::scale(glm::mat4(1.0), glm::vec3(ss, 1.0, 0.9));
 		glm::mat4 translateFromOriginMatrix = glm::translate(glm::mat4(1), glm::vec3(pNode->father->point.x, pNode->father->point.y, pNode->father->point.z));
-		//glm::mat4 rotate = glm::rotate(glm::mat4(1), 5.0f, glm::vec3(1,0,0));
 
 		// apply transformation of father to this childs matrix
 		glm::mat4 nodeMatrix = translateFromOriginMatrix * rotate * translateToOriginMatrix; /// glm::inverse if inverse skinning
@@ -965,12 +1017,359 @@ void Openworm_Wrapper::performTransformationsInSkeletonTree(skl::SkeletonNode * 
 		}
 	}
 }
+/*
+void Openworm_Wrapper::performGravitationBasedTransformationsInSkeletonTree(skl::SkeletonNode * skeletonNode, vector<glm::quat> * pSkinningQuatVec, vector<glm::mat4> * pSkinningMatrixVec, float gravitation_magnitude){
+	(*pSkinningMatrixVec).resize((*pSkinningQuatVec).size());
 
-void Openworm_Wrapper::nextTimeStepSkinningPreview(){
+	vector<skl::SkeletonNode*> queue;
+	queue.push_back((skl::SkeletonNode*)skeletonNode->nodes[0]);
+
+	glm::mat4 fathersAffine(1);
+
+	int nodeId = 0;
+	(*pSkinningMatrixVec)[0] = glm::mat4(1);
+
+	float gravitation = WORM_GRAVITATION_CONSTANT * gravitation_magnitude;
+
+	while (queue.size() > 0){
+		nodeId++;
+		skl::SkeletonNode* pNode = queue.back();
+		queue.pop_back();
+
+		glm::quat nodeQuat = (*pSkinningQuatVec)[nodeId];
+
+		glm::mat4 translateToOriginMatrix = glm::translate(glm::mat4(1), glm::vec3(-pNode->father->point.x, -pNode->father->point.y, -pNode->father->point.z));
+		glm::mat4 rotate = glm::mat4_cast(nodeQuat);
+		glm::mat4 scale = glm::scale(glm::mat4(1.0), glm::vec3(1 + gravitation, 1.0, 1.0 - gravitation));
+		glm::mat4 translateFromOriginMatrix = glm::translate(glm::mat4(1), glm::vec3(pNode->father->point.x, pNode->father->point.y, pNode->father->point.z));
+
+		// apply transformation of father to this childs matrix
+		glm::mat4 nodeMatrix = translateFromOriginMatrix * rotate * translateToOriginMatrix; /// glm::inverse if inverse skinning
+		glm::mat4 nodeMatrix2 = translateFromOriginMatrix * rotate * scale * translateToOriginMatrix;
+
+		nodeMatrix = fathersAffine * nodeMatrix;
+
+		// setn new matrix
+		(*pSkinningMatrixVec)[nodeId] = fathersAffine * nodeMatrix2;
+
+		// set father for calculation of child nodes
+		fathersAffine = nodeMatrix;
+
+		for (int i=0; i < pNode->nodes.size(); i++){
+			skl::SkeletonNode* pSon = (skl::SkeletonNode*)pNode->nodes[i];
+			queue.push_back(pSon);
+		}
+	}
+}
+*/
+void Openworm_Wrapper::performGravitationBasedTransformationsInSkeletonTree(skl::SkeletonNode * skeletonNode, vector<glm::quat> * pSkinningQuatVec, vector<glm::mat4> * pSkinningMatrixVec, float gravitation_magnitude){
+	(*pSkinningMatrixVec).resize((*pSkinningQuatVec).size());
+
+	vector<skl::SkeletonNode*> queue;
+	queue.push_back((skl::SkeletonNode*)skeletonNode->nodes[0]);
+
+	glm::mat4 fathersAffine(1);
+
+	int nodeId = 0;
+	(*pSkinningMatrixVec)[0] = glm::mat4(1);
+
+	float gravitation = WORM_GRAVITATION_CONSTANT * gravitation_magnitude;
+	float curvatureScale = OpenWorm::ScaleFactorFromCurvature(OpenWorm::TotalSkeletonCurvature(*pSkinningQuatVec));//0.85;
+
+	glm::mat4 gravity = glm::scale(glm::mat4(1.0), glm::vec3(1.0 + gravitation, curvatureScale, 1.0 - gravitation));
+
+	while (queue.size() > 0){
+		nodeId++;
+		skl::SkeletonNode* pNode = queue.back();
+		queue.pop_back();
+
+		glm::quat nodeQuat = (*pSkinningQuatVec)[nodeId];
+		glm::vec3 fatherPoint = glm::vec3(pNode->father->point.x, pNode->father->point.y, pNode->father->point.z);
+		//glm::vec3 point = glm::vec3(pNode->point.x, pNode->point.y, pNode->point.z);
+
+		fatherPoint = glm::vec3(fathersAffine * glm::vec4(fatherPoint, 1.0));
+
+		glm::mat4 translateToOriginMatrix = glm::translate(glm::mat4(1), -fatherPoint);
+		glm::mat4 rotate = glm::mat4_cast(nodeQuat);
+		glm::mat4 translateFromOriginMatrix = glm::translate(glm::mat4(1), fatherPoint);
+
+		// apply transformation of father to this childs matrix
+		glm::mat4 nodeMatrix = (nodeId == 1) ? (translateFromOriginMatrix * rotate * gravity * translateToOriginMatrix) : (translateFromOriginMatrix * rotate * translateToOriginMatrix);
+
+		nodeMatrix = nodeMatrix * fathersAffine;
+
+		// setn new matrix
+		(*pSkinningMatrixVec)[nodeId] = nodeMatrix;
+
+		// set father for calculation of child nodes
+		fathersAffine = nodeMatrix;
+
+		for (int i=0; i < pNode->nodes.size(); i++){
+			skl::SkeletonNode* pSon = (skl::SkeletonNode*)pNode->nodes[i];
+			queue.push_back(pSon);
+		}
+	}
+}
+
+void Openworm_Wrapper::performSDFBasedTransformationsInSkeletonTree(skl::SkeletonNode * skeletonNode, vector<glm::quat> * pSkinningQuatVec, vector<glm::mat4> * pSkinningMatrixVec, vector<float> &sdf, float gravitation_magnitude, const glm::vec3 &gravitationAxis) {
+	(*pSkinningMatrixVec).resize((*pSkinningQuatVec).size());
+
+	vector<skl::SkeletonNode*> queue;
+	queue.push_back((skl::SkeletonNode*)skeletonNode->nodes[0]);
+
+	glm::mat4 fathersAffine(1);
+
+	int nodeId = 0;
+	(*pSkinningMatrixVec)[0] = glm::mat4(1);
+	mmath::CVector3 P = queue.back()->point;
+	
+	float curvatureScale = OpenWorm::ScaleFactorFromCurvature(OpenWorm::TotalSkeletonCurvature(*pSkinningQuatVec));
+	glm::mat4 curvatureTranslateToOriginMatrix = glm::translate(glm::mat4(1.0), glm::vec3(-P.x, -P.y, -P.z));
+	glm::mat4 curvatureScaleMatrix = glm::scale(glm::mat4(1.0), glm::vec3(1.0, curvatureScale, 1.0));
+	glm::mat4 curvatureTranslateFromOriginMatrix = glm::translate(glm::mat4(1.0), glm::vec3(P.x, P.y, P.z));
+	glm::mat4 curvatureMatrix = curvatureTranslateFromOriginMatrix * curvatureScaleMatrix * curvatureTranslateToOriginMatrix;
+
+	while (queue.size() > 0){
+		nodeId++;
+		skl::SkeletonNode* pNode = queue.back();
+		queue.pop_back();
+
+		glm::quat nodeQuat = (*pSkinningQuatVec)[nodeId];
+
+		float gravitation = WORM_GRAVITATION_CONSTANT * OpenWorm::ScaleSDFByGravity(sdf[nodeId], gravitation_magnitude);//sdf[nodeId-1] - 1;
+		glm::vec3 point = glm::vec3(curvatureMatrix * glm::vec4(pNode->father->point.x, pNode->father->point.y, pNode->father->point.z, 1.0));
+		glm::mat4 translateToOriginMatrix = glm::translate(glm::mat4(1), -point);
+		glm::mat4 rotate = glm::mat4_cast(nodeQuat);
+		glm::mat4 scale = glm::scale(glm::mat4(1.0), glm::vec3(1 + gravitation, curvatureScale, 1.0 - gravitation));
+		glm::mat4 translateFromOriginMatrix = glm::translate(glm::mat4(1), point);
+
+		// apply transformation of father to this childs matrix
+		glm::mat4 nodeMatrix = translateFromOriginMatrix * rotate * translateToOriginMatrix; /// glm::inverse if inverse skinning
+		glm::mat4 nodeMatrix2 = translateFromOriginMatrix * rotate * scale * translateToOriginMatrix * curvatureMatrix;
+
+		nodeMatrix = fathersAffine * nodeMatrix;
+
+		// setn new matrix
+		(*pSkinningMatrixVec)[nodeId] = fathersAffine * nodeMatrix2;
+
+		// set father for calculation of child nodes
+		fathersAffine = nodeMatrix;
+
+		for (int i=0; i < pNode->nodes.size(); i++){
+			skl::SkeletonNode* pSon = (skl::SkeletonNode*)pNode->nodes[i];
+			queue.push_back(pSon);
+		}
+	}
+}
+	/*(*pSkinningMatrixVec).resize((*pSkinningQuatVec).size());
+
+	vector<skl::SkeletonNode*> queue;
+	queue.push_back((skl::SkeletonNode*)skeletonNode->nodes[0]);
+
+	glm::mat4 fathersAffine(1);
+
+	int nodeId = 0;
+	(*pSkinningMatrixVec)[0] = glm::mat4(1);
+
+	float gravitation = WORM_GRAVITATION_CONSTANT * OpenWorm::ScaleSDFByGravity(sdf[1], gravitation_magnitude);
+	float curvatureScale = OpenWorm::ScaleFactorFromCurvature(OpenWorm::TotalSkeletonCurvature(*pSkinningQuatVec));//0.85;
+
+	glm::mat4 gravity = glm::scale(glm::mat4(1.0), glm::vec3(1.0 + gravitation, curvatureScale, 1.0 - gravitation));
+
+	while (queue.size() > 0){
+		nodeId++;
+		skl::SkeletonNode* pNode = queue.back();
+		queue.pop_back();
+
+		glm::quat nodeQuat = (*pSkinningQuatVec)[nodeId];
+		glm::vec3 fatherPoint = glm::vec3(pNode->father->point.x, pNode->father->point.y, pNode->father->point.z);
+		glm::vec3 point = glm::vec3(pNode->point.x, pNode->point.y, pNode->point.z);
+		
+		fatherPoint = glm::vec3(fathersAffine * glm::vec4(fatherPoint, 1.0));
+		point = glm::vec3(fathersAffine * glm::vec4(point, 1.0));
+
+		glm::mat4 translateToOriginMatrix = glm::translate(glm::mat4(1), -fatherPoint);
+		glm::mat4 rotate = glm::mat4_cast(nodeQuat);
+		glm::mat4 translateFromOriginMatrix = glm::translate(glm::mat4(1), fatherPoint);
+
+		// apply transformation of father to this childs matrix
+		glm::mat4 nodeMatrix;
+		if (nodeId == 1) {
+			nodeMatrix = translateFromOriginMatrix * rotate * gravity * translateToOriginMatrix;
+		} else {
+			//get variables
+			float gravitationFactor = WORM_GRAVITATION_CONSTANT * OpenWorm::ScaleSDFByGravity(sdf[nodeId], gravitation_magnitude);
+			float s1 = (1 - gravitationFactor) / (1 - gravitation);
+			float s2 = (1 + gravitationFactor) / (1 + gravitation);
+			glm::vec3 dir = glm::normalize(point - fatherPoint);
+			glm::vec3 bitangent = glm::normalize(glm::cross(dir, gravitationAxis));
+			//undo previous gravitation change, apply current gravitation change
+			glm::mat4 gravityScale = glm::scale(glm::mat4(1.0), glm::VectorForScaleMatrix(gravitationAxis * s1));
+			//glm::mat4 directionScale = glm::mat4(1.0);
+			glm::mat4 bitangentScale = glm::scale(glm::mat4(1.0), glm::VectorForScaleMatrix(bitangent * s2));
+			//glm::mat4 scale = bitangentScale * gravityScale * directionScale;
+			glm::mat4 scale = bitangentScale;
+
+			nodeMatrix = translateFromOriginMatrix * rotate * scale * translateToOriginMatrix;
+			//set new gravbitation factor
+			gravitation = gravitationFactor;
+		}
+
+		nodeMatrix = nodeMatrix * fathersAffine;
+
+		// setn new matrix
+		(*pSkinningMatrixVec)[nodeId] = nodeMatrix;
+
+		// set father for calculation of child nodes
+		fathersAffine = nodeMatrix;
+
+		for (int i=0; i < pNode->nodes.size(); i++){
+			skl::SkeletonNode* pSon = (skl::SkeletonNode*)pNode->nodes[i];
+			queue.push_back(pSon);
+		}
+	}
+}*/
+
+void Openworm_Wrapper::loadSDFFromFile(string fileName, vector<float> &sdf) {
+	ifstream f(fileName);
+	sdf.clear();
+
+	float sdf_value = 0;
+	while (f >> sdf_value) {
+		sdf.push_back(sdf_value);
+	}
+}
+
+void Openworm_Wrapper::fixFedUpSDF(vector<float> &sdf_old, vector<float> &sdf_new) {
+	vector<float> sdf_temp;
+
+	for (int i = 0; i < sdf_old.size(); i++) {
+		sdf_temp.push_back(sdf_old[i]);
+
+		if (i+1 < sdf_old.size()) {
+			sdf_temp.push_back((sdf_old[i] + sdf_old[i+1]) / 2);
+		}
+	}
+	
+	sdf_new.clear();
+	for (int i = 0; i < sdf_temp.size(); i++) {
+		sdf_new.push_back(sdf_temp[i]);
+
+		if ((i < 5 || i > 15) && i+1 < sdf_temp.size()) {
+			sdf_new.push_back((sdf_temp[i] + sdf_temp[i+1]) / 2);
+		}
+	}
+}
+
+void Openworm_Wrapper::calculateHeuristicSkinningWeights(string projDir) {
+	string file = projDir + "export_0\\animation_" + std::to_string(OW_SKINNING_NUM_BONES) + "\\skeleton_" + std::to_string(OW_SKINNING_NUM_BONES) + "S_00000.skl";
+
+	ifstream ifs(file);
+	assert(ifs.good());
+	boost::archive::xml_iarchive ia(ifs);
+
+	skl::SkeletonNode *loadedSkeletonNode = new skl::SkeletonNode();
+	ia >> BOOST_SERIALIZATION_NVP(loadedSkeletonNode);
+	assignFathersForSkeletonTree(loadedSkeletonNode);
+
+	serMeshForSkinning->influences.clear();
+	serMeshForSkinning->skinWeights.clear();
+	serMeshForSkinning->jointIDs.clear();
+	//calculate offset along Y axis
+	vector<float> skelet;
+	SN::SkeletonNode *node = (SN::SkeletonNode*)loadedSkeletonNode;
+	while (node != NULL) {
+		skelet.push_back(node->point.y);
+
+		if (node->nodes.empty())
+			node = NULL;
+		else
+			node = node->nodes[0];
+	}
+	int maxIDX = skelet.size() - 1;
+	//find closest node in Y for each vertex
+	int numOfVerts = serMeshForSkinning->vertices.size() / 3;
+	for (int i = 0; i < numOfVerts; i++) {
+		float Y = serMeshForSkinning->GetVertex(i).y;
+		//find segment
+		int segment = 0;
+		while (segment < skelet.size() && skelet[segment] < Y) {
+			segment++;
+		}
+		segment--;
+		//calculate new skinning weights
+		serMeshForSkinning->influences.push_back(2);
+		if (segment < 0) {
+			serMeshForSkinning->jointIDs.push_back(1);
+			serMeshForSkinning->jointIDs.push_back(1);
+
+			serMeshForSkinning->skinWeights.push_back(1.0);
+			serMeshForSkinning->skinWeights.push_back(0.0);
+		} else if (segment == skelet.size() - 1) {
+			serMeshForSkinning->jointIDs.push_back(segment);
+			serMeshForSkinning->jointIDs.push_back(segment);
+
+			serMeshForSkinning->skinWeights.push_back(1.0);
+			serMeshForSkinning->skinWeights.push_back(0.0);
+		} else {
+			float MIX_FACTOR = 0.5;
+			float factor = (Y - skelet[segment]) / (skelet[segment + 1] - skelet[segment]);
+			/*if (factor > MIX_FACTOR && factor < 1 - MIX_FACTOR) {
+				serMeshForSkinning->jointIDs.push_back(segment + 1);
+				serMeshForSkinning->jointIDs.push_back(segment + 1);
+
+				serMeshForSkinning->skinWeights.push_back(1.0);
+				serMeshForSkinning->skinWeights.push_back(0.0);
+			} else*/ if (factor <= MIX_FACTOR) {
+				//normalize factor, flip and max mixig is 0.5
+				float weight = (1 - (factor / MIX_FACTOR)) * 0.5;
+
+				serMeshForSkinning->jointIDs.push_back(glm::clamp(segment, 1, maxIDX));
+				serMeshForSkinning->jointIDs.push_back(glm::clamp(segment + 1, 1, maxIDX));
+
+				serMeshForSkinning->skinWeights.push_back(weight);
+				serMeshForSkinning->skinWeights.push_back(1.0 - weight);
+			} else {
+				//normalize factor, flip and max mixig is 0.5
+				float weight = ((factor - (1 - MIX_FACTOR)) / MIX_FACTOR) * 0.5;
+
+				serMeshForSkinning->jointIDs.push_back(glm::clamp(segment + 1, 1, maxIDX));
+				serMeshForSkinning->jointIDs.push_back(glm::clamp(segment + 2, 1, maxIDX));
+				
+				serMeshForSkinning->skinWeights.push_back(1.0 - weight);
+				serMeshForSkinning->skinWeights.push_back(weight);
+			}
+		}
+	}
+}
+
+void Openworm_Wrapper::calculateMuscleMesh(string fileDir, meshes::IndexedFace *muscleMesh) {
+	meshes::MeshSkin muscleMeshZero;
+
+	muscleLoader.ReadWormIteration(&muscleMeshZero, 0);
+	// if the model is transformed x=-z, we have to use this
+	swapXandYInverted(&muscleMeshZero);
+
+	vector<meshes::IndexedFace> muscleMeshes;
+	vector<std::vector<int> > muscleIdMap;
+
+	muscleLoader.ReadWormMuscleWithIndex(&muscleMeshZero, muscleMeshes, muscleIdMap, fileDir + MUSCLE_PARTICLE_INDICES);
+
+	vector<meshes::IndexedFace*> muscleMeshes_ptr;
+	for (int i = 0; i < muscleMeshes.size(); i++) {
+		muscleMeshes_ptr.push_back(&muscleMeshes[i]);
+		Import::CreateMeshForMuscle(muscleMeshes_ptr.back());
+	}
+	Import::TransferMeshFromMuscles(muscleMesh, muscleMeshes_ptr, muscleIdMap);
+}
+
+void Openworm_Wrapper::nextTimeStepSkinningPreview(Export_Wrapper * exportWrapper){
+
+	return;
 
 	//load skeleton
 
-	string file = skinningFilePath + "animation_" + std::to_string(OW_SKINNING_NUM_BONES) + "\\skeleton_" + std::to_string(OW_SKINNING_NUM_BONES) + "S_" + std::to_string(animTimestep) + ".skl";
+	string file = skinningFilePath + "animation_" + std::to_string(OW_SKINNING_NUM_BONES) + "\\skeleton_" + std::to_string(OW_SKINNING_NUM_BONES) + "S_" + exportWrapper->PadNumber(animTimestep, OW_PADDING) + ".skl";
 
 	ifstream ifs(file);
 	assert(ifs.good());
@@ -983,8 +1382,8 @@ void Openworm_Wrapper::nextTimeStepSkinningPreview(){
 	ia >> BOOST_SERIALIZATION_NVP(loadedSkeletonNode);
 	assignFathersForSkeletonTree(loadedSkeletonNode);
 
-	#ifdef _GLD
-		//copySkeletonNode(loadedSkeletonNode, visualization->Skeleton);
+#ifdef _GLD
+	copySkeletonNode(loadedSkeletonNode, visualization->Skeleton);
 #endif
 
 	b_addSkinningSkeleton = true;
@@ -1021,19 +1420,39 @@ void Openworm_Wrapper::nextTimeStepSkinningPreview(){
 
 	// update quaternions
 
-	string quaternionFile = skinningFilePath + "animation_"+ std::to_string(OW_SKINNING_NUM_BONES) +"\\quaternion_" + std::to_string(OW_SKINNING_NUM_BONES) + "S_" + std::to_string(animTimestep) + ".qua";
+	string quaternionFile = skinningFilePath + "animation_"+ std::to_string(OW_SKINNING_NUM_BONES)+"_bindpose"+ std::to_string(OW_BINDPOSE_TIMESTEP) +"\\quaternion_" + std::to_string(OW_SKINNING_NUM_BONES) + "S_" + exportWrapper->PadNumber(animTimestep, OW_PADDING) + ".qua";
 	ifstream isq(quaternionFile);
 	assert(isq.good());
 
 	skinningQuatVecNew.clear();
 
 	ImportQuaternion(skinningQuatVecNew, isq);
+	
+	string sdf_file_31_0 = skinningFilePath + "animation_31\\SDF__31S_00000.sdf";
+	string sdf_file_0 = skinningFilePath + "animation_31\\SDF_31S_" + exportWrapper->PadNumber(0, OW_PADDING) + ".sdf";
+	string sdf_file_anim = skinningFilePath + "animation_31\\SDF_31S_" + exportWrapper->PadNumber(animTimestep, OW_PADDING) + ".sdf";
+	vector<float> sdf_loaded;
+	vector<float> sdf_reference;
+	
+	loadSDFFromFile(sdf_file_31_0, sdf_loaded);
+
+	/*loadSDFFromFile(sdf_file_0, sdf_reference);
+	fixFedUpSDF(sdf_reference, sdf_reference);
+	loadSDFFromFile(sdf_file_anim, sdf_loaded);
+	fixFedUpSDF(sdf_loaded, sdf_loaded);
+
+	for (int i = 0; i < sdf_loaded.size(); i++) {
+		sdf_loaded[i] = sdf_loaded[i] / sdf_reference[i];
+	}*/
 
 	//skinningQuatVecSimplified.clear();
 
 	//SM::CalculateSimplifiedWormMapping(skinningQuatVecNew, simplificationMap, 10.0f);
 
-	performTransformationsInSkeletonTree(&bindPoseSkeletonNode, &skinningQuatVecNew, &skinningMatrixVecNew);
+	//performTransformationsInSkeletonTree(&bindPoseSkeletonNode, &skinningQuatVecNew, &skinningMatrixVecNew);
+	//performTimeConstantTransformationsInSkeletonTree(&bindPoseSkeletonNode, &skinningQuatVecNew, &skinningMatrixVecNew);
+	//performGravitationBasedTransformationsInSkeletonTree(&bindPoseSkeletonNode, &skinningQuatVecNew, &skinningMatrixVecNew, 9.81);
+	performSDFBasedTransformationsInSkeletonTree(&bindPoseSkeletonNode, &skinningQuatVecNew, &skinningMatrixVecNew, sdf_loaded, 9.81, glm::vec3(0, 0, 1));
 
 	//QuaternionsToMatrices(skinningQuatVecNew, skinningMatrixVecNew);
 
@@ -1069,11 +1488,11 @@ void Openworm_Wrapper::nextTimeStepSkinningPreview(){
 
 	//SM::TransformWormSkeleton(skinnedCPUSkeleton, skinningMatrixVecNew);
 
-	#ifdef _GLD
+#ifdef _GLD
 
-		//copySkeletonNode(skinnedCPUSkeleton, visualization->Skeleton);
+	//copySkeletonNode(skinnedCPUSkeleton, visualization->Skeleton);
 
-	#endif
+#endif
 
 	delete skinnedCPUSkeleton;
 
@@ -1112,7 +1531,10 @@ void Openworm_Wrapper::CPUSkinningSkeleton(SN::SkeletonNode * skeleton) {
 
 	CPUSkinning(verticesSkeleton, indicesSkeleton, weightsSkeleton);
 
-	//visualization->updateSkeleton2(skinnedVertices.size(), &(skinnedVertices[0]));
+	#ifdef _GLD
+		visualization->updateSkeleton2(skinnedVertices.size(), &(skinnedVertices[0]));
+	#endif
+
 }
 
 void Openworm_Wrapper::CPUSkinningCuticle(meshes::MeshSkin * model) {
@@ -1120,6 +1542,10 @@ void Openworm_Wrapper::CPUSkinningCuticle(meshes::MeshSkin * model) {
 	CPUSkinning(model->vertices, model->jointIDs, model->skinWeights);
 	model->vertices = skinnedVertices;
 	loadCuticleModelIntoBuffer(model);
+
+	Export::ColladaExporter ex("worm_skin");
+	ex.Export(model, "logs/worm_skin.dae");
+
 	model->vertices = bindPoseVertices;
 }
 
@@ -1130,7 +1556,11 @@ void Openworm_Wrapper::CPUSkinningMuscles(meshes::MeshSkin * model) {
 	//model->vertices = muscleMeshToAdd.vertices;
 
 	CPUSkinning(model->vertices, model->jointIDs, model->skinWeights);
-	model->vertices = skinnedVertices;
+	model->vertices = skinnedVertices;	
+
+	Export::ColladaExporter ex("worm_muscle_cpu");
+	ex.Export(model, "logs/worm_muscle_cpu.dae");
+
 	loadMuscleModelIntoBuffer(model);
 	model->vertices = bindPoseVertices;
 }
@@ -1200,10 +1630,33 @@ void Openworm_Wrapper::QuaternionsToMatrices(vector<glm::quat> &quaternions, vec
 }
 
 void Openworm_Wrapper::nextTimeStepSimulationPreview(){
+
 	cuticleLoader.ReadWormIteration(mesh, animTimestep);
-	//wormLoader.ReadWormMesh(mesh);
+	cuticleLoader.ReadWormMesh(mesh);
+
+	meshes::IndexedFace loadedMesh0;
+	cuticleLoader.ReadWormIteration(&loadedMesh0, 0);
+
+	CVector3 shiftVec = CVector3(loadedMesh0.vertices[0], loadedMesh0.vertices[1], loadedMesh0.vertices[2]) - CVector3(mesh->vertices[0], mesh->vertices[1], mesh->vertices[2]);
+
+	// shift points
+	MEM::ShiftMeshByPoint(mesh, shiftVec);
+
+
+	// if the model is transformed x=-z, we have to use this
+	swapXandYInverted(mesh);
+
+	/*if (animTimestep <= 1 || animTimestep >= 6099){
+		int klkk = 0;
+	}*/
+
+	//gldReloadTransformations("Simulation muscle");
+
+	Export::ColladaExporter ex("worm_sim");
+	ex.Export(mesh, "logs/worm_sim.dae");
 
 	addSimulationModel(mesh);
+
 }
 
 void Openworm_Wrapper::swapXandYInverted(meshes::IndexedFace * mesh){
@@ -1225,6 +1678,11 @@ void Openworm_Wrapper::nextTimeStepMuscleSimulationPreview(){
 	// if the model is transformed x=-z, we have to use this
 	swapXandYInverted(muscleMesh);
 
+	muscleMesh->indices = serMuscleMeshForSkinning->indices;
+
+	Export::ColladaExporter ex("worm_muscle");
+	ex.Export(muscleMesh, "logs/worm_muscle.dae");
+
 	/*vector<IndexedFace> muscleMeshes;
 
 	muscleLoader.ReadWormMuscleWithIndex(muscleMesh, muscleMeshes, muscleIndexGroupFile);
@@ -1237,24 +1695,24 @@ void Openworm_Wrapper::nextTimeStepMuscleSimulationPreview(){
 	int muscleOffset = 0;
 
 	for (int m=0; m < muscleMeshes.size(); m++){
-		IndexedFace * muscleMesh = &(muscleMeshes[m]);
+	IndexedFace * muscleMesh = &(muscleMeshes[m]);
 
-		for  (int i = 0; i < muscleMesh->vertices.size() / 3; i++){
+	for  (int i = 0; i < muscleMesh->vertices.size() / 3; i++){
 
-			newVertices.push_back(muscleMesh->vertices[i * 3]);
-			newVertices.push_back(muscleMesh->vertices[i * 3 + 1]);
-			newVertices.push_back(muscleMesh->vertices[i * 3 + 2]);
+	newVertices.push_back(muscleMesh->vertices[i * 3]);
+	newVertices.push_back(muscleMesh->vertices[i * 3 + 1]);
+	newVertices.push_back(muscleMesh->vertices[i * 3 + 2]);
 
-			for  (int j = 0; j < muscleMesh->vertices.size() / 3; j++){
-				if (i != j){
-					newIndices.push_back(muscleOffset + i);
-					newIndices.push_back(muscleOffset + j);
-					newIndices.push_back(muscleOffset + i);
-				}
-			}
-		}
+	for  (int j = 0; j < muscleMesh->vertices.size() / 3; j++){
+	if (i != j){
+	newIndices.push_back(muscleOffset + i);
+	newIndices.push_back(muscleOffset + j);
+	newIndices.push_back(muscleOffset + i);
+	}
+	}
+	}
 
-		muscleOffset = muscleOffset + muscleMesh->vertices.size() / 3;
+	muscleOffset = muscleOffset + muscleMesh->vertices.size() / 3;
 	}
 
 	mesh->vertices = newVertices;
@@ -1265,26 +1723,32 @@ void Openworm_Wrapper::nextTimeStepMuscleSimulationPreview(){
 	addSimulationMuscleModel(muscleMesh);
 }
 
-void Openworm_Wrapper::nextTimeStepSimulationAndSkinningPreview(bool * finished, bool force){
+void Openworm_Wrapper::nextTimeStepSimulationAndSkinningPreview(bool * finished, bool force, Export_Wrapper * exportWrapper){
 
 	delete mesh;
 	mesh = new meshes::IndexedFace();
 
-	if (animTimestep >= OW_MAX_WORM_ITERATIONS || animTimestep <= 0 && (!previewPaused || force)){
-		//animTimestep = 0;
+	/*if (animTimestep >= OW_MAX_WORM_ITERATIONS || animTimestep <= 0 && (!previewPaused || force)){
+
+		// change direction of animation
 		if (animTimestep <= 0)
 			simulationDirection = 1;
 		else
 			simulationDirection = -1;
 
 		animTimestep += timeStepDelta * simulationDirection;
+	}*/
+
+	if (animTimestep >= OW_MAX_WORM_ITERATIONS && (!previewPaused || force)){
+		animTimestep = 0;
+		//animTimestep += timeStepDelta * simulationDirection;
 	}
 
 	if (!previewPaused || force){
 
 		if (b_cuticleReading){
 			nextTimeStepSimulationPreview();
-			nextTimeStepSkinningPreview();
+			nextTimeStepSkinningPreview(exportWrapper);
 		}
 
 		if (b_muscleReading){
@@ -1377,6 +1841,16 @@ void Openworm_Wrapper::skeletonExtractionSDF_calculateSDF(meshes::Mesh * _mesh, 
 
 }
 
+void Openworm_Wrapper::multiplyPerSegmentSDF(sdf::Extractor * pSDFExtractor){
+	vector<float> newPerSegmentSDFVec;
+	for (int j=0; j < perSegmentSDFVec.size(); j++){
+		for (int i=0; i < pSDFExtractor->skeletonTesselationFactor; i++){
+			newPerSegmentSDFVec.push_back(perSegmentSDFVec[j]);
+		}
+	}	
+	perSegmentSDFVec = newPerSegmentSDFVec;
+}
+
 void Openworm_Wrapper::skeletonExtractionSDF_extractSkeleton(SN::SkeletonNode * pSkeletonRoot, lbse::Extractor * pLBSExtractor, sdf::Extractor * pSDFExtractor){
 
 	for (int i=0; i < pLBSExtractor->pMesh->numOfVertices; i++){
@@ -1417,7 +1891,8 @@ void Openworm_Wrapper::skeletonExtractionSDF_extractSkeleton(SN::SkeletonNode * 
 			pLBSExtractor->polyMesh = new MeshGraph();
 
 			float threshold = (minSDF * (1.0 - interpolationParam) + maxSDF * (interpolationParam));
-			pSDFExtractor->applyMedianMerge(pLBSExtractor->polyMesh, pLBSExtractor->pMesh, threshold);
+			perSegmentSDFVec.clear();
+			pSDFExtractor->applyMedianMerge(pLBSExtractor->polyMesh, pLBSExtractor->pMesh, threshold, &perSegmentSDFVec, pLBSExtractor->sdfHalfVectorsMG);
 
 			polyMeshNumOfBones = pLBSExtractor->polyMesh->numOfVertices;
 
@@ -1438,6 +1913,7 @@ void Openworm_Wrapper::skeletonExtractionSDF_extractSkeleton(SN::SkeletonNode * 
 
 			if (bindPoseSegmentLengths.size() > 0){
 				pLBSExtractor->applyConnectivitySurgery(false, pSkeletonRoot, adaptVMdmax);
+				multiplyPerSegmentSDF(pSDFExtractor);
 				oSDFExtractor.subdivideSkeletonByCrossSectionMedians(pSkeletonRoot, pLBSExtractor->pMesh, pSDFExtractor->skeletonTesselationFactor);
 				pLBSExtractor->currentNumberOfSkeletonBones = generateIdForTree(pSkeletonRoot, pLBSExtractor->skeletonMeshGraphIndices);
 
@@ -1464,6 +1940,7 @@ void Openworm_Wrapper::skeletonExtractionSDF_extractSkeleton(SN::SkeletonNode * 
 			} else {
 				segmentLengthsAreEqual = true;
 				pLBSExtractor->applyConnectivitySurgery(false, pSkeletonRoot, adaptVMdmax);
+				multiplyPerSegmentSDF(pSDFExtractor);
 				oSDFExtractor.subdivideSkeletonByCrossSectionMedians(pSkeletonRoot, pLBSExtractor->pMesh, pSDFExtractor->skeletonTesselationFactor);
 				pLBSExtractor->currentNumberOfSkeletonBones = generateIdForTree(pSkeletonRoot, pLBSExtractor->skeletonMeshGraphIndices);
 			}
@@ -1650,3 +2127,31 @@ void Openworm_Wrapper::extractMuscleSkeleton(meshes::IndexedFace * muscle, SN::S
 
 }
 
+
+#pragma region Additions
+
+namespace OpenWorm {
+	float TotalSkeletonCurvature(vector<glm::quat> &quats) {
+		float curvature = 0;
+
+		for (int i = 0; i < quats.size(); i++) {
+			//float angle = fabsf(acos(quats[i].w) * 2.0);
+			float angle = fabsf(glm::AngleFromQuaternion(quats[i]));
+			curvature += angle;
+		}
+
+		return curvature;
+	}
+
+	float ScaleFactorFromCurvature(float curvature) {
+		//linear interpolation for now
+		return 1 - (0.025 * curvature);
+	}
+
+	float ScaleSDFByGravity(float sdf, float gravitationMagnitude) {
+		//linear interpolation for now
+		return (max(sdf - 4.0, 0.0) / 6.0) * gravitationMagnitude;
+	}
+}
+
+#pragma endregion

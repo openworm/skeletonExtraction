@@ -190,5 +190,8 @@
     <None Include="OpenCLKernels\proces.cl">
       <Filter>OpenCLKernels</Filter>
     </None>
+    <None Include="..\ClientSide\examples\webgl_loader_collada_openworm.html">
+      <Filter>Source Files\Structures\Mesh</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -202,14 +202,14 @@ float GraphAlgorithms::GeodesicDistance(MeshGraph * pMesh,  Array2D<float> dista
 		if (idx1 == -1 || idx2 == -1){
 			continue;
 		}
-		if (idx1 == idx2){
-			return Distance(p1, pMesh->pVerts[idx2]);
-		}
+		float d = 0;
 		//if (firstSkeletonPoint)
 		//	return distanceMatrix[idx1][idx2] + Distance(p1, pMesh->pVerts[idx1]);
-		float d = distanceMatrix[idx1][idx2] + Distance(p1, pMesh->pVerts[idx1]);
-		if (d < minDistance){
-			minDistance = d;
+		if (idx1 != idx2){
+			d = distanceMatrix[idx1][idx2] + Distance(p1, pMesh->pVerts[idx1]);
+			if (d < minDistance){
+				minDistance = d;
+			}
 		}
 	}
 	return minDistance;

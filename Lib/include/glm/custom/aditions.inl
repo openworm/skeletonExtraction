@@ -1,10 +1,11 @@
 namespace glm {
+
 	GLM_FUNC_QUALIFIER bool operator==(const glm::vec3 &vecA, const glm::vec3 &vecB) 
 	{ 
-		const double epsilion = 0.000001;  // choose something apprpriate.
+		const double epsilion = 0.000001;  // choose something appropriate.
 
-		return    fabs(vecA[0] -vecB[0]) < epsilion   
-			&& fabs(vecA[1] -vecB[1]) < epsilion   
+		return fabs(vecA[0] -vecB[0]) < epsilion
+			&& fabs(vecA[1] -vecB[1]) < epsilion
 			&& fabs(vecA[2] -vecB[2]) < epsilion;
 	}; 
 	GLM_FUNC_QUALIFIER bool operator!=(const glm::vec3 &vecA, const glm::vec3 &vecB) 
@@ -77,5 +78,13 @@ namespace glm {
 
 		float alfa = acosf(d);
 		return angleAxis<float>(glm::degrees(alfa), axis);
+	}
+
+	GLM_FUNC_QUALIFIER float AngleFromQuaternion(const quat &q) {
+		return acosf(q.w) * 2.0;
+	}
+
+	GLM_FUNC_QUALIFIER glm::vec2 CubicBezierInterpolate(const glm::vec2 &P0, const glm::vec2 &P1, const glm::vec2 &P2, const glm::vec2 &P3, float t) {
+		return (pow(1.0f - t, 3.0f)*P0 + 3.0f*pow(1.0f - t, 2.0f)*t*P1 + 3.0f*(1.0f - t)*pow(t, 2.0f)*P2 + pow(t, 3.0f)*P3);
 	}
 }

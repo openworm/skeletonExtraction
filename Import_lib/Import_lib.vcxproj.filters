@@ -30,6 +30,9 @@
     <ClCompile Include="m_colladaLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\include\Import_lib\SphericalDelaunay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WormLoader.h">
@@ -42,6 +45,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="m_colladaLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Import_lib\SphericalDelaunay.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
