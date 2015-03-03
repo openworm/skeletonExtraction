@@ -1,3 +1,35 @@
+1/ Data from the simulation are loaded, for this there are 2 objects - cuticleLoader and MuscleLoader … for cuticle the cuticleLoader, position file and membrane file has to be set. Position file is taken from OW_DATA_VERSION data dir and membrane file is taken from OW_BINDPOSE_DATA_VERSION data dir.
+
+g_core->openwormWrapper.cuticleLoader.ReadWormIteration(g_core->openwormWrapper.mesh, timestep);
+Import::CalculatePerVertexNormals(g_core->openwormWrapper.mesh);
+
+2/ All the cuticles in all the timesteps are loaded in a loop and exported into collada files (in order to be loaded by assimp, so SDF can be calculated). 
+
+g_core->openwormWrapper.exporter.Export( g_core->openwormWrapper.mesh, config.projectDir + "Models\\OpenWorm\\Export\\export_"+OW_DATA_VERSION+"\\collada\\wormCollada_" + g_core->exportWrapper.PadNumber( g_core->openwormWrapper.timeStep, OW_PADDING) + ".dae");
+
+3/ Next, wrapper is called from the script. It is loaded from the script in a loop, because there is a memory leak in SDF library. In can be run in 8 threads using 8 powershell scripts. By running this wrapper, skeletons and transformations between skeletons and a bindpose are calculated.
+The output are quaternions, matrices and axis angles. They are rotations only encoding in the matrices.
+
+g_core->openwormWrapper.skeletonExtractionSDF_calculateSDF(&(g_engine->oModel), &(g_core->lbseWrapper.oLBSExtractor));
+g_core->openwormWrapper.skeletonExtractionSDF_extractSkeleton(g_core->defaultSkeletonRoot, &(g_core->lbseWrapper.oLBSExtractor), &(g_core->sdfWrapper.oSDFExtractor));			 
+
+4) Postprocessing of the rotations. There are three steps in the postprocessing process.
+
+a - interpolation is applied, SLERP is used for this
+(this is performed to get rid of the shivering of the worm caused by floating inaccuracy)
+SM::SmoothQuaternions(source, 130);  // 100-150 are good smoothing neighbourhoods
+
+b - SDF is calculated, muscle stretching and gravitation force is applied and composed into the matrices
+(muscle are stretching the cuticle, therefore the volume has to be restored)
+
+c - rotations are perform in the skeleton chain, the translation of the skeleton root is ignored
+(in each node, there is transformation for local node only and by multiplying of transformation matrices in skeleton chain we get global transformation matrix for each node, that can be directly used for skinning in shaders)
+g_core->openwormWrapper.performSDFBasedTransformationsInSkeletonTree(&g_core->openwormWrapper.bindPoseSkeletonNode, &source[i], &matrices, sdf_loaded, 9.81, glm::vec3(0, 0, 1)); // b and c are both called in this method
+
+d - the skeleton is anchored in some skeleton node
+(for each timestep, the translation vector for anchored skeleton node is calculated - translation between bindpose position and the skinned one. Then this translation vector is added to each transformation matrix, do the skinning is applied and final skinned vertex is translated at the end by the vector)
+g_core->openwormWrapper.anchorSkeletonDuringSkinning(&g_core->openwormWrapper.bindPoseSkeletonNode, &matrices, 15); // last parameter is the index of the node
+
 ###PROJECTS:###
 *All projects are in this repository's [Visual Studio Solution](http://msdn.microsoft.com/en-us/library/bb165951(v=vs.80).aspx) [file](https://github.com/openworm/skeletonExtraction/blob/master/OpenWormSkeletonExtraction.sln).*
 
