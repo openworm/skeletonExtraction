@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - collada</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+
+			}
+
+			a { color: skyblue }
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> -
+			<a href="http://http://www.openworm.org/" target="_blank">OpenWorm</a> | 
+			<a href="javascript:" id="moveworm">move worm</a>
+			<div id="info2">
+			Loading Collada model...
+			</div>
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/controls/TrackballControls.js"></script>
+		
+		<script src="js/loaders/ColladaLoader.js"></script>
+		
+		<script type="text/javascript" language="Javascript" 
+			src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js">
+		</script>
+		
+		
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, scene, renderer, objects, controls;
+			var particleLight;
+			var dae;
+			
+			var quaternionValues = new Array();
+			var matrixValues = new Array();
+			var skeletonNodeValues = new Array();
+			var filesLoaded = false;
+			var moveWorm = false;
+			
+			var OW_START_TIMESTEP = 67; //65
+			var OW_END_TIMESTEP = 6380; //6382
+			var OW_NUM_NODES = 31;
+			
+			var timestep = OW_START_TIMESTEP;
+			
+			var loader = new THREE.ColladaLoader();
+			loader.options.convertUpAxis = true;
+			loader.load( '../../SkinningData/Dropbox/reindexedColladas/muscles_anim_oneGeo.dae', function ( collada ) {
+
+				dae = collada.scene;
+
+				dae.traverse( function ( child ) {
+
+					if ( child instanceof THREE.SkinnedMesh ) {
+
+						var animation = new THREE.Animation( child, child.geometry.animation );
+						animation.play();
+
+					}
+
+				} );
+				
+				$( "#moveworm" ).click(function() {
+					if (moveWorm){
+						moveWorm = false;
+						$( "#moveworm" ).text("move worm");
+					} else {
+						moveWorm = true;
+						$( "#moveworm" ).text("stop moving worm");					
+					}
+				});
+
+				dae.scale.x = dae.scale.y = dae.scale.z = 0.026;
+				dae.position.x = 15;
+				dae.position.y = 8; 
+				dae.position.z = 9;
+				dae.rotation.set( -Math.PI * 0.5, 0, 0 );
+				dae.updateMatrix();
+
+				init();
+				animate();
+
+			} );
+			
+				/*loader.load( '../../SkinningData/Dropbox/animation_wormMeshAndSkinningData_31S_0ite.dae', function ( collada ) {
+
+				dae = collada.scene;
+
+				dae.traverse( function ( child ) {
+
+					if ( child instanceof THREE.SkinnedMesh ) {
+
+						var animation = new THREE.Animation( child, child.geometry.animation );
+						animation.play();
+
+					}
+
+				} );
+
+				dae.scale.x = dae.scale.y = dae.scale.z = 0.002;
+				dae.updateMatrix();
+
+				init();
+				animate();
+
+			} );*/
+			
+			/*function readFile(file, ite) {
+				$.get(file, function(data) {  
+					var lines = data.split("\n");
+					$.each(lines, function(n, elem) {
+						var qvalues = elem.split(" ");
+						quaternionValues.push(qvalues[0]);
+						quaternionValues.push(qvalues[1]);
+						quaternionValues.push(qvalues[2]);
+						quaternionValues.push(qvalues[3]);
+					});
+					if (ite == OW_END_TIMESTEP){
+						console.log('All quaternion files loaded !');
+						filesLoaded = true;
+					}
+				});
+			}*/
+			
+			function parseTransformationElem(n, elem) {
+				var qvalues = elem.split(" ");
+				if (qvalues.length >= 4){
+					matrixValues.push(qvalues[0]);
+					matrixValues.push(qvalues[1]);
+					matrixValues.push(qvalues[2]);
+					matrixValues.push(qvalues[3]);
+				}
+			}
+			
+			function parseTransformationData(data) {  
+				var lines = data.split("\n");
+				$.each(lines, parseTransformationElem);
+			}
+			
+			function readTransformationFile(file, ite) {
+				//$.get(file, parseData);
+				
+				jQuery.ajax({
+					url:    file,
+					success: parseTransformationData,
+					async:   false
+				});   
+				
+				if (ite == OW_END_TIMESTEP){
+					console.log('All quaternion files loaded !');
+					filesLoaded = true;
+				}
+				
+			}
+			
+			function parseSkeletonNodeElem(n, elem) {
+				var qvalues = elem.split(" ");
+				if (qvalues.length >= 3){
+					skeletonNodeValues.push(qvalues[0]);
+					skeletonNodeValues.push(qvalues[1]);
+					skeletonNodeValues.push(qvalues[2]);
+				}
+			}
+			
+			function parseSkeletonNodeData(data) {  
+				var lines = data.split("\n");
+				$.each(lines, parseSkeletonNodeElem);
+			}
+			
+			function readSkeletonFile(file) {
+		
+				jQuery.ajax({
+					url:    file,
+					success: parseSkeletonNodeData,
+					async:   false
+				});   
+				
+			}
+			
+			function padNumber(number, places) {
+				var result = "";
+				if (number != 0){
+					while (Math.pow(10, places) > number) {
+						result += "0";
+						places--;
+					}
+				} else {
+					for (var i=0; i < places; i++){
+						result += "0";
+					}
+				}
+				result += number;
+				return result;
+			}
+			
+			function readAllStreamedFiles() {
+				console.log('Start laoding files.');
+				for ( var i = OW_START_TIMESTEP; i <= OW_END_TIMESTEP; i += 1 ) {
+					var padi = padNumber(i, 4);
+					//readTransformationFile('../../SkinningData/Dropbox/quaternion_31S_' + padi + '.qua', i)
+					//readTransformationFile('../../SkinningData/Dropbox/matrix_31S_' + padi + '.mat', i)
+					readTransformationFile('../../SkinningData/Dropbox/anchored2/matrix_anchored_31S_' + padi + '.mat', i)
+					//readTransformationFile('../../SkinningData/Dropbox/postprocessed2/matrix_post_31S_' + padi + '.mat', i)
+				}
+				readSkeletonFile('../../SkinningData/Dropbox/skeletonNodes.txt');
+			}
+			
+			function performPreprocessing(i){
+				//console.log('Preprocessing started.');
+				
+				var text = "";
+				text = text + '<div>' + 'Timestep: ' + i + '</div>';
+				document.getElementById('info2').innerHTML = text;
+				
+				//for ( var i = OW_START_TIMESTEP; i <= OW_END_TIMESTEP; i += 1 ) {
+					// fathers transformation matrix, for root it is identity, or translation of the worm 
+				/*	var fathersAffine = new THREE.Matrix4()
+					fathersAffine.identity();
+					
+				
+					for ( var j = 0; j < 30; j += 1 ) {
+						// for each line get quaternion
+						var q = new THREE.Quaternion(quaternionValues[i * j * 4 + 0], quaternionValues[i * j * 4 + 1], quaternionValues[i * j * 4 + 2], quaternionValues[i * j * 4 + 3]);
+						//text = text + '<div>' + '(' + q.x + ',' + q.y + ',' + q.z + ',' + q.w + ')' + '</div>';
+						document.getElementById('info2').innerHTML = text;
+						// create matrix from quaternion
+						var rotate = new THREE.Matrix4();
+						rotate.makeRotationFromQuaternion(q);
+						// crate translation matrices
+						var translateToOriginMatrix = new THREE.Matrix4(); //glm::translate(glm::mat4(1), glm::vec3(-pNode->father->point.x, -pNode->father->point.y, -pNode->father->point.z));
+						var translateFromOriginMatrix = new THREE.Matrix4();  //glm::translate(glm::mat4(1), glm::vec3(pNode->father->point.x, pNode->father->point.y, pNode->father->point.z));						
+						// multiply matrices in skeleton tree
+						var nodeMatrix = new THREE.Matrix4();
+						nodeMatrix.multiplyMatrices(rotate, translateToOriginMatrix);
+						nodeMatrix.multiplyMatrices(translateFromOriginMatrix, nodeMatrix);
+						
+						nodeMatrix.multiplyMatrices(fathersAffine, nodeMatrix);
+						
+						// set matrix to shaders
+						
+						// set fathers transformation
+						fathersAffine = nodeMatrix;
+					}*/
+				//}
+				//console.log('Preprocessing finished.');
+			}
+
+			function init() {
+			
+				//var textLoad = '<div>' + 'Loading quaternions... ' + '</div>';
+				var textLoad = '<div>' + 'Loading transformation matrices... ' + '</div>';
+				document.getElementById('info2').innerHTML = textLoad;
+			
+				// read skinning data
+				
+				readAllStreamedFiles();
+				
+				//
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+				//camera.position.set( 0, 1, 3 );
+				
+				camera.position.x = 1 * 10 + 20;
+				camera.position.y = 14;
+				camera.position.z = 0 * 10 + 3;
+				
+				//camera.position.z = 500;
+				
+				//controls = new THREE.TrackballControls( camera );
+
+				//controls.rotateSpeed = 1.0;
+				//controls.zoomSpeed = 12;
+				//controls.panSpeed = 0.8;
+
+				//controls.noZoom = false;
+				//controls.noPan = false;
+
+				//controls.staticMoving = true;
+				//controls.dynamicDampingFactor = 0.3;
+
+				//controls.keys = [ 65, 83, 68 ];
+
+				//controls.addEventListener( 'change', render );
+
+				scene = new THREE.Scene();
+
+				// Grid
+
+				var size = 14, step = 1;
+
+				var geometry = new THREE.Geometry();
+				var material = new THREE.LineBasicMaterial( { color: 0x303030 } );
+
+				for ( var i = - size; i <= size; i += step ) {
+
+					geometry.vertices.push( new THREE.Vector3( - size, - 0.04, i ) );
+					geometry.vertices.push( new THREE.Vector3(   size, - 0.04, i ) );
+
+					geometry.vertices.push( new THREE.Vector3( i, - 0.04, - size ) );
+					geometry.vertices.push( new THREE.Vector3( i, - 0.04,   size ) );
+
+				}
+
+				var line = new THREE.Line( geometry, material, THREE.LinePieces );
+				scene.add( line );
+
+				// Add the COLLADA
+
+				scene.add( dae );
+
+				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
+				scene.add( particleLight );
+				
+				// Lights
+
+				scene.add( new THREE.AmbientLight( 0xcccccc ) );
+
+				var directionalLight = new THREE.DirectionalLight(/*Math.random() * 0xffffff*/0xeeeeee );
+				directionalLight.position.x = Math.random() - 0.5;
+				directionalLight.position.y = Math.random() - 0.5;
+				directionalLight.position.z = Math.random() - 0.5;
+				directionalLight.position.normalize();
+				scene.add( directionalLight );
+
+				var pointLight = new THREE.PointLight( 0xffffff, 4 );
+				particleLight.add( pointLight );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				
+				//controls.handleResize();
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				//controls.update();
+				
+				render();
+				stats.update();
+
+			}
+
+			var clock = new THREE.Clock();
+
+			function render() {
+
+				var timer = Date.now() * 0.00000005; // 0.0005
+
+				//camera.position.x = Math.cos( timer ) * 10 + 20;
+				//camera.position.y = 3 + 5;
+				//camera.position.z = Math.sin( timer ) * 10 + 3;
+
+				camera.lookAt( scene.position );
+
+				particleLight.position.x = Math.sin( timer * 4 ) * 3009;
+				particleLight.position.y = Math.cos( timer * 5 ) * 4000;
+				particleLight.position.z = Math.cos( timer * 4 ) * 3009;
+
+				THREE.AnimationHandler.update( clock.getDelta() );
+				
+				if (filesLoaded){
+					timestep = Math.round(timestep + clock.getDelta() * 500000);
+					if (timestep > OW_END_TIMESTEP){
+						timestep = timestep - (OW_END_TIMESTEP - OW_START_TIMESTEP);
+					}
+					performPreprocessing(timestep);
+				}
+
+				renderer.render( scene, camera );
+				renderer.setTimestep(timestep);
+				
+				if (filesLoaded){
+				
+					var currentMatrix = new Array();
+					
+					var wormMovement = new THREE.Vector3(0, 0, 0);
+					if (moveWorm){
+						wormMovement = new THREE.Vector3(0, -200 + timestep / 10.0, 0);
+					}
+					
+					// multiply matrices recursively in skeleton tree
+					var fathersAffine = new THREE.Matrix4();
+					
+					
+					for (var m = 0; m < OW_NUM_NODES; m++){
+						
+						var mNode = new THREE.Matrix4();
+						var nodeMatrix = new THREE.Matrix4();	
+						
+						/*if (m > 0){
+							 mNode.set(matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 0], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 1], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 2], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 3],
+									   matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 4], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 5], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 6], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 7],
+									   matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 8], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 9], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 10], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 11],
+									   matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 12], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 13], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 14], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 15]);
+						
+							var translateToOriginMatrix = new THREE.Matrix4();
+							translateToOriginMatrix.makeTranslation(-skeletonNodeValues[(m - 1) * 3], -skeletonNodeValues[(m - 1) * 3 + 1], -skeletonNodeValues[(m - 1) * 3 + 2]);
+							
+							var translateFromOriginMatrix = new THREE.Matrix4();
+							translateFromOriginMatrix.makeTranslation(skeletonNodeValues[(m - 1) * 3], skeletonNodeValues[(m - 1) * 3 + 1], skeletonNodeValues[(m - 1) * 3 + 2]);
+
+							// apply transformation of father to this childs matrix
+							var mPart = new THREE.Matrix4();	
+							mPart.multiplyMatrices(mNode, translateToOriginMatrix);	
+							nodeMatrix.multiplyMatrices(translateFromOriginMatrix, mPart);	
+						} else {
+							nodeMatrix.makeTranslation(wormMovement.x, wormMovement.y, wormMovement.z);
+						}
+						
+						var mRecursive = new THREE.Matrix4();	
+						mRecursive.multiplyMatrices(fathersAffine, nodeMatrix);						
+					
+						for (var n = 0; n < 16; n++){
+							currentMatrix.push(mRecursive.elements[n]);
+						}
+						
+						fathersAffine = mRecursive;*/
+						
+						
+						 mNode.set(matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 0], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 4], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 8], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 12],
+								   matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 1], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 5], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 9], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 13],
+								   matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 2], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 6], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 10], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 14],
+								   matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 3], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 7], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 11], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 15]);
+						
+						for (var n = 0; n < 16; n++){
+							currentMatrix.push(mNode.elements[n]);
+						}
+						
+					}
+					
+					renderer.setCurrentMatrix(currentMatrix);
+				}
+
+			}
+
+		</script>
+	</body>
+</html>
