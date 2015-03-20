@@ -74,42 +74,50 @@
 			
 			var loader = new THREE.ColladaLoader();
 			loader.options.convertUpAxis = true;
-			loader.load( '../../SkinningData/Dropbox/reindexedColladas/muscles_anim_oneGeo.dae', function ( collada ) {
+			
+			
+			for (var i = 0; i < 10; i++){
+			
+				loader.load( '../../SkinningData/Dropbox/reindexedColladas/muscles/muscle_anim'+i+'.dae', function ( collada ) {
 
-				dae = collada.scene;
+					dae = collada.scene;
 
-				dae.traverse( function ( child ) {
+					dae.traverse( function ( child ) {
 
-					if ( child instanceof THREE.SkinnedMesh ) {
+						if ( child instanceof THREE.SkinnedMesh ) {
 
-						var animation = new THREE.Animation( child, child.geometry.animation );
-						animation.play();
+							var animation = new THREE.Animation( child, child.geometry.animation );
+							animation.play();
 
-					}
+						}
+
+					} );
+					
+					$( "#moveworm" ).click(function() {
+						if (moveWorm){
+							moveWorm = false;
+							$( "#moveworm" ).text("move worm");
+						} else {
+							moveWorm = true;
+							$( "#moveworm" ).text("stop moving worm");					
+						}
+					});
+
+					dae.scale.x = dae.scale.y = dae.scale.z = 0.026;
+					dae.position.x = 15;
+					dae.position.y = 8; 
+					dae.position.z = 9;
+					dae.rotation.set( -Math.PI * 0.5, 0, 0 );
+					dae.updateMatrix();
+
+					init();
+					animate();
 
 				} );
-				
-				$( "#moveworm" ).click(function() {
-					if (moveWorm){
-						moveWorm = false;
-						$( "#moveworm" ).text("move worm");
-					} else {
-						moveWorm = true;
-						$( "#moveworm" ).text("stop moving worm");					
-					}
-				});
+			
+			}
+			
 
-				dae.scale.x = dae.scale.y = dae.scale.z = 0.026;
-				dae.position.x = 15;
-				dae.position.y = 8; 
-				dae.position.z = 9;
-				dae.rotation.set( -Math.PI * 0.5, 0, 0 );
-				dae.updateMatrix();
-
-				init();
-				animate();
-
-			} );
 			
 				/*loader.load( '../../SkinningData/Dropbox/animation_wormMeshAndSkinningData_31S_0ite.dae', function ( collada ) {
 

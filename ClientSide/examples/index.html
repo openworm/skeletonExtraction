@@ -36,7 +36,7 @@
 			</div>
 		</div>
 
-		<script src="js/three.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/loaders/ColladaLoader.js"></script>
 		
@@ -412,7 +412,7 @@
 				THREE.AnimationHandler.update( clock.getDelta() );
 				
 				if (filesLoaded){
-					timestep = Math.round(timestep + clock.getDelta() * 10000);
+					timestep = Math.round(timestep + clock.getDelta() * 11000);
 					if (timestep > OW_END_TIMESTEP){
 						timestep = timestep - (OW_END_TIMESTEP - OW_START_TIMESTEP);
 					}

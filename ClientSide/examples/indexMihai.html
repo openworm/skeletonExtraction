@@ -36,10 +36,8 @@
 			</div>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script src="js/three.js"></script>
 
-		<script src="js/controls/TrackballControls.js"></script>
-		
 		<script src="js/loaders/ColladaLoader.js"></script>
 		
 		<script type="text/javascript" language="Javascript" 
@@ -72,10 +70,32 @@
 			
 			var timestep = OW_START_TIMESTEP;
 			
-			var loader = new THREE.ColladaLoader();
-			loader.options.convertUpAxis = true;
-			loader.load( '../../SkinningData/Dropbox/animatedColladas/cuticle_anim_oneGeo.dae', function ( collada ) {
-
+			var OW_NUM_OF_COLLADA_FILES = 5;
+			
+			var colladaLoadIte = 0;
+			/*loader.load( '../../SkinningData/Dropbox/animation_wormMeshAndSkinningData_31S_0ite.dae', loadCollada);
+			loader.load( '../../SkinningData/Dropbox/animation_wormMeshAndSkinningData_31S_0ite.dae', loadCollada);
+			loader.load( '../../SkinningData/Dropbox/animation_wormMeshAndSkinningData_31S_0ite.dae', loadCollada);
+			loader.load( '../../SkinningData/Dropbox/animation_wormMeshAndSkinningData_31S_0ite.dae', loadCollada);
+			loader.load( '../../SkinningData/Dropbox/animation_wormMeshAndSkinningData_31S_0ite.dae', loadCollada);*/
+			
+			for (var i=0; i < 96; i++){                            
+                                var loader = new THREE.ColladaLoader();
+                                loader.options.convertUpAxis = true;			
+				var padi = padNumber(i, 1);
+				//loader.load( '../../SkinningData/Dropbox/wormMuscleCell_'+padi+'Collada_00000.dae', loadCollada);
+				var url = '../../SkinningData/Dropbox/animatedColladas/muscles/muscle_anim'+i+'.dae';
+                                console.log(url);
+                                loader.load(url , loadCollada);
+			}
+			
+			
+			function loadCollada ( collada ) {
+				
+				if (colladaLoadIte == 0){
+					init();
+				}
+			
 				dae = collada.scene;
 
 				dae.traverse( function ( child ) {
@@ -89,68 +109,22 @@
 
 				} );
 				
-				$( "#moveworm" ).click(function() {
-					if (moveWorm){
-						moveWorm = false;
-						$( "#moveworm" ).text("move worm");
-					} else {
-						moveWorm = true;
-						$( "#moveworm" ).text("stop moving worm");					
-					}
-				});
-
 				dae.scale.x = dae.scale.y = dae.scale.z = 0.026;
-				dae.position.x = 15;
-				dae.position.y = 8; 
-				dae.position.z = 9;
-				dae.rotation.set( -Math.PI * 0.5, 0, 0 );
+				
+                                dae.rotation.set( -Math.PI * 0.5, 0, 0 );
 				dae.updateMatrix();
 
-				init();
-				animate();
-
-			} );
+				// Add the COLLADA
+				scene.add( dae );
+				
+				if (colladaLoadIte == OW_NUM_OF_COLLADA_FILES - 1){
+					animate();
+				}
+				
+				colladaLoadIte++;
+			} 
 			
-				/*loader.load( '../../SkinningData/Dropbox/animation_wormMeshAndSkinningData_31S_0ite.dae', function ( collada ) {
-
-				dae = collada.scene;
-
-				dae.traverse( function ( child ) {
-
-					if ( child instanceof THREE.SkinnedMesh ) {
-
-						var animation = new THREE.Animation( child, child.geometry.animation );
-						animation.play();
-
-					}
-
-				} );
-
-				dae.scale.x = dae.scale.y = dae.scale.z = 0.002;
-				dae.updateMatrix();
-
-				init();
-				animate();
-
-			} );*/
-			
-			/*function readFile(file, ite) {
-				$.get(file, function(data) {  
-					var lines = data.split("\n");
-					$.each(lines, function(n, elem) {
-						var qvalues = elem.split(" ");
-						quaternionValues.push(qvalues[0]);
-						quaternionValues.push(qvalues[1]);
-						quaternionValues.push(qvalues[2]);
-						quaternionValues.push(qvalues[3]);
-					});
-					if (ite == OW_END_TIMESTEP){
-						console.log('All quaternion files loaded !');
-						filesLoaded = true;
-					}
-				});
-			}*/
-			
+		
 			function parseTransformationElem(n, elem) {
 				var qvalues = elem.split(" ");
 				if (qvalues.length >= 4){
@@ -223,13 +197,13 @@
 			}
 			
 			function readAllStreamedFiles() {
-				console.log('Start laoding files.');
+				console.log('Start loading files.');
 				for ( var i = OW_START_TIMESTEP; i <= OW_END_TIMESTEP; i += 1 ) {
 					var padi = padNumber(i, 4);
 					//readTransformationFile('../../SkinningData/Dropbox/quaternion_31S_' + padi + '.qua', i)
 					//readTransformationFile('../../SkinningData/Dropbox/matrix_31S_' + padi + '.mat', i)
+					//readTransformationFile('../../SkinningData/Dropbox/postprocessed/matrix_post_31S_' + padi + '.mat', i)
 					readTransformationFile('../../SkinningData/Dropbox/anchored2/matrix_anchored_31S_' + padi + '.mat', i)
-					//readTransformationFile('../../SkinningData/Dropbox/postprocessed2/matrix_post_31S_' + padi + '.mat', i)
 				}
 				readSkeletonFile('../../SkinningData/Dropbox/skeletonNodes.txt');
 			}
@@ -279,6 +253,16 @@
 				//var textLoad = '<div>' + 'Loading quaternions... ' + '</div>';
 				var textLoad = '<div>' + 'Loading transformation matrices... ' + '</div>';
 				document.getElementById('info2').innerHTML = textLoad;
+				
+				$( "#moveworm" ).click(function() {
+					if (moveWorm){
+						moveWorm = false;
+						$( "#moveworm" ).text("move worm");
+					} else {
+						moveWorm = true;
+						$( "#moveworm" ).text("stop moving worm");					
+					}
+				});
 			
 				// read skinning data
 				
@@ -335,10 +319,6 @@
 
 				var line = new THREE.Line( geometry, material, THREE.LinePieces );
 				scene.add( line );
-
-				// Add the COLLADA
-
-				scene.add( dae );
 
 				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.add( particleLight );
@@ -416,7 +396,7 @@
 				THREE.AnimationHandler.update( clock.getDelta() );
 				
 				if (filesLoaded){
-					timestep = Math.round(timestep + clock.getDelta() * 500000);
+					timestep = Math.round(timestep + clock.getDelta() * 250000);
 					if (timestep > OW_END_TIMESTEP){
 						timestep = timestep - (OW_END_TIMESTEP - OW_START_TIMESTEP);
 					}
@@ -424,7 +404,7 @@
 				}
 
 				renderer.render( scene, camera );
-				renderer.setTimestep(timestep);
+				//renderer.setTimestep(timestep);
 				
 				if (filesLoaded){
 				
