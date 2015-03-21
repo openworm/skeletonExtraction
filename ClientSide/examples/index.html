@@ -64,37 +64,28 @@
 			var filesLoaded = false;
 			var moveWorm = false;
 			
-			var OW_START_TIMESTEP = 67; //65
-			var OW_END_TIMESTEP = 6380; //6382
+			var OW_START_TIMESTEP = 65
+			var OW_END_TIMESTEP = 6382
 			var OW_NUM_NODES = 31;
 			
 			var timestep = OW_START_TIMESTEP;
 			
-			var OW_NUM_OF_COLLADA_FILES = 5;
-			
 			var colladaLoadIte = 0;
-			/*loader.load( '../../SkinningData/Dropbox/animation_wormMeshAndSkinningData_31S_0ite.dae', loadCollada);
-			loader.load( '../../SkinningData/Dropbox/animation_wormMeshAndSkinningData_31S_0ite.dae', loadCollada);
-			loader.load( '../../SkinningData/Dropbox/animation_wormMeshAndSkinningData_31S_0ite.dae', loadCollada);
-			loader.load( '../../SkinningData/Dropbox/animation_wormMeshAndSkinningData_31S_0ite.dae', loadCollada);
-			loader.load( '../../SkinningData/Dropbox/animation_wormMeshAndSkinningData_31S_0ite.dae', loadCollada);*/
-			
+		
 		
 			
 			for (var i=0; i < 97; i++){                            
-                                var loader = new THREE.ColladaLoader();
-                                loader.options.convertUpAxis = true;			
+                var loader = new THREE.ColladaLoader();
+                loader.options.convertUpAxis = true;			
 				var padi = padNumber(i, 1);
-				//loader.load( '../../SkinningData/Dropbox/wormMuscleCell_'+padi+'Collada_00000.dae', loadCollada);
-				//var url = '../../SkinningData/Dropbox/staticColladas/wormMuscleCell_'+padi+'Collada_00000.dae';
 								
 					if (i == 96){
-								// as a last model load cuticle
-								loader.load( '../../SkinningData/Dropbox/animatedColladas/cuticle_anim_oneGeo.dae', loadCollada);
+						// as a last model load cuticle
+						loader.load( '../../SkinningData/Dropbox/animatedColladas/cuticle_anim_oneGeo.dae', loadCollada);
 					} else {
-								var url = '../../SkinningData/Dropbox/animatedColladas/muscles/muscle_anim'+i+'.dae';
-                                console.log(url);
-                                loader.load(url , loadCollada);					
+						var url = '../../SkinningData/Dropbox/animatedColladas/muscles/muscle_anim'+i+'.dae';
+                        console.log(url);
+                        loader.load(url , loadCollada);					
 					}
 			}
 			
@@ -213,14 +204,8 @@
 				console.log('Start loading files.');
 				for ( var i = OW_START_TIMESTEP; i <= OW_END_TIMESTEP; i += 1 ) {
 					var padi = padNumber(i, 4);
-					//readTransformationFile('../../SkinningData/Dropbox/quaternion_31S_' + padi + '.qua', i)
-					//readTransformationFile('../../SkinningData/Dropbox/matrix_31S_' + padi + '.mat', i)
-					//readTransformationFile('../../SkinningData/Dropbox/postprocessed/matrix_post_31S_' + padi + '.mat', i)
-					//readTransformationFile('http://localhost:8383/openworm-example/res/postprocessed_400/matrix_post_31S_' + padi + '.mat', i)
-					//readTransformationFile('../../SkinningData/Dropbox/postprocessed_400/matrix_post_31S_' + padi + '.mat', i)
-					readTransformationFile('../../SkinningData/Dropbox/anchored2/matrix_anchored_31S_' + padi + '.mat', i)
+					readTransformationFile('../../SkinningData/Dropbox/anchored/matrix_anchored_31S_' + padi + '.mat', i)
 				}
-				//readSkeletonFile('http://localhost:8383/openworm-example/res/skeletonNodes/skeletonNodes.txt');
 				readSkeletonFile('../../SkinningData/Dropbox/skeletonNodes.txt');
 			}
 			
@@ -266,7 +251,6 @@
 
 			function init() {
 			
-				//var textLoad = '<div>' + 'Loading quaternions... ' + '</div>';
 				var textLoad = '<div>' + 'Loading transformation matrices... ' + '</div>';
 				document.getElementById('info2').innerHTML = textLoad;
 				
@@ -439,6 +423,10 @@
 						
 						var mNode = new THREE.Matrix4();
 						var nodeMatrix = new THREE.Matrix4();	
+						
+						// this code is for recursive multiplication of matrices in skeleton chain...
+						// if the original matrices are loaded, it has to be called
+						// if postprocessed, it is not needed
 						
 						/*if (m > 0){
 							 mNode.set(matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 0], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 1], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 2], matrixValues[timestep * OW_NUM_NODES * 16 + m * 16 + 3],

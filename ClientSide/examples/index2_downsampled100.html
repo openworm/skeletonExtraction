@@ -416,6 +416,7 @@
 					if (timestep > OW_END_TIMESTEP){
 						timestep = timestep - (OW_END_TIMESTEP - OW_START_TIMESTEP);
 					}
+					timestep = Math.round(timestep / 100) * 100; // downsample timestep
 					performPreprocessing(timestep);
 				}
 

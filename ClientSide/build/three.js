@@ -22213,20 +22213,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 						}
 					}
 					
-					/*
-					
-					var scalingf = 2 * (timestep / 1000);
-					
-					for (var m = 0; m < 31; m++){
-						for (var n = 0; n < 4; n++){
-							for (var k = 0; k < 4; k++){
-								newMatrix[m * 16 + n * 4 + k] = modelMatrix[n * 4 + k];
-								if (n == k && n < 3)
-									newMatrix[m * 16 + n * 4 + k] = newMatrix[m * 16 + n * 4 + k] * scalingf;	
-							}
-						}
-					}*/
-					
 					_gl.uniformMatrix4fv( p_uniforms.boneGlobalMatrices, false, newMatrix );
 					//_gl.uniformMatrix4fv( p_uniforms.boneGlobalMatrices, false, object.skeleton.boneMatrices );					
 
