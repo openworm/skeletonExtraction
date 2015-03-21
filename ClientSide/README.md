@@ -199,47 +199,48 @@ What changes have to be done in the tree.js
 
 ###HTML FILES:###
 
-webgl_loader_collada_openworm.html - first version of skinned cuticle
-webgl_loader_collada_openworm_anchored.html - the cuticle is anchored in the middle
-webgl_loader_collada_openworm_anchored2.html - the cuticle is anchored in 1/4 from the head
-webgl_loader_collada_openworm_changedInjection.html - tryouts to change tree.js injection of skinning matrices
-webgl_loader_collada_openworm_musclesanchored2.html - muscles anchored in 1/4 from head
-webgl_loader_collada_openworm_post.html - postprocessed rotations, with SLERP filtering radius 100
-webgl_loader_collada_openworm_post2.html - postprocessed rotations, with SLERP filtering radius 200
-webgl_loader_collada_openworm_postArmy.html - more anymated cuticles 
-webgl_loader_collada_openworm_reindexedColladas.html - muscles models with diffrent IDs in the geoemtry tag
-indexMihai.html - html from mihai, it can load static muscles
-index.html - animated cuticle and muscles, with rotatios anchored in the middle of the cuticle
-index2.html - animated cuticle and muscles, with rotatios anchored in 1/4 from the head
-index2_downsampled10.html - animated cuticle and muscles, with rotatios anchored in 1/4 from the head, downsampled, only every 10th rotation is used
-index2_downsampled25.html - animated cuticle and muscles, with rotatios anchored in 1/4 from the head, downsampled, only every 25th rotation is used
-index2_downsampled50.html - animated cuticle and muscles, with rotatios anchored in 1/4 from the head, downsampled, only every 50th rotation is used
+webgl_loader_collada_openworm.html - first version of skinned cuticle	
+webgl_loader_collada_openworm_anchored.html - the cuticle is anchored in the middle	
+webgl_loader_collada_openworm_anchored2.html - the cuticle is anchored in 1/4 from the head	
+webgl_loader_collada_openworm_changedInjection.html - tryouts to change tree.js injection of skinning matrices	
+webgl_loader_collada_openworm_musclesanchored2.html - muscles anchored in 1/4 from head	
+webgl_loader_collada_openworm_post.html - postprocessed rotations, with SLERP filtering radius 100	
+webgl_loader_collada_openworm_post2.html - postprocessed rotations, with SLERP filtering radius 200	
+webgl_loader_collada_openworm_postArmy.html - more anymated cuticles 	
+webgl_loader_collada_openworm_reindexedColladas.html - muscles models with diffrent IDs in the geoemtry tag	
+indexMihai.html - html from mihai, it can load static muscles	
+index.html - animated cuticle and muscles, with rotatios anchored in the middle of the cuticle	
+index2.html - animated cuticle and muscles, with rotatios anchored in 1/4 from the head	
+index2_downsampled10.html - animated cuticle and muscles, with rotatios anchored in 1/4 from the head, downsampled, only every 10th rotation is used	
+index2_downsampled25.html - animated cuticle and muscles, with rotatios anchored in 1/4 from the head, downsampled, only every 25th rotation is used	
+index2_downsampled50.html - animated cuticle and muscles, with rotatios anchored in 1/4 from the head, downsampled, only every 50th rotation is used	
 
 
 ###COLLADA FILES:###
 
-DropBox/animatedColladas/animation_wormMuscleCollada_00000.dae - animated muscles in one geometry with old skinning weights
-DropBox/animatedColladas/animation_wormMeshAndSkinningData_31S_0ite.dae - animated cuticle with all skinning weights
-(*) DropBox/animatedColladas/cuticle_anim_oneGeo.dae - animated cuticle in one collada geoemtry object
-DropBox/animatedColladas/muscles_anim_partialGeo.dae - all animated muscles in one collada file, each muscle in separate geoemtry object
-DropBox/animatedColladas/muscles_anim_oneGeo.dae - all animated muscles in one collada file, all muscles in one object
-DropBox/animatedColladas/eveything_anim_partialGeo.dae - animated cuticle and muscles. everything in separate geometry
-(*) DropBox/animatedColladas/muscles/* - animated muscles, one muscle per one colada file
+DropBox/animatedColladas/animation_wormMuscleCollada_00000.dae - animated muscles in one geometry with old skinning weights	
+DropBox/animatedColladas/animation_wormMeshAndSkinningData_31S_0ite.dae - animated cuticle with all skinning weights	
+(*) DropBox/animatedColladas/cuticle_anim_oneGeo.dae - animated cuticle in one collada geoemtry object	
+DropBox/animatedColladas/muscles_anim_partialGeo.dae - all animated muscles in one collada file, each muscle in separate geoemtry object	
+DropBox/animatedColladas/muscles_anim_oneGeo.dae - all animated muscles in one collada file, all muscles in one object	
+DropBox/animatedColladas/eveything_anim_partialGeo.dae - animated cuticle and muscles. everything in separate geometry	
+(*) DropBox/animatedColladas/muscles/* - animated muscles, one muscle per one colada file	
 
-DropBox/staticColladas/wormMuscleColladaMuscleCellsAll_00000.dae - static muscles in separate geometry
-DropBox/staticColladas/wormMuscleCollada_00000.dae - static muscles in one geometry
-DropBox/staticColladas/wormMeshAndSkinningData_31S_0ite.dae - static cuticle with old skinning weights
-DropBox/staticColladas/wormColladaCuticleAndAllMuscleCells_00000.dae - static cuticle and muscles with old skinning weights in separate geometry
+DropBox/staticColladas/wormMuscleColladaMuscleCellsAll_00000.dae - static muscles in separate geometry	
+DropBox/staticColladas/wormMuscleCollada_00000.dae - static muscles in one geometry	
+DropBox/staticColladas/wormMeshAndSkinningData_31S_0ite.dae - static cuticle with old skinning weights	
+DropBox/staticColladas/wormColladaCuticleAndAllMuscleCells_00000.dae - static cuticle and muscles with old skinning weights in separate geometry	
 
 
 ###TRANSFORMATION FILES:###
 
-DropBox/originalQuaternions - quaternions exported from skeleton differences
-DropBox/originalMatrices - matrices exported from skeleton differences
-DropBox/postprocessed - transformations are multiplied recursively in the skeleton chain
-DropBox/postprocessed_100 -  - postprocessed matrices that are filtered out and smoothed by SLERP interpolation with radius 100
-DropBox/postprocessed_400 -  - postprocessed matrices that are filtered out and smoothed by SLERP interpolation with radius 400
-DropBox/anchored - rotations anchored in the middle of the cuticle and postprocessed by SLERP radius od 100
-(*) DropBox/anchored2 - rotations anchored in 1/4 from head and postprocessed by SLERP radius od 100
+DropBox/originalQuaternions - quaternions exported from skeleton differences	
+DropBox/originalMatrices - matrices exported from skeleton differences	
+DropBox/postprocessed - transformations are multiplied recursively in the skeleton chain	
+DropBox/postprocessed_100 -  - postprocessed matrices that are filtered out and smoothed by SLERP interpolation with radius 100	
+DropBox/postprocessed_400 -  - postprocessed matrices that are filtered out and smoothed by SLERP interpolation with radius 400	
+DropBox/anchored - rotations anchored in the middle of the cuticle and postprocessed by SLERP radius od 100	
+(*) DropBox/anchored2 - rotations anchored in 1/4 from head and postprocessed by SLERP radius od 100	
+
 
 
