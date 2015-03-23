@@ -90,7 +90,7 @@ void computeGlobalTriangulationFromPoints(int numOfPoints,
 ```
 D_SCL_SECURE_NO_WARNINGS;_NLOG;_NMMGR;NOMINMAX;
 ```
-###HOW IT WORKS:###
+###HOW DOES IT WORK:###
 
 When a process wants to extract a skeleton from an input mesh, the process has to call the `"computeSkeleton"` method from `LBSE_lib`. Next, for extraction of skinning weights, the `GDSW_lib` has to be used.
 
@@ -101,3 +101,69 @@ When a process wants to extract a skeleton from an input mesh, the process has t
 - Jama - linear solver for TNT vectors and matrices
 - ViennaCL - linear solver with OpenCL support...the solver can be parallelized on the GPU
 - Fade2D - used for Delaunay triangulation
+
+
+###HOW TO POSTPROCESS QUATERNIONS, SMOOTH THEM AND ANCHOR THEM:###
+
+ int timeStep = OW_START_WORM_ITERATION, timeIncrease = 1;
+ //load skeleton
+ string file = config.projectDir + "Models\\OpenWorm\\Export\\export_" + OW_DATA_VERSION + "\\animation_" + std::to_string(OW_SKINNING_NUM_BONES) + "\\skeleton_" + std::to_string(OW_SKINNING_NUM_BONES) + "S_"+ g_core->exportWrapper.PadNumber(OW_BINDPOSE_TIMESTEP, 4) + ".skl";
+ ifstream ifs(file);
+ assert(ifs.good());
+ boost::archive::xml_iarchive ia(ifs);
+ ia >> BOOST_SERIALIZATION_NVP(g_core->openwormWrapper.bindPoseSkeletonNode);
+ assignFathersForSkeletonTree(&g_core->openwormWrapper.bindPoseSkeletonNode);
+ //load sdf 
+ string sdf_file_31_0 = config.projectDir + "Models\\OpenWorm\\Export\\export_" + OW_DATA_VERSION + "\\animation_"+ std::to_string(OW_SKINNING_NUM_BONES)+"\\SDF__31S_00000.sdf";
+ vector<float> sdf_loaded;
+ g_core->openwormWrapper.loadSDFFromFile(sdf_file_31_0, sdf_loaded);
+ //load quaternions
+ vector<vector<glm::quat> > source;
+ source.reserve(OW_MAX_WORM_ITERATIONS);
+ while (timeStep < OW_MAX_WORM_ITERATIONS) {
+	 //load skinning data
+	 string quaternionFile = config.projectDir + "Models\\OpenWorm\\Export\\export_" + OW_DATA_VERSION + "\\animation_"+ std::to_string(OW_SKINNING_NUM_BONES)+"_bindpose"+ std::to_string(OW_BINDPOSE_TIMESTEP) +"\\quaternion_" + std::to_string(OW_SKINNING_NUM_BONES) + "S_" + g_core->exportWrapper.PadNumber(timeStep, 4) + ".qua";
+	 ifstream isq(quaternionFile);
+	 assert(isq.good());
+	 source.push_back(vector<glm::quat>());
+	 g_core->openwormWrapper.ImportQuaternion(source.back(), isq);
+
+	 timeStep += timeIncrease;
+ }				 
+ //postprocess quaternions, smoth them with SLERP radius
+ SM::SmoothQuaternions(source, 130);
+ //output quaternions
+ timeStep = OW_START_WORM_ITERATION;
+ for (int i = 0; i < source.size(); i++) {
+	 //save quaternions to file
+	 string quaternionFile = config.projectDir + "Models\\OpenWorm\\Export\\export_" + OW_DATA_VERSION + "\\animation_"+ std::to_string(OW_SKINNING_NUM_BONES)+"_bindpose"+ std::to_string(OW_BINDPOSE_TIMESTEP) +"\\postprocessed\\quaternion_post_" + std::to_string(OW_SKINNING_NUM_BONES) + "S_" + g_core->exportWrapper.PadNumber(timeStep, 4) + ".qua";
+	 ofstream outputQ(quaternionFile);
+
+	 for (int q = 0; q < source[i].size(); q++) {
+		 glm::quat quat = source[i][q];
+		 outputQ << quat.w << " " << quat.x << " " << quat.y << " " << quat.z << std::endl;
+	 }
+	 //save matrix to file
+	 string matrixFile = config.projectDir + "Models\\OpenWorm\\Export\\export_" + OW_DATA_VERSION + "\\animation_"+ std::to_string(OW_SKINNING_NUM_BONES)+"_bindpose"+ std::to_string(OW_BINDPOSE_TIMESTEP) +"\\anchored2\\matrix_anchored_" + std::to_string(OW_SKINNING_NUM_BONES) + "S_" + g_core->exportWrapper.PadNumber(timeStep, 4) + ".mat";
+	 ofstream outputM(matrixFile);
+	 vector<glm::mat4> matrices;
+	 g_core->openwormWrapper.performSDFBasedTransformationsInSkeletonTree(&g_core->openwormWrapper.bindPoseSkeletonNode, &source[i], &matrices, sdf_loaded, 9.81, glm::vec3(0, 0, 1));
+	 // anchor middle node of the skeleton, translate all the other nodes
+	 g_core->openwormWrapper.anchorSkeletonDuringSkinning(&g_core->openwormWrapper.bindPoseSkeletonNode, &matrices, 22);
+
+	 for (int m = 0; m < matrices.size(); m++) {
+		 for (int j = 0; j < 4; j++) {
+			 for (int k = 0; k < 4; k++) {
+				 outputM << matrices[m][j][k] << " ";
+			 }
+			 outputM << std::endl;
+		 }
+		 outputM << std::endl;
+	 }
+
+	 timeStep += timeIncrease;
+ }
+
+
+
+

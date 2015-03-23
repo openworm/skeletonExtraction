@@ -22178,6 +22178,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 			} else if ( object.skeleton && object.skeleton.boneMatrices ) {
+			
+			// this is the most important part of the tree.js injection....
+			// the current skinning matrices are stored in currentMatrix
+			// next, skinning matrices are multiplies by modelview matrices from the renderer - stored in modelMatrix
+			// finally, matrices are set to webgl
 
 				if ( p_uniforms.boneGlobalMatrices !== null ) {
 				
