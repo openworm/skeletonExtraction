@@ -104,7 +104,7 @@ When a process wants to extract a skeleton from an input mesh, the process has t
 
 
 ###HOW TO POSTPROCESS QUATERNIONS, SMOOTH THEM AND ANCHOR THEM:###
-
+```
  int timeStep = OW_START_WORM_ITERATION, timeIncrease = 1;
  //load skeleton
  string file = config.projectDir + "Models\\OpenWorm\\Export\\export_" + OW_DATA_VERSION + "\\animation_" + std::to_string(OW_SKINNING_NUM_BONES) + "\\skeleton_" + std::to_string(OW_SKINNING_NUM_BONES) + "S_"+ g_core->exportWrapper.PadNumber(OW_BINDPOSE_TIMESTEP, 4) + ".skl";
@@ -163,7 +163,7 @@ When a process wants to extract a skeleton from an input mesh, the process has t
 
 	 timeStep += timeIncrease;
  }
-
+```
 
 
 
