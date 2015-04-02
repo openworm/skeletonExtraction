@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>three.js webgl - collada</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <style>
+            body {
+                font-family: Monospace;
+                background-color: #000000;
+                margin: 0px;
+                overflow: hidden;
+            }
+
+            #info {
+                color: #fff;
+                position: absolute;
+                top: 10px;
+                width: 100%;
+                text-align: center;
+                z-index: 100;
+                display:block;
+
+            }
+
+            a { color: skyblue }
+        </style>
+    </head>
+    <body>
+        <div id="info">
+            <a href="http://threejs.org" target="_blank">three.js</a> -
+            <a href="http://http://www.openworm.org/" target="_blank">OpenWorm</a> | 
+            <a href="javascript:" id="moveworm">move worm</a>| 
+            <a href="javascript:" id="nextframe">next animation frame</a>
+            <div id="info2">
+                Loading Collada model...
+            </div>
+        </div>
+
+        <script src="js/three.js"></script>
+        <script src="js/loaders/ColladaLoader.js"></script>
+        <script src="js/wormsim/Utils.js"></script>
+        <script src="js/wormsim/FileLoader.js"></script>
+        <script src="js/wormsim/Utils.js"></script>
+        <script src="js/wormsim/WormRender.js"></script>
+        <script src="js/wormsim/WormLoader.js"></script>
+
+        <script type="text/javascript" language="Javascript" 
+                src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js">
+        </script>
+        <script src="js/Detector.js"></script>
+        <script src="js/libs/stats.min.js"></script>
+        <script>
+                    if (!Detector.webgl)
+                        Detector.addGetWebGLMessage();                    
+
+                    var PATH_PREFIX = 'http://localhost:8383/';
+
+                    var didObjectOutput = false;
+                    var OW_START_TIMESTEP = 65;
+                    var OW_END_TIMESTEP = 900;
+                    var OW_NUM_NODES = 31;
+                    //var skeletonNodeValues;
+                    
+                    init();
+                    addEventListeners();
+                    loadAssets();
+
+                    function init() {     
+                        readAllStreamedFiles();
+                        initRendering();
+                    }
+                    
+                    function addEventListeners() {
+                        $("#moveworm").click(function () {
+                            if (moveWorm) {
+                                moveWorm = false;
+                                $("#moveworm").text("move worm");
+                            } else {
+                                moveWorm = true;
+                                $("#moveworm").text("stop moving worm");
+                            }
+                        });
+
+                        $("#nextframe").click(function () {
+                            timestep++;
+                            requestAnimationFrame(animate);
+                        });
+                    }
+
+
+        </script>
+    </body>
+</html>
