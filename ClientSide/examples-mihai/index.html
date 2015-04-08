@@ -37,13 +37,14 @@
             </div>
         </div>
 
-        <script src="js/three.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r71/three.min.js"></script>
         <script src="js/loaders/ColladaLoader.js"></script>
         <script src="js/wormsim/Utils.js"></script>
         <script src="js/wormsim/FileLoader.js"></script>
         <script src="js/wormsim/Utils.js"></script>
         <script src="js/wormsim/WormRender.js"></script>
         <script src="js/wormsim/WormLoader.js"></script>
+        <script src="js/wormsim/WormWebGLRenderer.js"></script>
 
         <script type="text/javascript" language="Javascript" 
                 src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js">
@@ -55,6 +56,9 @@
                         Detector.addGetWebGLMessage();                    
 
                     var PATH_PREFIX = 'http://localhost:8383/';
+
+                    var renderer = new THREE.WormWebGLRenderer();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
 
                     var didObjectOutput = false;
                     var OW_START_TIMESTEP = 65;

@@ -2,7 +2,7 @@
 
 var container, stats;
 
-var camera, scene, renderer, objects, controls;
+var camera, scene, objects, controls;
 var particleLight;
 
 // custom variables needed
@@ -57,8 +57,7 @@ function initRendering() {
     var pointLight = new THREE.PointLight(0xffffff, 4);
     particleLight.add(pointLight);
 
-    renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    
 
     container.appendChild(renderer.domElement);
 
@@ -97,7 +96,7 @@ function render() {
     if (filesLoaded) {
         checkTimestepOverflow();
         // here the current skinning matrices are set to renderer !!! this is themost important line
-        //renderer.setCurrentMatrix(getCurrentMatrix());
+        renderer.setCurrentMatrix(getCurrentMatrix());
         //hijackBoneMatrices();
     }
 
