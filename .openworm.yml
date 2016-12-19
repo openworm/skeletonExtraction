@@ -1,0 +1,20 @@
+repo: openworm/skeletonExtraction
+shortDescription: "Transforms Sibernetic output into a COLLADA animation"
+coordinator: matteo@openworm.org
+documentation: "https://github.com/openworm/skeletonExtraction/blob/master/README.md"
+gitter: "http://gitter.im/openworm/sibernetic"
+keywords: 
+  - simulation
+  - animation
+  - COLLADA
+  - worm body
+languages: 
+  - c++
+members: 
+  - gitmado
+inputs: 
+  - openworm/sibernetic
+outputs: 
+  - openworm/geppetto
+parent: 
+  - openworm/sibernetic
