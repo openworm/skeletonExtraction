@@ -1509,7 +1509,7 @@ int OpenCLManager::isExtensionSupported(const char* support_str, const char* ext
 				if( strncmp(support_str, ext_string + offset, space_pos) == 0 )
 					{
 						// Device supports requested extension!
-							printf("Info: Found extension support ‘%s’!\n", support_str);
+							printf("Info: Found extension support â€˜%sâ€™!\n", support_str);
 						return 1;
 						}
 				// Keep searching -- skip to next token string
@@ -1517,7 +1517,7 @@ int OpenCLManager::isExtensionSupported(const char* support_str, const char* ext
 				space_substr = strstr(ext_string + offset, " ");
 				space_pos = space_substr ? space_substr - ext_string : 0;
 				}
-		printf("Warning: Extension not supported ‘%s’!\n", support_str);
+		printf("Warning: Extension not supported â€˜%sâ€™!\n", support_str);
 		return 0;
 	}
 
