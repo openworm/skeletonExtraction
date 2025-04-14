@@ -55,7 +55,9 @@ namespace skl {
 			sId = "";
 		};
 		SkeletonNode(SN::SkeletonNode *node);
-		using SN::SkeletonNode::~SkeletonNode;
+		~SkeletonNode() {
+			SN::SkeletonNode::~SkeletonNode();
+		}
 
 	protected:
 		// When the class Archive corresponds to an output archive, the
